@@ -18842,6 +18842,15 @@ var _debois$elm_mdl$Material$Model = F8(
 		return {button: a, textfield: b, menu: c, snackbar: d, layout: e, toggles: f, tooltip: g, tabs: h};
 	});
 
+var _user$project$Main$tabTitles = {
+	ctor: '::',
+	_0: _elm_lang$html$Html$text('Login'),
+	_1: {
+		ctor: '::',
+		_0: _elm_lang$html$Html$text('Register'),
+		_1: {ctor: '[]'}
+	}
+};
 var _user$project$Main$model = {count: 0, mdl: _debois$elm_mdl$Material$model};
 var _user$project$Main$Model = F2(
 	function (a, b) {
@@ -18887,7 +18896,7 @@ var _user$project$Main$view = function (model) {
 		{
 			header: {
 				ctor: '::',
-				_0: _elm_lang$html$Html$text('header text'),
+				_0: _elm_lang$html$Html$text('LearnMath'),
 				_1: {ctor: '[]'}
 			},
 			drawer: {
@@ -18897,7 +18906,7 @@ var _user$project$Main$view = function (model) {
 			},
 			tabs: {
 				ctor: '_Tuple2',
-				_0: {ctor: '[]'},
+				_0: _user$project$Main$tabTitles,
 				_1: {ctor: '[]'}
 			},
 			main: {

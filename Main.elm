@@ -68,15 +68,23 @@ type alias Mdl =
     Material.Model
 
 
+tabTitles =
+    [ text "Login"
+    , text "Register"
+    ]
+
+
 view : Model -> Html Msg
 view model =
     Layout.render Mdl
         model.mdl
         [ Layout.fixedHeader
         ]
-        { header = [ text "header text" ]
+        { header =
+            [ text "LearnMath"
+            ]
         , drawer = [ text "drawer text" ]
-        , tabs = ( [], [] )
+        , tabs = ( tabTitles, [] )
         , main = [ text "main text" ]
         }
 
