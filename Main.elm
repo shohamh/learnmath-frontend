@@ -13,6 +13,7 @@ import Material.Options as Options exposing (css)
 
 type alias Model =
     { count : Int
+    , selectedTab : Int
     , mdl :
         Material.Model
         -- Boilerplate: model store for any and all Mdl components you use.
@@ -22,6 +23,7 @@ type alias Model =
 model : Model
 model =
     { count = 0
+    , selectedTab = 0
     , mdl =
         Material.model
         -- Boilerplate: Always use this initial Mdl model store.
@@ -35,6 +37,7 @@ model =
 type Msg
     = Increase
     | Reset
+    | SelectTab Int
     | Mdl (Material.Msg Msg)
 
 
@@ -54,6 +57,9 @@ update msg model =
             ( { model | count = 0 }
             , Cmd.none
             )
+
+        SelectTab num ->
+            { model | selectedTab = num } ! []
 
         -- Boilerplate: Mdl action handler.
         Mdl msg_ ->
@@ -79,14 +85,29 @@ view model =
     Layout.render Mdl
         model.mdl
         [ Layout.fixedHeader
+        , Layout.onSelectTab SelectTab
+        , Layout.selectedTab model.selectedTab
         ]
         { header =
             [ text "LearnMath"
             ]
         , drawer = [ text "drawer text" ]
         , tabs = ( tabTitles, [] )
-        , main = [ text "main text" ]
+        , main = [ viewBody model ]
         }
+
+
+viewBody : Model -> Html Msg
+viewBody model =
+    case model.selectedTab of
+        0 ->
+            text "register"
+
+        1 ->
+            text "login"
+
+        _ ->
+            text "404"
 
 
 

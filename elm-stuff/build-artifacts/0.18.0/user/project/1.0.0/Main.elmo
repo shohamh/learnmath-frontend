@@ -1,3 +1,14 @@
+var _user$project$Main$viewBody = function (model) {
+	var _p0 = model.selectedTab;
+	switch (_p0) {
+		case 0:
+			return _elm_lang$html$Html$text('register');
+		case 1:
+			return _elm_lang$html$Html$text('login');
+		default:
+			return _elm_lang$html$Html$text('404');
+	}
+};
 var _user$project$Main$tabTitles = {
 	ctor: '::',
 	_0: _elm_lang$html$Html$text('Login'),
@@ -7,18 +18,18 @@ var _user$project$Main$tabTitles = {
 		_1: {ctor: '[]'}
 	}
 };
-var _user$project$Main$model = {count: 0, mdl: _debois$elm_mdl$Material$model};
-var _user$project$Main$Model = F2(
-	function (a, b) {
-		return {count: a, mdl: b};
+var _user$project$Main$model = {count: 0, selectedTab: 0, mdl: _debois$elm_mdl$Material$model};
+var _user$project$Main$Model = F3(
+	function (a, b, c) {
+		return {count: a, selectedTab: b, mdl: c};
 	});
 var _user$project$Main$Mdl = function (a) {
 	return {ctor: 'Mdl', _0: a};
 };
 var _user$project$Main$update = F2(
 	function (msg, model) {
-		var _p0 = msg;
-		switch (_p0.ctor) {
+		var _p1 = msg;
+		switch (_p1.ctor) {
 			case 'Increase':
 				return {
 					ctor: '_Tuple2',
@@ -35,10 +46,20 @@ var _user$project$Main$update = F2(
 						{count: 0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
+			case 'SelectTab':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{selectedTab: _p1._0}),
+					{ctor: '[]'});
 			default:
-				return A3(_debois$elm_mdl$Material$update, _user$project$Main$Mdl, _p0._0, model);
+				return A3(_debois$elm_mdl$Material$update, _user$project$Main$Mdl, _p1._0, model);
 		}
 	});
+var _user$project$Main$SelectTab = function (a) {
+	return {ctor: 'SelectTab', _0: a};
+};
 var _user$project$Main$view = function (model) {
 	return A4(
 		_debois$elm_mdl$Material_Layout$render,
@@ -47,7 +68,15 @@ var _user$project$Main$view = function (model) {
 		{
 			ctor: '::',
 			_0: _debois$elm_mdl$Material_Layout$fixedHeader,
-			_1: {ctor: '[]'}
+			_1: {
+				ctor: '::',
+				_0: _debois$elm_mdl$Material_Layout$onSelectTab(_user$project$Main$SelectTab),
+				_1: {
+					ctor: '::',
+					_0: _debois$elm_mdl$Material_Layout$selectedTab(model.selectedTab),
+					_1: {ctor: '[]'}
+				}
+			}
 		},
 		{
 			header: {
@@ -67,7 +96,7 @@ var _user$project$Main$view = function (model) {
 			},
 			main: {
 				ctor: '::',
-				_0: _elm_lang$html$Html$text('main text'),
+				_0: _user$project$Main$viewBody(model),
 				_1: {ctor: '[]'}
 			}
 		});
@@ -84,13 +113,13 @@ var _user$project$Main$main = _elm_lang$html$Html$program(
 			_1: _debois$elm_mdl$Material_Layout$sub0(_user$project$Main$Mdl)
 		},
 		view: _user$project$Main$view,
-		subscriptions: function (_p1) {
+		subscriptions: function (_p2) {
 			return A2(
 				_debois$elm_mdl$Material_Layout$subs,
 				_user$project$Main$Mdl,
 				function (_) {
 					return _.mdl;
-				}(_p1));
+				}(_p2));
 		},
 		update: _user$project$Main$update
 	})();
