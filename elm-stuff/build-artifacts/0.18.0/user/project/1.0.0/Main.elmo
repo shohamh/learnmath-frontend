@@ -1,62 +1,336 @@
-var _user$project$Main$viewBody = function (model) {
-	var _p0 = model.selectedTab;
-	switch (_p0) {
-		case 0:
-			return _elm_lang$html$Html$text('register');
-		case 1:
-			return _elm_lang$html$Html$text('login');
-		default:
-			return _elm_lang$html$Html$text('404');
-	}
-};
 var _user$project$Main$tabTitles = {
 	ctor: '::',
-	_0: _elm_lang$html$Html$text('Login'),
+	_0: _elm_lang$html$Html$text('Register'),
 	_1: {
 		ctor: '::',
-		_0: _elm_lang$html$Html$text('Register'),
+		_0: _elm_lang$html$Html$text('Login'),
 		_1: {ctor: '[]'}
 	}
 };
-var _user$project$Main$model = {count: 0, selectedTab: 0, mdl: _debois$elm_mdl$Material$model};
-var _user$project$Main$Model = F3(
-	function (a, b, c) {
-		return {count: a, selectedTab: b, mdl: c};
+var _user$project$Main$model = {count: 0, selectedTab: 0, register_password: '', register_passwordAgain: '', mdl: _debois$elm_mdl$Material$model};
+var _user$project$Main$Model = F5(
+	function (a, b, c, d, e) {
+		return {count: a, selectedTab: b, register_password: c, register_passwordAgain: d, mdl: e};
 	});
 var _user$project$Main$Mdl = function (a) {
 	return {ctor: 'Mdl', _0: a};
 };
 var _user$project$Main$update = F2(
 	function (msg, model) {
-		var _p1 = msg;
-		switch (_p1.ctor) {
-			case 'Increase':
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{count: model.count + 1}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-			case 'Reset':
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{count: 0}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
+		var _p0 = msg;
+		switch (_p0.ctor) {
 			case 'SelectTab':
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{selectedTab: _p1._0}),
+						{selectedTab: _p0._0}),
+					{ctor: '[]'});
+			case 'Update_register_password':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{register_password: _p0._0}),
+					{ctor: '[]'});
+			case 'Update_register_passwordAgain':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{register_passwordAgain: _p0._0}),
+					{ctor: '[]'});
+			case 'SubmitRegisterForm':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					model,
+					{ctor: '[]'});
+			case 'SubmitLoginForm':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					model,
 					{ctor: '[]'});
 			default:
-				return A3(_debois$elm_mdl$Material$update, _user$project$Main$Mdl, _p1._0, model);
+				return A3(_debois$elm_mdl$Material$update, _user$project$Main$Mdl, _p0._0, model);
 		}
 	});
+var _user$project$Main$SubmitLoginForm = {ctor: 'SubmitLoginForm'};
+var _user$project$Main$loginForm = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: A5(
+				_debois$elm_mdl$Material_Textfield$render,
+				_user$project$Main$Mdl,
+				{
+					ctor: '::',
+					_0: 0,
+					_1: {ctor: '[]'}
+				},
+				model.mdl,
+				{
+					ctor: '::',
+					_0: _debois$elm_mdl$Material_Textfield$label('Username'),
+					_1: {
+						ctor: '::',
+						_0: _debois$elm_mdl$Material_Textfield$floatingLabel,
+						_1: {
+							ctor: '::',
+							_0: _debois$elm_mdl$Material_Textfield$text_,
+							_1: {ctor: '[]'}
+						}
+					}
+				},
+				{ctor: '[]'}),
+			_1: {
+				ctor: '::',
+				_0: A5(
+					_debois$elm_mdl$Material_Textfield$render,
+					_user$project$Main$Mdl,
+					{
+						ctor: '::',
+						_0: 1,
+						_1: {ctor: '[]'}
+					},
+					model.mdl,
+					{
+						ctor: '::',
+						_0: _debois$elm_mdl$Material_Textfield$label('Password'),
+						_1: {
+							ctor: '::',
+							_0: _debois$elm_mdl$Material_Textfield$floatingLabel,
+							_1: {
+								ctor: '::',
+								_0: _debois$elm_mdl$Material_Textfield$password,
+								_1: {ctor: '[]'}
+							}
+						}
+					},
+					{ctor: '[]'}),
+				_1: {
+					ctor: '::',
+					_0: A5(
+						_debois$elm_mdl$Material_Button$render,
+						_user$project$Main$Mdl,
+						{
+							ctor: '::',
+							_0: 2,
+							_1: {ctor: '[]'}
+						},
+						model.mdl,
+						{
+							ctor: '::',
+							_0: _debois$elm_mdl$Material_Button$raised,
+							_1: {
+								ctor: '::',
+								_0: _debois$elm_mdl$Material_Button$colored,
+								_1: {
+									ctor: '::',
+									_0: _debois$elm_mdl$Material_Button$ripple,
+									_1: {
+										ctor: '::',
+										_0: _debois$elm_mdl$Material_Options$onClick(_user$project$Main$SubmitLoginForm),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('Login'),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
+			}
+		});
+};
+var _user$project$Main$SubmitRegisterForm = {ctor: 'SubmitRegisterForm'};
+var _user$project$Main$Update_register_passwordAgain = function (a) {
+	return {ctor: 'Update_register_passwordAgain', _0: a};
+};
+var _user$project$Main$Update_register_password = function (a) {
+	return {ctor: 'Update_register_password', _0: a};
+};
+var _user$project$Main$registerForm = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: A5(
+				_debois$elm_mdl$Material_Textfield$render,
+				_user$project$Main$Mdl,
+				{
+					ctor: '::',
+					_0: 0,
+					_1: {ctor: '[]'}
+				},
+				model.mdl,
+				{
+					ctor: '::',
+					_0: _debois$elm_mdl$Material_Textfield$label('Username'),
+					_1: {
+						ctor: '::',
+						_0: _debois$elm_mdl$Material_Textfield$floatingLabel,
+						_1: {
+							ctor: '::',
+							_0: _debois$elm_mdl$Material_Textfield$text_,
+							_1: {ctor: '[]'}
+						}
+					}
+				},
+				{ctor: '[]'}),
+			_1: {
+				ctor: '::',
+				_0: A5(
+					_debois$elm_mdl$Material_Textfield$render,
+					_user$project$Main$Mdl,
+					{
+						ctor: '::',
+						_0: 1,
+						_1: {ctor: '[]'}
+					},
+					model.mdl,
+					{
+						ctor: '::',
+						_0: _debois$elm_mdl$Material_Textfield$label('Password'),
+						_1: {
+							ctor: '::',
+							_0: _debois$elm_mdl$Material_Textfield$floatingLabel,
+							_1: {
+								ctor: '::',
+								_0: _debois$elm_mdl$Material_Textfield$password,
+								_1: {
+									ctor: '::',
+									_0: _debois$elm_mdl$Material_Options$onInput(_user$project$Main$Update_register_password),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_debois$elm_mdl$Material_Options$when,
+											!_elm_lang$core$Native_Utils.eq(model.register_password, model.register_passwordAgain),
+											_debois$elm_mdl$Material_Textfield$error('Passwords don\'t match.')),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
+					},
+					{ctor: '[]'}),
+				_1: {
+					ctor: '::',
+					_0: A5(
+						_debois$elm_mdl$Material_Textfield$render,
+						_user$project$Main$Mdl,
+						{
+							ctor: '::',
+							_0: 2,
+							_1: {ctor: '[]'}
+						},
+						model.mdl,
+						{
+							ctor: '::',
+							_0: _debois$elm_mdl$Material_Textfield$label('Confirm password'),
+							_1: {
+								ctor: '::',
+								_0: _debois$elm_mdl$Material_Textfield$floatingLabel,
+								_1: {
+									ctor: '::',
+									_0: _debois$elm_mdl$Material_Textfield$password,
+									_1: {
+										ctor: '::',
+										_0: _debois$elm_mdl$Material_Options$onInput(_user$project$Main$Update_register_passwordAgain),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_debois$elm_mdl$Material_Options$when,
+												!_elm_lang$core$Native_Utils.eq(model.register_password, model.register_passwordAgain),
+												_debois$elm_mdl$Material_Textfield$error('Passwords don\'t match.')),
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {
+						ctor: '::',
+						_0: A5(
+							_debois$elm_mdl$Material_Textfield$render,
+							_user$project$Main$Mdl,
+							{
+								ctor: '::',
+								_0: 3,
+								_1: {ctor: '[]'}
+							},
+							model.mdl,
+							{
+								ctor: '::',
+								_0: _debois$elm_mdl$Material_Textfield$label('Email'),
+								_1: {
+									ctor: '::',
+									_0: _debois$elm_mdl$Material_Textfield$floatingLabel,
+									_1: {
+										ctor: '::',
+										_0: _debois$elm_mdl$Material_Textfield$email,
+										_1: {ctor: '[]'}
+									}
+								}
+							},
+							{ctor: '[]'}),
+						_1: {
+							ctor: '::',
+							_0: A5(
+								_debois$elm_mdl$Material_Button$render,
+								_user$project$Main$Mdl,
+								{
+									ctor: '::',
+									_0: 4,
+									_1: {ctor: '[]'}
+								},
+								model.mdl,
+								{
+									ctor: '::',
+									_0: _debois$elm_mdl$Material_Button$raised,
+									_1: {
+										ctor: '::',
+										_0: _debois$elm_mdl$Material_Button$colored,
+										_1: {
+											ctor: '::',
+											_0: _debois$elm_mdl$Material_Button$ripple,
+											_1: {
+												ctor: '::',
+												_0: _debois$elm_mdl$Material_Options$onClick(_user$project$Main$SubmitRegisterForm),
+												_1: {ctor: '[]'}
+											}
+										}
+									}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Register'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			}
+		});
+};
+var _user$project$Main$viewBody = function (model) {
+	var _p1 = model.selectedTab;
+	switch (_p1) {
+		case 0:
+			return _user$project$Main$registerForm(model);
+		case 1:
+			return _user$project$Main$loginForm(model);
+		default:
+			return _elm_lang$html$Html$text('404');
+	}
+};
 var _user$project$Main$SelectTab = function (a) {
 	return {ctor: 'SelectTab', _0: a};
 };
@@ -123,5 +397,3 @@ var _user$project$Main$main = _elm_lang$html$Html$program(
 		},
 		update: _user$project$Main$update
 	})();
-var _user$project$Main$Reset = {ctor: 'Reset'};
-var _user$project$Main$Increase = {ctor: 'Increase'};

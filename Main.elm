@@ -4,8 +4,9 @@ import Html exposing (..)
 import Html.Attributes exposing (href, class, style)
 import Material
 import Material.Layout as Layout
-import Material.Button as Button
-import Material.Options as Options exposing (css)
+import Material.Button as Button exposing (..)
+import Material.Options as Options exposing (css, when, onClick, onInput)
+import Material.Textfield as Textfield
 
 
 -- MODEL
@@ -14,6 +15,8 @@ import Material.Options as Options exposing (css)
 type alias Model =
     { count : Int
     , selectedTab : Int
+    , register_password : String
+    , register_passwordAgain : String
     , mdl :
         Material.Model
         -- Boilerplate: model store for any and all Mdl components you use.
@@ -24,6 +27,8 @@ model : Model
 model =
     { count = 0
     , selectedTab = 0
+    , register_password = ""
+    , register_passwordAgain = ""
     , mdl =
         Material.model
         -- Boilerplate: Always use this initial Mdl model store.
@@ -35,9 +40,11 @@ model =
 
 
 type Msg
-    = Increase
-    | Reset
-    | SelectTab Int
+    = SelectTab Int
+    | Update_register_password String
+    | Update_register_passwordAgain String
+    | SubmitRegisterForm
+    | SubmitLoginForm
     | Mdl (Material.Msg Msg)
 
 
@@ -48,18 +55,20 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Increase ->
-            ( { model | count = model.count + 1 }
-            , Cmd.none
-            )
-
-        Reset ->
-            ( { model | count = 0 }
-            , Cmd.none
-            )
-
         SelectTab num ->
             { model | selectedTab = num } ! []
+
+        Update_register_password str ->
+            { model | register_password = str } ! []
+
+        Update_register_passwordAgain str ->
+            { model | register_passwordAgain = str } ! []
+
+        SubmitRegisterForm ->
+            model ! []
+
+        SubmitLoginForm ->
+            model ! []
 
         -- Boilerplate: Mdl action handler.
         Mdl msg_ ->
@@ -75,8 +84,8 @@ type alias Mdl =
 
 
 tabTitles =
-    [ text "Login"
-    , text "Register"
+    [ text "Register"
+    , text "Login"
     ]
 
 
@@ -101,13 +110,95 @@ viewBody : Model -> Html Msg
 viewBody model =
     case model.selectedTab of
         0 ->
-            text "register"
+            registerForm model
 
         1 ->
-            text "login"
+            loginForm model
 
         _ ->
             text "404"
+
+
+registerForm : Model -> Html Msg
+registerForm model =
+    div []
+        [ Textfield.render Mdl
+            [ 0 ]
+            model.mdl
+            [ Textfield.label "Username"
+            , Textfield.floatingLabel
+            , Textfield.text_
+            ]
+            []
+        , Textfield.render Mdl
+            [ 1 ]
+            model.mdl
+            [ Textfield.label "Password"
+            , Textfield.floatingLabel
+            , Textfield.password
+            , Options.onInput Update_register_password
+            , Textfield.error ("Passwords don't match.") |> Options.when (model.register_password /= model.register_passwordAgain)
+            ]
+            []
+        , Textfield.render Mdl
+            [ 2 ]
+            model.mdl
+            [ Textfield.label "Confirm password"
+            , Textfield.floatingLabel
+            , Textfield.password
+            , Options.onInput Update_register_passwordAgain
+            , Textfield.error ("Passwords don't match.") |> Options.when (model.register_password /= model.register_passwordAgain)
+            ]
+            []
+        , Textfield.render Mdl
+            [ 3 ]
+            model.mdl
+            [ Textfield.label "Email"
+            , Textfield.floatingLabel
+            , Textfield.email
+            ]
+            []
+        , Button.render Mdl
+            [ 4 ]
+            model.mdl
+            [ Button.raised
+            , Button.colored
+            , Button.ripple
+            , Options.onClick SubmitRegisterForm
+            ]
+            [ text "Register" ]
+        ]
+
+
+loginForm : Model -> Html Msg
+loginForm model =
+    div []
+        [ Textfield.render Mdl
+            [ 0 ]
+            model.mdl
+            [ Textfield.label "Username"
+            , Textfield.floatingLabel
+            , Textfield.text_
+            ]
+            []
+        , Textfield.render Mdl
+            [ 1 ]
+            model.mdl
+            [ Textfield.label "Password"
+            , Textfield.floatingLabel
+            , Textfield.password
+            ]
+            []
+        , Button.render Mdl
+            [ 2 ]
+            model.mdl
+            [ Button.raised
+            , Button.colored
+            , Button.ripple
+            , Options.onClick SubmitLoginForm
+            ]
+            [ text "Login" ]
+        ]
 
 
 
