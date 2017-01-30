@@ -7,6 +7,8 @@ import Material.Layout as Layout
 import Material.Button as Button exposing (..)
 import Material.Options as Options exposing (css, when, onClick, onInput)
 import Material.Textfield as Textfield
+import Json.Decode
+import Json.Encode
 
 
 -- MODEL
@@ -65,14 +67,73 @@ update msg model =
             { model | register_passwordAgain = str } ! []
 
         SubmitRegisterForm ->
+            model
+                ! [ sendRegister
+                        { username = model.register_username
+                        , password = model.register_password
+                        , email = model.register_email
+                        }
+                  ]
+
+        RegistrationResult (Ok successMessage) ->
+            { model | registration_result = successMessage } ! []
+
+        RegistrationResult (Err _) ->
             model ! []
 
         SubmitLoginForm ->
             model ! []
 
+        LoginResult (Ok successMessage) ->
+            { model | login_result = successMessage } ! []
+
+        LoginResult (Err _) ->
+            model ! []
+
         -- Boilerplate: Mdl action handler.
         Mdl msg_ ->
             Material.update Mdl msg_ model
+
+
+type alias RegisterData =
+    { username : String
+    , password : String
+    , email : String
+    }
+
+
+sendRegister : RegisterData -> Cmd Msg
+sendRegister registerData =
+    let
+        url =
+            "http://learnmath.pythonanywhere.com/register"
+                jsonBody
+                Json.Encode.object
+                [ ( "username", Json.Encode.string registerData.username )
+                , ( "password", Json.Encode.string registerData.password )
+                , ( "email", Json.Encode.string registerData.email )
+                ]
+
+        request =
+            Http.post url decodeRegisterResult
+    in
+        Http.send RegistrationResult request
+
+
+type alias JsonResult =
+    { success : Bool
+    , errorMessage : String
+    }
+
+
+decodeRegisterResult : Json.Decoder JsonResult
+decodeRegisterResult =
+    map2 JsonResult
+        (Json.Decode.field "success" Bool)
+        (Json.Decode.field
+            "error_message"
+            String
+        )
 
 
 
