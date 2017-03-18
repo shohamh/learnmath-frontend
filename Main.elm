@@ -10,32 +10,35 @@ import Material.Options as Options exposing (css, when, onClick, onInput)
 import Material.Textfield as Textfield
 import Json.Decode
 import Json.Encode
+import Forms.Register
+import Forms.Login
 
 
 -- MODEL
 
 
 type alias Model =
-  { count : Int
-  , selectedTab : Int
-  , register_password : String
-  , register_passwordAgain : String
-  , mdl :
-      Material.Model
-      -- Boilerplate: model store for any and all Mdl components you use.
-  }
+    { count : Int
+    , selectedTab : Int
+    , registerForm : Forms.Register.Model
+    , loginForm : Forms.Login.Model
+    , mdl :
+        Material.Model
+        -- Boilerplate: model store for any and all Mdl components you use.
+    }
 
 
 model : Model
 model =
-  { count = 0
-  , selectedTab = 0
-  , register_password = ""
-  , register_passwordAgain = ""
-  , mdl =
-      Material.Model
-      -- Boilerplate: Always use this initial Mdl model store.
-  }
+    { count = 0
+    , selectedTab = 0
+    , registerForm = Forms.Register.model
+    , loginForm = Forms.Login.model
+    , mdl =
+        Material.model
+        -- Boilerplate: Always use this initial Mdl model store.
+    }
+
 
 
 -- ACTION, UPDATE
@@ -43,8 +46,8 @@ model =
 
 type Msg
     = SelectTab Int
-    | Forms.Register.Msg
-    | Forms.Login.Msg
+    | RegisterFormHandler Forms.Register.Msg
+    | LoginFormHandler Forms.Login.Msg
     | Mdl (Material.Msg Msg)
 
 
@@ -54,21 +57,32 @@ update msg model =
         SelectTab num ->
             { model | selectedTab = num } ! []
 
-        RegistrationResult (Ok successMessage) ->
-            { model | registration_result = successMessage } ! []
+        RegisterFormHandler msg ->
+            let
+                ( newmodel, cmd ) =
+                    Forms.Register.update msg model.registerForm
+            in
+                ( { model
+                    | registerForm = newmodel
+                  }
+                , Cmd.map RegisterFormHandler cmd
+                )
 
-        RegistrationResult (Err _) ->
-            model ! []
-
-        LoginResult (Ok successMessage) ->
-            { model | login_result = successMessage } ! []
-
-        LoginResult (Err _) ->
-            model ! []
+        LoginFormHandler msg ->
+            let
+                ( newmodel, cmd ) =
+                    Forms.Login.update msg model.loginForm
+            in
+                ( { model
+                    | loginForm = newmodel
+                  }
+                , Cmd.map LoginFormHandler cmd
+                )
 
         -- Boilerplate: Mdl action handler.
         Mdl msg_ ->
             Material.update Mdl msg_ model
+
 
 
 -- VIEW
@@ -105,10 +119,16 @@ viewBody : Model -> Html Msg
 viewBody model =
     case model.selectedTab of
         0 ->
-            registerForm model
+            Html.map RegisterFormHandler
+                (Forms.Register.viewForm
+                    model.registerForm
+                )
 
         1 ->
-            loginForm model
+            Html.map LoginFormHandler
+                (Forms.Login.viewForm
+                    model.loginForm
+                )
 
         _ ->
             text "404"
