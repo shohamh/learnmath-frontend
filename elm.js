@@ -15394,6 +15394,20 @@ var _user$project$Forms_Login$update = F2(
 		switch (_p0.ctor) {
 			case 'Mdl':
 				return A3(_debois$elm_mdl$Material$update, _user$project$Forms_Login$Mdl, _p0._0, model);
+			case 'UpdateUsername':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{username: _p0._0}),
+					{ctor: '[]'});
+			case 'UpdatePassword':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{password: _p0._0}),
+					{ctor: '[]'});
 			case 'Submit':
 				var requestData = _user$project$Forms_Login$requestModel(model);
 				return A2(
@@ -15419,6 +15433,12 @@ var _user$project$Forms_Login$update = F2(
 		}
 	});
 var _user$project$Forms_Login$Submit = {ctor: 'Submit'};
+var _user$project$Forms_Login$UpdatePassword = function (a) {
+	return {ctor: 'UpdatePassword', _0: a};
+};
+var _user$project$Forms_Login$UpdateUsername = function (a) {
+	return {ctor: 'UpdateUsername', _0: a};
+};
 var _user$project$Forms_Login$viewForm = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
@@ -15443,7 +15463,11 @@ var _user$project$Forms_Login$viewForm = function (model) {
 						_1: {
 							ctor: '::',
 							_0: _debois$elm_mdl$Material_Textfield$text_,
-							_1: {ctor: '[]'}
+							_1: {
+								ctor: '::',
+								_0: _debois$elm_mdl$Material_Options$onInput(_user$project$Forms_Login$UpdateUsername),
+								_1: {ctor: '[]'}
+							}
 						}
 					}
 				},
@@ -15468,7 +15492,11 @@ var _user$project$Forms_Login$viewForm = function (model) {
 							_1: {
 								ctor: '::',
 								_0: _debois$elm_mdl$Material_Textfield$password,
-								_1: {ctor: '[]'}
+								_1: {
+									ctor: '::',
+									_0: _debois$elm_mdl$Material_Options$onInput(_user$project$Forms_Login$UpdatePassword),
+									_1: {ctor: '[]'}
+								}
 							}
 						}
 					},
@@ -15562,7 +15590,7 @@ var _user$project$Forms_Register$requestModel = function (model) {
 };
 var _user$project$Forms_Register$ResponseData = F2(
 	function (a, b) {
-		return {success: a, error_messages: b};
+		return {success: a, errorMessages: b};
 	});
 var _user$project$Forms_Register$responseDecoder = A3(
 	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
@@ -15592,6 +15620,13 @@ var _user$project$Forms_Register$update = F2(
 		switch (_p0.ctor) {
 			case 'Mdl':
 				return A3(_debois$elm_mdl$Material$update, _user$project$Forms_Register$Mdl, _p0._0, model);
+			case 'UpdateUsername':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{username: _p0._0}),
+					{ctor: '[]'});
 			case 'UpdatePassword':
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
@@ -15606,6 +15641,13 @@ var _user$project$Forms_Register$update = F2(
 						model,
 						{passwordAgain: _p0._0}),
 					{ctor: '[]'});
+			case 'UpdateEmail':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{email: _p0._0}),
+					{ctor: '[]'});
 			case 'Submit':
 				var requestData = _user$project$Forms_Register$requestModel(model);
 				return A2(
@@ -15618,24 +15660,72 @@ var _user$project$Forms_Register$update = F2(
 					});
 			default:
 				if (_p0._0.ctor === 'Ok') {
+					var _p2 = _p0._0._0;
 					return A2(
 						_elm_lang$core$Platform_Cmd_ops['!'],
-						model,
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								successMessage: function () {
+									var _p1 = _p2.success;
+									if (_p1 === true) {
+										return 'Registration was successful.';
+									} else {
+										return 'Registration failed.';
+									}
+								}(),
+								errorMessages: _p2.errorMessages
+							}),
 						{ctor: '[]'});
 				} else {
+					var errorMessage = function () {
+						var _p3 = _p0._0._0;
+						switch (_p3.ctor) {
+							case 'BadUrl':
+								return A2(_elm_lang$core$Basics_ops['++'], 'Bad url: ', _p3._0);
+							case 'Timeout':
+								return 'Request timed out.';
+							case 'NetworkError':
+								return 'Network error (no connectivity on your side).';
+							case 'BadStatus':
+								return A2(
+									_elm_lang$core$Basics_ops['++'],
+									'Bad status code returned: ',
+									_elm_lang$core$Basics$toString(_p3._0.status.code));
+							default:
+								return A2(_elm_lang$core$Basics_ops['++'], 'JSON decoding of response failed: ', _p3._0);
+						}
+					}();
 					return A2(
 						_elm_lang$core$Platform_Cmd_ops['!'],
-						model,
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								errorMessages: A2(
+									_elm_lang$core$List$append,
+									model.errorMessages,
+									{
+										ctor: '::',
+										_0: errorMessage,
+										_1: {ctor: '[]'}
+									})
+							}),
 						{ctor: '[]'});
 				}
 		}
 	});
 var _user$project$Forms_Register$Submit = {ctor: 'Submit'};
+var _user$project$Forms_Register$UpdateEmail = function (a) {
+	return {ctor: 'UpdateEmail', _0: a};
+};
 var _user$project$Forms_Register$UpdatePasswordAgain = function (a) {
 	return {ctor: 'UpdatePasswordAgain', _0: a};
 };
 var _user$project$Forms_Register$UpdatePassword = function (a) {
 	return {ctor: 'UpdatePassword', _0: a};
+};
+var _user$project$Forms_Register$UpdateUsername = function (a) {
+	return {ctor: 'UpdateUsername', _0: a};
 };
 var _user$project$Forms_Register$viewForm = function (model) {
 	return A2(
@@ -15661,7 +15751,11 @@ var _user$project$Forms_Register$viewForm = function (model) {
 						_1: {
 							ctor: '::',
 							_0: _debois$elm_mdl$Material_Textfield$text_,
-							_1: {ctor: '[]'}
+							_1: {
+								ctor: '::',
+								_0: _debois$elm_mdl$Material_Options$onInput(_user$project$Forms_Register$UpdateUsername),
+								_1: {ctor: '[]'}
+							}
 						}
 					}
 				},
@@ -15758,7 +15852,11 @@ var _user$project$Forms_Register$viewForm = function (model) {
 									_1: {
 										ctor: '::',
 										_0: _debois$elm_mdl$Material_Textfield$email,
-										_1: {ctor: '[]'}
+										_1: {
+											ctor: '::',
+											_0: _debois$elm_mdl$Material_Options$onInput(_user$project$Forms_Register$UpdateEmail),
+											_1: {ctor: '[]'}
+										}
 									}
 								}
 							},
@@ -15796,7 +15894,16 @@ var _user$project$Forms_Register$viewForm = function (model) {
 									_0: _elm_lang$html$Html$text('Register'),
 									_1: {ctor: '[]'}
 								}),
-							_1: {ctor: '[]'}
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(
+									A2(_elm_lang$core$String$join, '<br />', model.errorMessages)),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html$text(model.successMessage),
+									_1: {ctor: '[]'}
+								}
+							}
 						}
 					}
 				}

@@ -43,7 +43,9 @@ type alias ResponseData =
 
 
 type Msg
-    = Submit
+    = UpdateUsername String
+    | UpdatePassword String
+    | Submit
     | SubmitResult (Result Http.Error ResponseData)
     | Mdl (Material.Msg Msg)
 
@@ -58,6 +60,12 @@ update msg model =
     case msg of
         Mdl msg_ ->
             Material.update Mdl msg_ model
+
+        UpdateUsername str ->
+            { model | username = str } ! []
+
+        UpdatePassword str ->
+            { model | password = str } ! []
 
         Submit ->
             let
@@ -116,6 +124,7 @@ viewForm model =
             [ Textfield.label "Username"
             , Textfield.floatingLabel
             , Textfield.text_
+            , Options.onInput UpdateUsername
             ]
             []
         , Textfield.render Mdl
@@ -124,6 +133,7 @@ viewForm model =
             [ Textfield.label "Password"
             , Textfield.floatingLabel
             , Textfield.password
+            , Options.onInput UpdatePassword
             ]
             []
         , Button.render Mdl

@@ -43,13 +43,15 @@ type alias RequestData =
 
 type alias ResponseData =
     { success : Bool
-    , error_messages : List String
+    , errorMessages : List String
     }
 
 
 type Msg
-    = UpdatePassword String
+    = UpdateUsername String
+    | UpdatePassword String
     | UpdatePasswordAgain String
+    | UpdateEmail String
     | Submit
     | SubmitResult (Result Http.Error ResponseData)
     | Mdl (Material.Msg Msg)
@@ -66,11 +68,17 @@ update msg model =
         Mdl msg_ ->
             Material.update Mdl msg_ model
 
+        UpdateUsername str ->
+            { model | username = str } ! []
+
         UpdatePassword str ->
             { model | password = str } ! []
 
         UpdatePasswordAgain str ->
             { model | passwordAgain = str } ! []
+
+        UpdateEmail str ->
+            { model | email = str } ! []
 
         Submit ->
             let
@@ -79,11 +87,45 @@ update msg model =
             in
                 model ! [ send requestData ]
 
-        SubmitResult (Ok successMessage) ->
-            model ! []
+        SubmitResult (Ok responseData) ->
+            { model
+                | successMessage =
+                    case responseData.success of
+                        True ->
+                            "Registration was successful."
 
-        SubmitResult (Err errorMessage) ->
-            model ! []
+                        False ->
+                            "Registration failed."
+                , errorMessages = responseData.errorMessages
+            }
+                ! []
+
+        SubmitResult (Err httpError) ->
+            let
+                errorMessage =
+                    case httpError of
+                        Http.BadUrl str ->
+                            "Bad url: " ++ str
+
+                        Http.Timeout ->
+                            "Request timed out."
+
+                        Http.NetworkError ->
+                            "Network error (no connectivity on your side)."
+
+                        Http.BadStatus response ->
+                            "Bad status code returned: " ++ Basics.toString response.status.code
+
+                        Http.BadPayload debug_str response ->
+                            "JSON decoding of response failed: " ++ debug_str
+            in
+                { model
+                    | errorMessages =
+                        List.append model.errorMessages
+                            [ errorMessage
+                            ]
+                }
+                    ! []
 
 
 send : RequestData -> Cmd Msg
@@ -130,6 +172,7 @@ viewForm model =
             [ Textfield.label "Username"
             , Textfield.floatingLabel
             , Textfield.text_
+            , Options.onInput UpdateUsername
             ]
             []
         , Textfield.render Mdl
@@ -158,6 +201,7 @@ viewForm model =
             [ Textfield.label "Email"
             , Textfield.floatingLabel
             , Textfield.email
+            , Options.onInput UpdateEmail
             ]
             []
         , Button.render Mdl
@@ -169,4 +213,6 @@ viewForm model =
             , Options.onClick Submit
             ]
             [ text "Register" ]
+        , text (String.join "<br />" model.errorMessages)
+        , text model.successMessage
         ]
