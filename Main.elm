@@ -1,6 +1,7 @@
 module Main exposing (..)
 
 import Forms.Login
+import Forms.Question
 import Forms.Register
 import Html exposing (..)
 import Material
@@ -15,6 +16,7 @@ type alias Model =
     , selectedTab : Int
     , registerForm : Forms.Register.Model
     , loginForm : Forms.Login.Model
+    , questionForm : Forms.Question.Model
     , mdl :
         Material.Model
 
@@ -28,6 +30,7 @@ model =
     , selectedTab = 0
     , registerForm = Forms.Register.model
     , loginForm = Forms.Login.model
+    , questionForm = Forms.Question.model
     , mdl =
         Material.model
 
@@ -43,6 +46,7 @@ type Msg
     = SelectTab Int
     | RegisterFormHandler Forms.Register.Msg
     | LoginFormHandler Forms.Login.Msg
+    | QuestionFormHandler Forms.Question.Msg
     | Mdl (Material.Msg Msg)
 
 
@@ -74,6 +78,17 @@ update msg model =
             , Cmd.map LoginFormHandler cmd
             )
 
+        QuestionFormHandler msg_ ->
+            let
+                ( newmodel, cmd ) =
+                    Forms.Question.update msg_ model.questionForm
+            in
+            ( { model
+                | questionForm = newmodel
+              }
+            , Cmd.map QuestionFormHandler cmd
+            )
+
         -- Boilerplate: Mdl action handler.
         Mdl msg_ ->
             Material.update Mdl msg_ model
@@ -91,6 +106,7 @@ tabTitles : List (Html msg)
 tabTitles =
     [ text "Register"
     , text "Login"
+    , text "Question"
     ]
 
 
@@ -115,16 +131,13 @@ viewBody : Model -> Html Msg
 viewBody model =
     case model.selectedTab of
         0 ->
-            Html.map RegisterFormHandler
-                (Forms.Register.viewForm
-                    model.registerForm
-                )
+            Html.map RegisterFormHandler (Forms.Register.viewForm model.registerForm)
 
         1 ->
-            Html.map LoginFormHandler
-                (Forms.Login.viewForm
-                    model.loginForm
-                )
+            Html.map LoginFormHandler (Forms.Login.viewForm model.loginForm)
+
+        2 ->
+            Html.map QuestionFormHandler (Forms.Question.viewForm model.questionForm)
 
         _ ->
             text "404"
