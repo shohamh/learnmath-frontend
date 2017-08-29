@@ -1,17 +1,10 @@
 module Main exposing (..)
 
+import Forms.Login
+import Forms.Register
 import Html exposing (..)
-import Html.Attributes exposing (href, class, style)
-import Http
 import Material
 import Material.Layout as Layout
-import Material.Button as Button exposing (..)
-import Material.Options as Options exposing (css, when, onClick, onInput)
-import Material.Textfield as Textfield
-import Json.Decode
-import Json.Encode
-import Forms.Register
-import Forms.Login
 
 
 -- MODEL
@@ -24,7 +17,8 @@ type alias Model =
     , loginForm : Forms.Login.Model
     , mdl :
         Material.Model
-        -- Boilerplate: model store for any and all Mdl components you use.
+
+    -- Boilerplate: model store for any and all Mdl components you use.
     }
 
 
@@ -36,7 +30,8 @@ model =
     , loginForm = Forms.Login.model
     , mdl =
         Material.model
-        -- Boilerplate: Always use this initial Mdl model store.
+
+    -- Boilerplate: Always use this initial Mdl model store.
     }
 
 
@@ -57,27 +52,27 @@ update msg model =
         SelectTab num ->
             { model | selectedTab = num } ! []
 
-        RegisterFormHandler msg ->
+        RegisterFormHandler msg_ ->
             let
                 ( newmodel, cmd ) =
-                    Forms.Register.update msg model.registerForm
+                    Forms.Register.update msg_ model.registerForm
             in
-                ( { model
-                    | registerForm = newmodel
-                  }
-                , Cmd.map RegisterFormHandler cmd
-                )
+            ( { model
+                | registerForm = newmodel
+              }
+            , Cmd.map RegisterFormHandler cmd
+            )
 
-        LoginFormHandler msg ->
+        LoginFormHandler msg_ ->
             let
                 ( newmodel, cmd ) =
-                    Forms.Login.update msg model.loginForm
+                    Forms.Login.update msg_ model.loginForm
             in
-                ( { model
-                    | loginForm = newmodel
-                  }
-                , Cmd.map LoginFormHandler cmd
-                )
+            ( { model
+                | loginForm = newmodel
+              }
+            , Cmd.map LoginFormHandler cmd
+            )
 
         -- Boilerplate: Mdl action handler.
         Mdl msg_ ->
@@ -92,6 +87,7 @@ type alias Mdl =
     Material.Model
 
 
+tabTitles : List (Html msg)
 tabTitles =
     [ text "Register"
     , text "Login"
