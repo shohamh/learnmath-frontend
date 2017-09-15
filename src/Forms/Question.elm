@@ -88,12 +88,16 @@ update msg model =
             model ! []
 
         MyscriptReceive str ->
-            model ! [ WebSocket.send "ws://echo.websocket.org" ("Hello" ++ str) ]
+            model ! [ Debug.log str WebSocket.send "ws://echo.websocket.org" ("Hello" ++ str) ]
 
 
 subs : Model -> Sub Msg
 subs model =
     WebSocket.listen "wss://cloud.myscript.com/api/v3.0/recognition/ws/math" MyscriptReceive
+
+
+
+--WebSocket.listen "wss://cloud.myscript.com" MyscriptReceive
 
 
 send : RequestData -> Cmd Msg
