@@ -10,6 +10,7 @@ import Material
 import Material.Button as Button exposing (..)
 import Material.Options as Options exposing (css, onClick, onInput, when)
 import Material.Textfield as Textfield
+import WebSocket
 
 
 type alias Model =
@@ -48,6 +49,7 @@ type Msg
     | UpdatePassword String
     | Submit
     | SubmitResult (Result Http.Error ResponseData)
+    | MyscriptReceive String
     | Mdl (Material.Msg Msg)
 
 
@@ -73,13 +75,25 @@ update msg model =
                 requestData =
                     requestModel model
             in
-            model ! [ send requestData ]
+            model
+                ! [ Debug.log "hi"
+                        send
+                        requestData
+                  ]
 
         SubmitResult (Ok successMessage) ->
             model ! []
 
         SubmitResult (Err errorMessage) ->
             model ! []
+
+        MyscriptReceive str ->
+            model ! [ WebSocket.send "ws://echo.websocket.org" ("Hello" ++ str) ]
+
+
+subs : Model -> Sub Msg
+subs model =
+    WebSocket.listen "wss://cloud.myscript.com/api/v3.0/recognition/ws/math" MyscriptReceive
 
 
 send : RequestData -> Cmd Msg

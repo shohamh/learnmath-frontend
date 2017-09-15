@@ -143,6 +143,11 @@ viewBody model =
             text "404"
 
 
+subs : Model -> Sub Msg
+subs model =
+    Sub.batch [ Sub.map QuestionFormHandler (Forms.Question.subs model.questionForm), Layout.subs Mdl model.mdl ]
+
+
 main : Program Never Model Msg
 main =
     Html.program
@@ -151,6 +156,6 @@ main =
             , Layout.sub0 Mdl
             )
         , view = view
-        , subscriptions = .mdl >> Layout.subs Mdl
+        , subscriptions = subs
         , update = update
         }
