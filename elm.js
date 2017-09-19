@@ -20092,7 +20092,12 @@ var _user$project$Forms_Question$MyscriptReceive = function (a) {
 	return {ctor: 'MyscriptReceive', _0: a};
 };
 var _user$project$Forms_Question$subs = function (model) {
-	return A2(_elm_lang$websocket$WebSocket$listen, 'wss://cloud.myscript.com/api/v3.0/recognition/ws/math', _user$project$Forms_Question$MyscriptReceive);
+	return _elm_lang$core$Platform_Sub$batch(
+		{
+			ctor: '::',
+			_0: A2(_elm_lang$websocket$WebSocket$listen, 'wss://cloud.myscript.com/api/v3.0/recognition/ws/math', _user$project$Forms_Question$MyscriptReceive),
+			_1: {ctor: '[]'}
+		});
 };
 var _user$project$Forms_Question$SubmitResult = function (a) {
 	return {ctor: 'SubmitResult', _0: a};
@@ -20775,33 +20780,29 @@ var _user$project$Main$viewBody = function (model) {
 		{ctor: '[]'},
 		{
 			ctor: '::',
-			_0: _user$project$Main$stylesheet,
-			_1: {
-				ctor: '::',
-				_0: function () {
-					var _p4 = model.selectedTab;
-					switch (_p4) {
-						case 0:
-							return A2(
-								_elm_lang$html$Html$map,
-								_user$project$Main$RegisterFormHandler,
-								_user$project$Forms_Register$viewForm(model.registerForm));
-						case 1:
-							return A2(
-								_elm_lang$html$Html$map,
-								_user$project$Main$LoginFormHandler,
-								_user$project$Forms_Login$viewForm(model.loginForm));
-						case 2:
-							return A2(
-								_elm_lang$html$Html$map,
-								_user$project$Main$QuestionFormHandler,
-								_user$project$Forms_Question$viewForm(model.questionForm));
-						default:
-							return _elm_lang$html$Html$text('404');
-					}
-				}(),
-				_1: {ctor: '[]'}
-			}
+			_0: function () {
+				var _p4 = model.selectedTab;
+				switch (_p4) {
+					case 0:
+						return A2(
+							_elm_lang$html$Html$map,
+							_user$project$Main$RegisterFormHandler,
+							_user$project$Forms_Register$viewForm(model.registerForm));
+					case 1:
+						return A2(
+							_elm_lang$html$Html$map,
+							_user$project$Main$LoginFormHandler,
+							_user$project$Forms_Login$viewForm(model.loginForm));
+					case 2:
+						return A2(
+							_elm_lang$html$Html$map,
+							_user$project$Main$QuestionFormHandler,
+							_user$project$Forms_Question$viewForm(model.questionForm));
+					default:
+						return _elm_lang$html$Html$text('404');
+				}
+			}(),
+			_1: {ctor: '[]'}
 		});
 };
 var _user$project$Main$SelectTab = function (a) {

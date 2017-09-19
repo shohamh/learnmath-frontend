@@ -93,7 +93,11 @@ update msg model =
 
 subs : Model -> Sub Msg
 subs model =
-    WebSocket.listen "wss://cloud.myscript.com/api/v3.0/recognition/ws/math" MyscriptReceive
+    Sub.batch
+        [ WebSocket.listen "wss://cloud.myscript.com/api/v3.0/recognition/ws/math" MyscriptReceive
+
+        --, WebSocket.listen "wss://cloud.myscript.com" MyscriptReceive
+        ]
 
 
 
