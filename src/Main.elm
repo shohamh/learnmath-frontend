@@ -4,6 +4,7 @@ import Forms.Login
 import Forms.Question
 import Forms.Register
 import Html exposing (..)
+import Html.Attributes exposing (attribute)
 import Material
 import Material.Layout as Layout
 
@@ -110,6 +111,23 @@ tabTitles =
     ]
 
 
+stylesheet =
+    let
+        tag =
+            "link"
+
+        attrs =
+            [ attribute "rel" "stylesheet"
+            , attribute "property" "stylesheet"
+            , attribute "href" "main.css"
+            ]
+
+        children =
+            []
+    in
+    node tag attrs children
+
+
 view : Model -> Html Msg
 view model =
     Layout.render Mdl
@@ -129,18 +147,23 @@ view model =
 
 viewBody : Model -> Html Msg
 viewBody model =
-    case model.selectedTab of
-        0 ->
-            Html.map RegisterFormHandler (Forms.Register.viewForm model.registerForm)
+    div []
+        [ {- stylesheet
+             ,
+          -}
+          case model.selectedTab of
+            0 ->
+                Html.map RegisterFormHandler (Forms.Register.viewForm model.registerForm)
 
-        1 ->
-            Html.map LoginFormHandler (Forms.Login.viewForm model.loginForm)
+            1 ->
+                Html.map LoginFormHandler (Forms.Login.viewForm model.loginForm)
 
-        2 ->
-            Html.map QuestionFormHandler (Forms.Question.viewForm model.questionForm)
+            2 ->
+                Html.map QuestionFormHandler (Forms.Question.viewForm model.questionForm)
 
-        _ ->
-            text "404"
+            _ ->
+                text "404"
+        ]
 
 
 subs : Model -> Sub Msg

@@ -20658,6 +20658,24 @@ var _user$project$Forms_Register$viewForm = function (model) {
 		});
 };
 
+var _user$project$Main$stylesheet = function () {
+	var children = {ctor: '[]'};
+	var attrs = {
+		ctor: '::',
+		_0: A2(_elm_lang$html$Html_Attributes$attribute, 'rel', 'stylesheet'),
+		_1: {
+			ctor: '::',
+			_0: A2(_elm_lang$html$Html_Attributes$attribute, 'property', 'stylesheet'),
+			_1: {
+				ctor: '::',
+				_0: A2(_elm_lang$html$Html_Attributes$attribute, 'href', 'main.css'),
+				_1: {ctor: '[]'}
+			}
+		}
+	};
+	var tag = 'link';
+	return A3(_elm_lang$html$Html$node, tag, attrs, children);
+}();
 var _user$project$Main$tabTitles = {
 	ctor: '::',
 	_0: _elm_lang$html$Html$text('Register'),
@@ -20752,26 +20770,39 @@ var _user$project$Main$update = F2(
 		}
 	});
 var _user$project$Main$viewBody = function (model) {
-	var _p4 = model.selectedTab;
-	switch (_p4) {
-		case 0:
-			return A2(
-				_elm_lang$html$Html$map,
-				_user$project$Main$RegisterFormHandler,
-				_user$project$Forms_Register$viewForm(model.registerForm));
-		case 1:
-			return A2(
-				_elm_lang$html$Html$map,
-				_user$project$Main$LoginFormHandler,
-				_user$project$Forms_Login$viewForm(model.loginForm));
-		case 2:
-			return A2(
-				_elm_lang$html$Html$map,
-				_user$project$Main$QuestionFormHandler,
-				_user$project$Forms_Question$viewForm(model.questionForm));
-		default:
-			return _elm_lang$html$Html$text('404');
-	}
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _user$project$Main$stylesheet,
+			_1: {
+				ctor: '::',
+				_0: function () {
+					var _p4 = model.selectedTab;
+					switch (_p4) {
+						case 0:
+							return A2(
+								_elm_lang$html$Html$map,
+								_user$project$Main$RegisterFormHandler,
+								_user$project$Forms_Register$viewForm(model.registerForm));
+						case 1:
+							return A2(
+								_elm_lang$html$Html$map,
+								_user$project$Main$LoginFormHandler,
+								_user$project$Forms_Login$viewForm(model.loginForm));
+						case 2:
+							return A2(
+								_elm_lang$html$Html$map,
+								_user$project$Main$QuestionFormHandler,
+								_user$project$Forms_Question$viewForm(model.questionForm));
+						default:
+							return _elm_lang$html$Html$text('404');
+					}
+				}(),
+				_1: {ctor: '[]'}
+			}
+		});
 };
 var _user$project$Main$SelectTab = function (a) {
 	return {ctor: 'SelectTab', _0: a};
