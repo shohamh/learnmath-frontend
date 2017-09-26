@@ -2,13 +2,14 @@ module Forms.Register exposing (..)
 
 import Html exposing (..)
 import Http
+import Json.Decode as JD exposing (..)
+import Json.Decode.Pipeline exposing (decode, required)
+import Json.Encode as JE exposing (..)
+import List
 import Material
 import Material.Button as Button exposing (..)
-import Material.Options as Options exposing (css, when, onClick, onInput)
+import Material.Options as Options exposing (css, onClick, onInput, when)
 import Material.Textfield as Textfield
-import Json.Decode as JD exposing (..)
-import Json.Encode as JE exposing (..)
-import Json.Decode.Pipeline exposing (decode, required)
 
 
 type alias Model =
@@ -85,7 +86,7 @@ update msg model =
                 requestData =
                     requestModel model
             in
-                model ! [ send requestData ]
+            model ! [ send requestData ]
 
         SubmitResult (Ok responseData) ->
             { model
@@ -119,13 +120,13 @@ update msg model =
                         Http.BadPayload debug_str response ->
                             "JSON decoding of response failed: " ++ debug_str
             in
-                { model
-                    | errorMessages =
-                        List.append model.errorMessages
-                            [ errorMessage
-                            ]
-                }
-                    ! []
+            { model
+                | errorMessages =
+                    List.append model.errorMessages
+                        [ errorMessage
+                        ]
+            }
+                ! []
 
 
 send : RequestData -> Cmd Msg
@@ -140,7 +141,7 @@ send requestData =
         request =
             Http.post url body responseDecoder
     in
-        Http.send SubmitResult request
+    Http.send SubmitResult request
 
 
 requestEncoder : RequestData -> JE.Value
@@ -182,7 +183,7 @@ viewForm model =
             , Textfield.floatingLabel
             , Textfield.password
             , Options.onInput UpdatePassword
-            , Textfield.error ("Passwords don't match.") |> Options.when (model.password /= model.passwordAgain)
+            , Textfield.error "Passwords don't match." |> Options.when (model.password /= model.passwordAgain)
             ]
             []
         , Textfield.render Mdl
@@ -192,7 +193,7 @@ viewForm model =
             , Textfield.floatingLabel
             , Textfield.password
             , Options.onInput UpdatePasswordAgain
-            , Textfield.error ("Passwords don't match.") |> Options.when (model.password /= model.passwordAgain)
+            , Textfield.error "Passwords don't match." |> Options.when (model.password /= model.passwordAgain)
             ]
             []
         , Textfield.render Mdl
@@ -213,6 +214,6 @@ viewForm model =
             , Options.onClick Submit
             ]
             [ text "Register" ]
-        , text (String.join "<br />" model.errorMessages)
+        , div [] (List.intersperse (br [] []) (List.map text model.errorMessages))
         , text model.successMessage
         ]

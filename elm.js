@@ -20648,8 +20648,16 @@ var _user$project$Forms_Register$viewForm = function (model) {
 								}),
 							_1: {
 								ctor: '::',
-								_0: _elm_lang$html$Html$text(
-									A2(_elm_lang$core$String$join, '<br />', model.errorMessages)),
+								_0: A2(
+									_elm_lang$html$Html$div,
+									{ctor: '[]'},
+									A2(
+										_elm_lang$core$List$intersperse,
+										A2(
+											_elm_lang$html$Html$br,
+											{ctor: '[]'},
+											{ctor: '[]'}),
+										A2(_elm_lang$core$List$map, _elm_lang$html$Html$text, model.errorMessages))),
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html$text(model.successMessage),
