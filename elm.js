@@ -19818,6 +19818,71 @@ var _elm_lang$websocket$WebSocket$onSelfMsg = F3(
 	});
 _elm_lang$core$Native_Platform.effectManagers['WebSocket'] = {pkg: 'elm-lang/websocket', init: _elm_lang$websocket$WebSocket$init, onEffects: _elm_lang$websocket$WebSocket$onEffects, onSelfMsg: _elm_lang$websocket$WebSocket$onSelfMsg, tag: 'fx', cmdMap: _elm_lang$websocket$WebSocket$cmdMap, subMap: _elm_lang$websocket$WebSocket$subMap};
 
+var _user$project$Data_User$encode = function (user) {
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'email',
+				_1: _elm_lang$core$Json_Encode$string(user.email)
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'token',
+					_1: _elm_lang$core$Json_Encode$string(user.token)
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'username',
+						_1: _elm_lang$core$Json_Encode$string(user.username)
+					},
+					_1: {ctor: '[]'}
+				}
+			}
+		});
+};
+var _user$project$Data_User$User = F3(
+	function (a, b, c) {
+		return {email: a, token: b, username: c};
+	});
+var _user$project$Data_User$decoder = A3(
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+	'username',
+	_elm_lang$core$Json_Decode$string,
+	A3(
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+		'token',
+		_elm_lang$core$Json_Decode$string,
+		A3(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+			'email',
+			_elm_lang$core$Json_Decode$string,
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_user$project$Data_User$User))));
+
+var _user$project$Ports$storeSession = _elm_lang$core$Native_Platform.outgoingPort(
+	'storeSession',
+	function (v) {
+		return (v.ctor === 'Nothing') ? null : v._0;
+	});
+var _user$project$Ports$onSessionChange = _elm_lang$core$Native_Platform.incomingPort('onSessionChange', _elm_lang$core$Json_Decode$value);
+
+var _user$project$Forms_Login$viewErrorMessages = function (errorMessages) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		A2(
+			_elm_lang$core$List$intersperse,
+			A2(
+				_elm_lang$html$Html$br,
+				{ctor: '[]'},
+				{ctor: '[]'}),
+			A2(_elm_lang$core$List$map, _elm_lang$html$Html$text, errorMessages)));
+};
 var _user$project$Forms_Login$requestEncoder = function (requestData) {
 	return _elm_lang$core$Json_Encode$object(
 		{
@@ -19844,6 +19909,14 @@ var _user$project$Forms_Login$model = {
 	successMessage: '',
 	errorMessages: {ctor: '[]'},
 	mdl: _debois$elm_mdl$Material$model
+};
+var _user$project$Forms_Login$storeSession = function (user) {
+	return _user$project$Ports$storeSession(
+		_elm_lang$core$Maybe$Just(
+			A2(
+				_elm_lang$core$Json_Encode$encode,
+				0,
+				_user$project$Data_User$encode(user))));
 };
 var _user$project$Forms_Login$Model = F5(
 	function (a, b, c, d, e) {
@@ -19919,9 +19992,38 @@ var _user$project$Forms_Login$update = F2(
 						model,
 						{ctor: '[]'});
 				} else {
+					var errorMessage = function () {
+						var _p1 = _p0._0._0;
+						switch (_p1.ctor) {
+							case 'BadUrl':
+								return A2(_elm_lang$core$Basics_ops['++'], 'Bad url: ', _p1._0);
+							case 'Timeout':
+								return 'Request timed out.';
+							case 'NetworkError':
+								return 'Network error (no connectivity on your side).';
+							case 'BadStatus':
+								return A2(
+									_elm_lang$core$Basics_ops['++'],
+									'Bad status code returned: ',
+									_elm_lang$core$Basics$toString(_p1._0.status.code));
+							default:
+								return A2(_elm_lang$core$Basics_ops['++'], 'JSON decoding of response failed: ', _p1._0);
+						}
+					}();
 					return A2(
 						_elm_lang$core$Platform_Cmd_ops['!'],
-						model,
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								errorMessages: A2(
+									_elm_lang$core$List$append,
+									model.errorMessages,
+									{
+										ctor: '::',
+										_0: errorMessage,
+										_1: {ctor: '[]'}
+									})
+							}),
 						{ctor: '[]'});
 				}
 		}
@@ -20028,7 +20130,15 @@ var _user$project$Forms_Login$viewForm = function (model) {
 							_0: _elm_lang$html$Html$text('Login'),
 							_1: {ctor: '[]'}
 						}),
-					_1: {ctor: '[]'}
+					_1: {
+						ctor: '::',
+						_0: _user$project$Forms_Login$viewErrorMessages(model.errorMessages),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(model.successMessage),
+							_1: {ctor: '[]'}
+						}
+					}
 				}
 			}
 		});
@@ -20292,6 +20402,18 @@ var _user$project$Forms_Question$viewForm = function (model) {
 		});
 };
 
+var _user$project$Forms_Register$viewErrorMessages = function (errorMessages) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		A2(
+			_elm_lang$core$List$intersperse,
+			A2(
+				_elm_lang$html$Html$br,
+				{ctor: '[]'},
+				{ctor: '[]'}),
+			A2(_elm_lang$core$List$map, _elm_lang$html$Html$text, errorMessages)));
+};
 var _user$project$Forms_Register$requestEncoder = function (requestData) {
 	return _elm_lang$core$Json_Encode$object(
 		{
@@ -20648,16 +20770,7 @@ var _user$project$Forms_Register$viewForm = function (model) {
 								}),
 							_1: {
 								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$div,
-									{ctor: '[]'},
-									A2(
-										_elm_lang$core$List$intersperse,
-										A2(
-											_elm_lang$html$Html$br,
-											{ctor: '[]'},
-											{ctor: '[]'}),
-										A2(_elm_lang$core$List$map, _elm_lang$html$Html$text, model.errorMessages))),
+								_0: _user$project$Forms_Register$viewErrorMessages(model.errorMessages),
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html$text(model.successMessage),

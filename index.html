@@ -48,6 +48,15 @@
   <script src="elm.js"></script>
   <script>
     app = Elm.Main.fullscreen();
+
+    app.ports.storeSession.subscribe(function (session) {
+      localStorage.session = session;
+    });
+    window.addEventListener("storage", function (event) {
+      if (event.storageArea === localStorage && event.key === "session") {
+        app.ports.onSessionChange.send(event.newValue);
+      }
+    }, false);
   </script>
 
 </body>

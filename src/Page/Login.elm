@@ -1,14 +1,24 @@
 module Forms.Login exposing (..)
 
+import Data.User as User exposing (User)
 import Html exposing (..)
 import Http
+import Json.Decode as JD exposing (..)
+import Json.Decode.Pipeline exposing (decode, required)
+import Json.Encode as JE exposing (..)
 import Material
 import Material.Button as Button exposing (..)
-import Material.Options as Options exposing (css, when, onClick, onInput)
+import Material.Options as Options exposing (css, onClick, onInput, when)
 import Material.Textfield as Textfield
-import Json.Decode as JD exposing (..)
-import Json.Encode as JE exposing (..)
-import Json.Decode.Pipeline exposing (decode, required)
+import Ports
+
+
+storeSession : User -> Cmd Msg
+storeSession user =
+    User.encode user
+        |> JE.encode 0
+        |> Just
+        |> Ports.storeSession
 
 
 type alias Model =
@@ -72,13 +82,37 @@ update msg model =
                 requestData =
                     requestModel model
             in
-                model ! [ send requestData ]
+            model ! [ send requestData ]
 
-        SubmitResult (Ok successMessage) ->
+        SubmitResult (Ok responseData) ->
             model ! []
 
-        SubmitResult (Err errorMessage) ->
-            model ! []
+        SubmitResult (Err httpError) ->
+            let
+                errorMessage =
+                    case httpError of
+                        Http.BadUrl str ->
+                            "Bad url: " ++ str
+
+                        Http.Timeout ->
+                            "Request timed out."
+
+                        Http.NetworkError ->
+                            "Network error (no connectivity on your side)."
+
+                        Http.BadStatus response ->
+                            "Bad status code returned: " ++ Basics.toString response.status.code
+
+                        Http.BadPayload debug_str response ->
+                            "JSON decoding of response failed: " ++ debug_str
+            in
+            { model
+                | errorMessages =
+                    List.append model.errorMessages
+                        [ errorMessage
+                        ]
+            }
+                ! []
 
 
 send : RequestData -> Cmd Msg
@@ -93,7 +127,7 @@ send requestData =
         request =
             Http.post url body responseDecoder
     in
-        Http.send SubmitResult request
+    Http.send SubmitResult request
 
 
 requestEncoder : RequestData -> JE.Value
@@ -113,6 +147,11 @@ responseDecoder =
 
 type alias Mdl =
     Material.Model
+
+
+viewErrorMessages : List String -> Html Msg
+viewErrorMessages errorMessages =
+    div [] (List.intersperse (br [] []) (List.map text errorMessages))
 
 
 viewForm : Model -> Html Msg
@@ -145,4 +184,6 @@ viewForm model =
             , Options.onClick Submit
             ]
             [ text "Login" ]
+        , viewErrorMessages model.errorMessages
+        , text model.successMessage
         ]

@@ -164,6 +164,11 @@ type alias Mdl =
     Material.Model
 
 
+viewErrorMessages : List String -> Html Msg
+viewErrorMessages errorMessages =
+    div [] (List.intersperse (br [] []) (List.map text errorMessages))
+
+
 viewForm : Model -> Html Msg
 viewForm model =
     div []
@@ -214,6 +219,6 @@ viewForm model =
             , Options.onClick Submit
             ]
             [ text "Register" ]
-        , div [] (List.intersperse (br [] []) (List.map text model.errorMessages))
+        , viewErrorMessages model.errorMessages
         , text model.successMessage
         ]
