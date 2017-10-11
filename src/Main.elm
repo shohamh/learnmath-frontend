@@ -1,23 +1,29 @@
 module Main exposing (..)
 
-import Forms.Login
-import Forms.Question
-import Forms.Register
+import Page.Login
+import Page.Question
+import Page.Register
 import Html exposing (..)
 import Html.Attributes exposing (attribute)
 import Material
 import Material.Layout as Layout
-
+import Json.Decode as Decode exposing (Value)
+import Route exposing (Route)
+import Navigation exposing (Location)
+import Task
+import Views.Page as Page exposing (ActivePage)
 
 -- MODEL
 
 
 type alias Model =
-    { count : Int
+    { pageState : PageState
+    , session : Session
+    , count : Int
     , selectedTab : Int
-    , registerForm : Forms.Register.Model
-    , loginForm : Forms.Login.Model
-    , questionForm : Forms.Question.Model
+    , registerPage : Page.Register.Model
+    , loginPage : Page.Login.Model
+    , questionPage : Page.Question.Model
     , mdl :
         Material.Model
 
@@ -29,25 +35,36 @@ model : Model
 model =
     { count = 0
     , selectedTab = 0
-    , registerForm = Forms.Register.model
-    , loginForm = Forms.Login.model
-    , questionForm = Forms.Question.model
+    , registerPage = Page.Register.model
+    , loginPage = Page.Login.model
+    , questionPage = Page.Question.model
     , mdl =
         Material.model
 
     -- Boilerplate: Always use this initial Mdl model store.
     }
 
+initialPage : Page
+initialPage =
+    Blank
 
+
+decodeUserFromJson : Value -> Maybe User
+decodeUserFromJson json =
+    json
+        |> Decode.decodeValue Decode.string
+        |> Result.toMaybe
+        |> Maybe.andThen (Decode.decodeString User.decoder >> Result.toMaybe)
 
 -- ACTION, UPDATE
 
 
 type Msg
     = SelectTab Int
-    | RegisterFormHandler Forms.Register.Msg
-    | LoginFormHandler Forms.Login.Msg
-    | QuestionFormHandler Forms.Question.Msg
+    | HomeMsg Home.Msg
+    | LoginMsg Login.Msg
+    | RegisterMsg Register.Msg
+    | QuestionMsg Question.Msg
     | Mdl (Material.Msg Msg)
 
 
@@ -57,37 +74,37 @@ update msg model =
         SelectTab num ->
             { model | selectedTab = num } ! []
 
-        RegisterFormHandler msg_ ->
+        RegisterPageHandler msg_ ->
             let
                 ( newmodel, cmd ) =
-                    Forms.Register.update msg_ model.registerForm
+                    Page.Register.update msg_ model.registerPage
             in
             ( { model
-                | registerForm = newmodel
+                | registerPage = newmodel
               }
-            , Cmd.map RegisterFormHandler cmd
+            , Cmd.map RegisterPageHandler cmd
             )
 
-        LoginFormHandler msg_ ->
+        LoginPageHandler msg_ ->
             let
                 ( newmodel, cmd ) =
-                    Forms.Login.update msg_ model.loginForm
+                    Page.Login.update msg_ model.loginPage
             in
             ( { model
-                | loginForm = newmodel
+                | loginPage = newmodel
               }
-            , Cmd.map LoginFormHandler cmd
+            , Cmd.map LoginPageHandler cmd
             )
 
-        QuestionFormHandler msg_ ->
+        QuestionPageHandler msg_ ->
             let
                 ( newmodel, cmd ) =
-                    Forms.Question.update msg_ model.questionForm
+                    Page.Question.update msg_ model.questionPage
             in
             ( { model
-                | questionForm = newmodel
+                | questionPage = newmodel
               }
-            , Cmd.map QuestionFormHandler cmd
+            , Cmd.map QuestionPageHandler cmd
             )
 
         -- Boilerplate: Mdl action handler.
@@ -102,12 +119,50 @@ update msg model =
 type alias Mdl =
     Material.Model
 
+type Page
+    = Blank
+    | Home Home.Model
+    | Login Login.Model
+    | Register Register.Model
+    | Question Question.Model
+
+
+type PageState
+    = Loaded Page
+    | TransitioningFrom Page
+
+getPage : PageState -> Page
+getPage pageState =
+    case pageState of
+        Loaded page ->
+            page
+        TransitioningFrom page ->
+            page
+
+pageSubscriptions : Page -> Sub Msg
+pageSubscriptions page =
+    case page of
+        Blank ->
+            Sub.none
+
+        Question _ ->
+            Sub.none
+
+        Home _ ->
+            Sub.none
+
+        Login _ ->
+            Sub.none
+
+        Register _ ->
+            Sub.none
+
 
 tabTitles : List (Html msg)
 tabTitles =
-    [ text "Register"
-    , text "Login"
-    , text "Question"
+    [ text toString Register
+    , text toString Login
+    , text toString Question
     ]
 
 
@@ -126,6 +181,37 @@ stylesheet =
             []
     in
     node tag attrs children
+
+
+view : Model -> Html Msg
+view model =
+    case model.pageState of
+        Loaded page ->
+            viewPage model.session False page
+
+        TransitioningFrom page ->
+            viewPage model.session True page
+
+
+viewPage : Session -> Bool -> Page -> Html Msg
+viewPage session isLoading page =
+    let
+        frame =
+            Page.frame isLoading session.user
+    in
+    case page of
+        Blank ->
+            -- This is for the very initial page load, while we are loading
+            -- data via HTTP. We could also render a spinner here.
+            Html.text "loading..." |> frame Page.Other
+        Login subModel ->
+            Login.view session subModel |> frame Page.Other |> Html.map LoginMsg
+
+        Register subModel ->
+            Register.view session subModel |> frame Page.Other |> Html.map RegisterMsg
+
+        Question subModel ->
+            Question.view session subModel |> frame Page.Other |> Html.map QuestionMsg
 
 
 view : Model -> Html Msg
@@ -153,13 +239,13 @@ viewBody model =
           -}
           case model.selectedTab of
             0 ->
-                Html.map RegisterFormHandler (Forms.Register.viewForm model.registerForm)
+                Html.map RegisterPageHandler (Page.Register.viewPage model.registerPage)
 
             1 ->
-                Html.map LoginFormHandler (Forms.Login.viewForm model.loginForm)
+                Html.map LoginPageHandler (Page.Login.viewPage model.loginPage)
 
             2 ->
-                Html.map QuestionFormHandler (Forms.Question.viewForm model.questionForm)
+                Html.map QuestionPageHandler (Page.Question.viewPage model.questionPage)
 
             _ ->
                 text "404"
@@ -168,16 +254,17 @@ viewBody model =
 
 subs : Model -> Sub Msg
 subs model =
-    Sub.batch [ Sub.map QuestionFormHandler (Forms.Question.subs model.questionForm), Layout.subs Mdl model.mdl ]
+    Sub.batch [ Sub.map QuestionPageHandler (Page.Question.subs model.questionPage), Layout.subs Mdl model.mdl ]
 
-
-main : Program Never Model Msg
-main =
-    Html.program
-        { init =
-            ( { model | mdl = Layout.setTabsWidth 1384 model.mdl }
+init : Value -> Location -> ( Model, Cmd Msg )
+init value location =
+    ( { model | mdl = Layout.setTabsWidth 1384 model.mdl }
             , Layout.sub0 Mdl
             )
+main : Program Never Model Msg
+main =
+    Navigation.programWithFlags (Route.fromLocation >> SetRoute)
+        { init = init
         , view = view
         , subscriptions = subs
         , update = update

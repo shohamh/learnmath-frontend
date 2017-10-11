@@ -1,4 +1,4 @@
-module Forms.Login exposing (..)
+module Page.Login exposing (..)
 
 import Data.User as User exposing (User)
 import Html exposing (..)

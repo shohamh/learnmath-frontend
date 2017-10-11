@@ -1,4 +1,4 @@
-module Forms.Question exposing (..)
+module Page.Question exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (attribute)

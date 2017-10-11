@@ -1,4 +1,4 @@
-module Forms.Register exposing (..)
+module Page.Register exposing (..)
 
 import Html exposing (..)
 import Http
