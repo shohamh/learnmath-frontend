@@ -6,9 +6,35 @@ import Data.User as User exposing (User, Username)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Lazy exposing (lazy2)
+import Material
+import Material.Layout as Layout
 import Route exposing (Route)
 import Util exposing ((=>))
 import Views.Spinner exposing (spinner)
+
+
+type alias Model =
+    { mdl : Material.Model
+    , selectedTab : Int
+    }
+
+
+model : Model
+model =
+    { mdl = Material.model
+    , selectedTab = 0
+    }
+
+
+type Msg
+    = SelectTab Int
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+    case msg of
+        SelectTab tabIndex ->
+            { model | selectedTab = tabIndex } ! []
 
 
 {-| Determines which navbar link (if any) will be rendered as active.
@@ -24,8 +50,21 @@ type ActivePage
     | Question
 
 
+tabTitles : List String
+tabTitles =
+    [ "Home"
+    , "Login"
+    , "Register"
+    , "Question"
+    ]
+
+
 
 --| Profile Username
+
+
+type alias Mdl =
+    Material.Model
 
 
 {-| Take a page's Html and frame it with a header and footer.
@@ -36,11 +75,26 @@ in the header. (This comes up during slow page transitions.)
 -}
 frame : Bool -> Maybe User -> ActivePage -> Html msg -> Html msg
 frame isLoading user page content =
-    div [ class "page-frame" ]
-        [ viewHeader page user isLoading
-        , content
-        , viewFooter
+    Layout.render Mdl
+        model.mdl
+        [ Layout.fixedHeader
+        , Layout.onSelectTab SelectTab
+        , Layout.selectedTab model.selectedTab
         ]
+        { header = viewHeader page user isLoading
+        , drawer = [ text "drawer text" ]
+        , tabs = ( tabTitles, [] )
+        , main = [ content ]
+        }
+
+
+
+{- div [ class "page-frame" ]
+   [ viewHeader page user isLoading
+   , content
+   , viewFooter
+   ]
+-}
 
 
 viewHeader : ActivePage -> Maybe User -> Bool -> Html msg

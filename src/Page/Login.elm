@@ -1,5 +1,6 @@
 module Page.Login exposing (ExternalMsg(..), Model, Msg, model, update, view)
 
+import Data.AuthToken as AuthToken exposing (AuthToken)
 import Data.Session as Session exposing (Session)
 import Data.User as User exposing (User)
 import Html exposing (..)
@@ -12,6 +13,7 @@ import Material.Button as Button exposing (..)
 import Material.Options as Options exposing (css, onClick, onInput, when)
 import Material.Textfield as Textfield
 import Ports
+import Route
 import Util exposing ((=>))
 
 
@@ -50,6 +52,7 @@ type alias RequestData =
 
 type alias ResponseData =
     { success : Bool
+    , authToken : AuthToken
     , error_messages : List String
     }
 
@@ -70,6 +73,11 @@ type ExternalMsg
 requestModel : Model -> RequestData
 requestModel model =
     RequestData model.username model.password
+
+
+responseDataToUser : ResponseData -> Model -> User
+responseDataToUser responseData model =
+    User ("email@email.com" responseData.authToken (User.Username model.username))
 
 
 update : Msg -> Model -> ( ( Model, Cmd Msg ), ExternalMsg )
@@ -93,7 +101,7 @@ update msg model =
 
         SubmitResult (Ok responseData) ->
             model
-                => Cmd.none
+                => Cmd.batch [ storeSession (responseDataToUser responseData model), Route.modifyUrl Route.Home ]
                 => NoOp
 
         SubmitResult (Err httpError) ->
@@ -152,6 +160,7 @@ responseDecoder : Decoder ResponseData
 responseDecoder =
     decode ResponseData
         |> required "success" JD.bool
+        |> required "session_key" AuthToken.decoder
         |> required "error_messages" (JD.list JD.string)
 
 

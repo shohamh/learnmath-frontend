@@ -53,7 +53,7 @@ init val location =
             setRoute (Route.fromLocation location)
                 { pageState = Loaded initialPage
                 , session = { user = decodeUserFromJson val }
-                , mdl = Layout.setTabsWidth 1384 Material.model
+                , mdl = {- Layout.setTabsWidth 1384 -} Material.model
                 }
     in
     ( model_, Cmd.batch [ cmd_, Layout.sub0 Mdl ] )

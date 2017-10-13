@@ -22701,7 +22701,7 @@ var _shohamh$learnmath_frontend$Main$init = F2(
 				session: {
 					user: _shohamh$learnmath_frontend$Main$decodeUserFromJson(val)
 				},
-				mdl: A2(_debois$elm_mdl$Material_Layout$setTabsWidth, 1384, _debois$elm_mdl$Material$model)
+				mdl: _debois$elm_mdl$Material$model
 			});
 		var model_ = _p7._0;
 		var cmd_ = _p7._1;
