@@ -293,6 +293,7 @@ getPage pageState =
 -}
 
 
+stylesheet : Html Msg
 stylesheet =
     let
         tag =
