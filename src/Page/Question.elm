@@ -1,5 +1,6 @@
 module Page.Question exposing (..)
 
+import Data.Session as Session exposing (Session)
 import Html exposing (..)
 import Html.Attributes exposing (attribute)
 import Http
@@ -138,8 +139,8 @@ type alias Mdl =
     Material.Model
 
 
-viewForm : Model -> Html Msg
-viewForm model =
+view : Session -> Model -> Html Msg
+view session model =
     div []
         [ Textfield.render Mdl
             [ 0 ]

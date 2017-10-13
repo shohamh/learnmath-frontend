@@ -1,6 +1,6 @@
 module Route exposing (Route(..), fromLocation, href, modifyUrl)
 
-import Data.User as Data.User
+import Data.User as User exposing (Username)
 import Html exposing (Attribute)
 import Html.Attributes as Attr
 import Navigation exposing (Location)
@@ -18,6 +18,10 @@ type Route
     | Question
 
 
+
+-- | Profile Username
+
+
 route : Parser (Route -> a) a
 route =
     oneOf
@@ -26,8 +30,9 @@ route =
         , Url.map Logout (s "logout")
         , Url.map Register (s "register")
         , Url.map Question (s "question")
-        ]
 
+        --       , Url.map Profile (s "profile" </> User.usernameParser)
+        ]
 
 
 
@@ -54,9 +59,12 @@ routeToString page =
                 Question ->
                     [ "question" ]
 
-
+        {- Profile username ->
+           [ "profile", User.usernameToString username ]
+        -}
     in
-"#/" ++ String.join "/" pieces
+    "#/" ++ String.join "/" pieces
+
 
 
 -- PUBLIC HELPERS --
@@ -77,4 +85,4 @@ fromLocation location =
     if String.isEmpty location.hash then
         Just Home
     else
-parseHash route location
+        parseHash route location

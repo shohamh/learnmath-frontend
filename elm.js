@@ -18922,6 +18922,10 @@ var _debois$elm_mdl$Material$Model = F8(
 		return {button: a, textfield: b, menu: c, snackbar: d, layout: e, toggles: f, tooltip: g, tabs: h};
 	});
 
+var _elm_lang$html$Html_Lazy$lazy3 = _elm_lang$virtual_dom$VirtualDom$lazy3;
+var _elm_lang$html$Html_Lazy$lazy2 = _elm_lang$virtual_dom$VirtualDom$lazy2;
+var _elm_lang$html$Html_Lazy$lazy = _elm_lang$virtual_dom$VirtualDom$lazy;
+
 var _elm_lang$http$Native_Http = function() {
 
 
@@ -19282,6 +19286,408 @@ var _elm_lang$http$Http$StringPart = F2(
 		return {ctor: 'StringPart', _0: a, _1: b};
 	});
 var _elm_lang$http$Http$stringPart = _elm_lang$http$Http$StringPart;
+
+var _elm_lang$navigation$Native_Navigation = function() {
+
+
+// FAKE NAVIGATION
+
+function go(n)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		if (n !== 0)
+		{
+			history.go(n);
+		}
+		callback(_elm_lang$core$Native_Scheduler.succeed(_elm_lang$core$Native_Utils.Tuple0));
+	});
+}
+
+function pushState(url)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		history.pushState({}, '', url);
+		callback(_elm_lang$core$Native_Scheduler.succeed(getLocation()));
+	});
+}
+
+function replaceState(url)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		history.replaceState({}, '', url);
+		callback(_elm_lang$core$Native_Scheduler.succeed(getLocation()));
+	});
+}
+
+
+// REAL NAVIGATION
+
+function reloadPage(skipCache)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		document.location.reload(skipCache);
+		callback(_elm_lang$core$Native_Scheduler.succeed(_elm_lang$core$Native_Utils.Tuple0));
+	});
+}
+
+function setLocation(url)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		try
+		{
+			window.location = url;
+		}
+		catch(err)
+		{
+			// Only Firefox can throw a NS_ERROR_MALFORMED_URI exception here.
+			// Other browsers reload the page, so let's be consistent about that.
+			document.location.reload(false);
+		}
+		callback(_elm_lang$core$Native_Scheduler.succeed(_elm_lang$core$Native_Utils.Tuple0));
+	});
+}
+
+
+// GET LOCATION
+
+function getLocation()
+{
+	var location = document.location;
+
+	return {
+		href: location.href,
+		host: location.host,
+		hostname: location.hostname,
+		protocol: location.protocol,
+		origin: location.origin,
+		port_: location.port,
+		pathname: location.pathname,
+		search: location.search,
+		hash: location.hash,
+		username: location.username,
+		password: location.password
+	};
+}
+
+
+// DETECT IE11 PROBLEMS
+
+function isInternetExplorer11()
+{
+	return window.navigator.userAgent.indexOf('Trident') !== -1;
+}
+
+
+return {
+	go: go,
+	setLocation: setLocation,
+	reloadPage: reloadPage,
+	pushState: pushState,
+	replaceState: replaceState,
+	getLocation: getLocation,
+	isInternetExplorer11: isInternetExplorer11
+};
+
+}();
+
+var _elm_lang$navigation$Navigation$replaceState = _elm_lang$navigation$Native_Navigation.replaceState;
+var _elm_lang$navigation$Navigation$pushState = _elm_lang$navigation$Native_Navigation.pushState;
+var _elm_lang$navigation$Navigation$go = _elm_lang$navigation$Native_Navigation.go;
+var _elm_lang$navigation$Navigation$reloadPage = _elm_lang$navigation$Native_Navigation.reloadPage;
+var _elm_lang$navigation$Navigation$setLocation = _elm_lang$navigation$Native_Navigation.setLocation;
+var _elm_lang$navigation$Navigation_ops = _elm_lang$navigation$Navigation_ops || {};
+_elm_lang$navigation$Navigation_ops['&>'] = F2(
+	function (task1, task2) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (_p0) {
+				return task2;
+			},
+			task1);
+	});
+var _elm_lang$navigation$Navigation$notify = F3(
+	function (router, subs, location) {
+		var send = function (_p1) {
+			var _p2 = _p1;
+			return A2(
+				_elm_lang$core$Platform$sendToApp,
+				router,
+				_p2._0(location));
+		};
+		return A2(
+			_elm_lang$navigation$Navigation_ops['&>'],
+			_elm_lang$core$Task$sequence(
+				A2(_elm_lang$core$List$map, send, subs)),
+			_elm_lang$core$Task$succeed(
+				{ctor: '_Tuple0'}));
+	});
+var _elm_lang$navigation$Navigation$cmdHelp = F3(
+	function (router, subs, cmd) {
+		var _p3 = cmd;
+		switch (_p3.ctor) {
+			case 'Jump':
+				return _elm_lang$navigation$Navigation$go(_p3._0);
+			case 'New':
+				return A2(
+					_elm_lang$core$Task$andThen,
+					A2(_elm_lang$navigation$Navigation$notify, router, subs),
+					_elm_lang$navigation$Navigation$pushState(_p3._0));
+			case 'Modify':
+				return A2(
+					_elm_lang$core$Task$andThen,
+					A2(_elm_lang$navigation$Navigation$notify, router, subs),
+					_elm_lang$navigation$Navigation$replaceState(_p3._0));
+			case 'Visit':
+				return _elm_lang$navigation$Navigation$setLocation(_p3._0);
+			default:
+				return _elm_lang$navigation$Navigation$reloadPage(_p3._0);
+		}
+	});
+var _elm_lang$navigation$Navigation$killPopWatcher = function (popWatcher) {
+	var _p4 = popWatcher;
+	if (_p4.ctor === 'Normal') {
+		return _elm_lang$core$Process$kill(_p4._0);
+	} else {
+		return A2(
+			_elm_lang$navigation$Navigation_ops['&>'],
+			_elm_lang$core$Process$kill(_p4._0),
+			_elm_lang$core$Process$kill(_p4._1));
+	}
+};
+var _elm_lang$navigation$Navigation$onSelfMsg = F3(
+	function (router, location, state) {
+		return A2(
+			_elm_lang$navigation$Navigation_ops['&>'],
+			A3(_elm_lang$navigation$Navigation$notify, router, state.subs, location),
+			_elm_lang$core$Task$succeed(state));
+	});
+var _elm_lang$navigation$Navigation$subscription = _elm_lang$core$Native_Platform.leaf('Navigation');
+var _elm_lang$navigation$Navigation$command = _elm_lang$core$Native_Platform.leaf('Navigation');
+var _elm_lang$navigation$Navigation$Location = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return function (k) {
+											return {href: a, host: b, hostname: c, protocol: d, origin: e, port_: f, pathname: g, search: h, hash: i, username: j, password: k};
+										};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var _elm_lang$navigation$Navigation$State = F2(
+	function (a, b) {
+		return {subs: a, popWatcher: b};
+	});
+var _elm_lang$navigation$Navigation$init = _elm_lang$core$Task$succeed(
+	A2(
+		_elm_lang$navigation$Navigation$State,
+		{ctor: '[]'},
+		_elm_lang$core$Maybe$Nothing));
+var _elm_lang$navigation$Navigation$Reload = function (a) {
+	return {ctor: 'Reload', _0: a};
+};
+var _elm_lang$navigation$Navigation$reload = _elm_lang$navigation$Navigation$command(
+	_elm_lang$navigation$Navigation$Reload(false));
+var _elm_lang$navigation$Navigation$reloadAndSkipCache = _elm_lang$navigation$Navigation$command(
+	_elm_lang$navigation$Navigation$Reload(true));
+var _elm_lang$navigation$Navigation$Visit = function (a) {
+	return {ctor: 'Visit', _0: a};
+};
+var _elm_lang$navigation$Navigation$load = function (url) {
+	return _elm_lang$navigation$Navigation$command(
+		_elm_lang$navigation$Navigation$Visit(url));
+};
+var _elm_lang$navigation$Navigation$Modify = function (a) {
+	return {ctor: 'Modify', _0: a};
+};
+var _elm_lang$navigation$Navigation$modifyUrl = function (url) {
+	return _elm_lang$navigation$Navigation$command(
+		_elm_lang$navigation$Navigation$Modify(url));
+};
+var _elm_lang$navigation$Navigation$New = function (a) {
+	return {ctor: 'New', _0: a};
+};
+var _elm_lang$navigation$Navigation$newUrl = function (url) {
+	return _elm_lang$navigation$Navigation$command(
+		_elm_lang$navigation$Navigation$New(url));
+};
+var _elm_lang$navigation$Navigation$Jump = function (a) {
+	return {ctor: 'Jump', _0: a};
+};
+var _elm_lang$navigation$Navigation$back = function (n) {
+	return _elm_lang$navigation$Navigation$command(
+		_elm_lang$navigation$Navigation$Jump(0 - n));
+};
+var _elm_lang$navigation$Navigation$forward = function (n) {
+	return _elm_lang$navigation$Navigation$command(
+		_elm_lang$navigation$Navigation$Jump(n));
+};
+var _elm_lang$navigation$Navigation$cmdMap = F2(
+	function (_p5, myCmd) {
+		var _p6 = myCmd;
+		switch (_p6.ctor) {
+			case 'Jump':
+				return _elm_lang$navigation$Navigation$Jump(_p6._0);
+			case 'New':
+				return _elm_lang$navigation$Navigation$New(_p6._0);
+			case 'Modify':
+				return _elm_lang$navigation$Navigation$Modify(_p6._0);
+			case 'Visit':
+				return _elm_lang$navigation$Navigation$Visit(_p6._0);
+			default:
+				return _elm_lang$navigation$Navigation$Reload(_p6._0);
+		}
+	});
+var _elm_lang$navigation$Navigation$Monitor = function (a) {
+	return {ctor: 'Monitor', _0: a};
+};
+var _elm_lang$navigation$Navigation$program = F2(
+	function (locationToMessage, stuff) {
+		var init = stuff.init(
+			_elm_lang$navigation$Native_Navigation.getLocation(
+				{ctor: '_Tuple0'}));
+		var subs = function (model) {
+			return _elm_lang$core$Platform_Sub$batch(
+				{
+					ctor: '::',
+					_0: _elm_lang$navigation$Navigation$subscription(
+						_elm_lang$navigation$Navigation$Monitor(locationToMessage)),
+					_1: {
+						ctor: '::',
+						_0: stuff.subscriptions(model),
+						_1: {ctor: '[]'}
+					}
+				});
+		};
+		return _elm_lang$html$Html$program(
+			{init: init, view: stuff.view, update: stuff.update, subscriptions: subs});
+	});
+var _elm_lang$navigation$Navigation$programWithFlags = F2(
+	function (locationToMessage, stuff) {
+		var init = function (flags) {
+			return A2(
+				stuff.init,
+				flags,
+				_elm_lang$navigation$Native_Navigation.getLocation(
+					{ctor: '_Tuple0'}));
+		};
+		var subs = function (model) {
+			return _elm_lang$core$Platform_Sub$batch(
+				{
+					ctor: '::',
+					_0: _elm_lang$navigation$Navigation$subscription(
+						_elm_lang$navigation$Navigation$Monitor(locationToMessage)),
+					_1: {
+						ctor: '::',
+						_0: stuff.subscriptions(model),
+						_1: {ctor: '[]'}
+					}
+				});
+		};
+		return _elm_lang$html$Html$programWithFlags(
+			{init: init, view: stuff.view, update: stuff.update, subscriptions: subs});
+	});
+var _elm_lang$navigation$Navigation$subMap = F2(
+	function (func, _p7) {
+		var _p8 = _p7;
+		return _elm_lang$navigation$Navigation$Monitor(
+			function (_p9) {
+				return func(
+					_p8._0(_p9));
+			});
+	});
+var _elm_lang$navigation$Navigation$InternetExplorer = F2(
+	function (a, b) {
+		return {ctor: 'InternetExplorer', _0: a, _1: b};
+	});
+var _elm_lang$navigation$Navigation$Normal = function (a) {
+	return {ctor: 'Normal', _0: a};
+};
+var _elm_lang$navigation$Navigation$spawnPopWatcher = function (router) {
+	var reportLocation = function (_p10) {
+		return A2(
+			_elm_lang$core$Platform$sendToSelf,
+			router,
+			_elm_lang$navigation$Native_Navigation.getLocation(
+				{ctor: '_Tuple0'}));
+	};
+	return _elm_lang$navigation$Native_Navigation.isInternetExplorer11(
+		{ctor: '_Tuple0'}) ? A3(
+		_elm_lang$core$Task$map2,
+		_elm_lang$navigation$Navigation$InternetExplorer,
+		_elm_lang$core$Process$spawn(
+			A3(_elm_lang$dom$Dom_LowLevel$onWindow, 'popstate', _elm_lang$core$Json_Decode$value, reportLocation)),
+		_elm_lang$core$Process$spawn(
+			A3(_elm_lang$dom$Dom_LowLevel$onWindow, 'hashchange', _elm_lang$core$Json_Decode$value, reportLocation))) : A2(
+		_elm_lang$core$Task$map,
+		_elm_lang$navigation$Navigation$Normal,
+		_elm_lang$core$Process$spawn(
+			A3(_elm_lang$dom$Dom_LowLevel$onWindow, 'popstate', _elm_lang$core$Json_Decode$value, reportLocation)));
+};
+var _elm_lang$navigation$Navigation$onEffects = F4(
+	function (router, cmds, subs, _p11) {
+		var _p12 = _p11;
+		var _p15 = _p12.popWatcher;
+		var stepState = function () {
+			var _p13 = {ctor: '_Tuple2', _0: subs, _1: _p15};
+			_v6_2:
+			do {
+				if (_p13._0.ctor === '[]') {
+					if (_p13._1.ctor === 'Just') {
+						return A2(
+							_elm_lang$navigation$Navigation_ops['&>'],
+							_elm_lang$navigation$Navigation$killPopWatcher(_p13._1._0),
+							_elm_lang$core$Task$succeed(
+								A2(_elm_lang$navigation$Navigation$State, subs, _elm_lang$core$Maybe$Nothing)));
+					} else {
+						break _v6_2;
+					}
+				} else {
+					if (_p13._1.ctor === 'Nothing') {
+						return A2(
+							_elm_lang$core$Task$map,
+							function (_p14) {
+								return A2(
+									_elm_lang$navigation$Navigation$State,
+									subs,
+									_elm_lang$core$Maybe$Just(_p14));
+							},
+							_elm_lang$navigation$Navigation$spawnPopWatcher(router));
+					} else {
+						break _v6_2;
+					}
+				}
+			} while(false);
+			return _elm_lang$core$Task$succeed(
+				A2(_elm_lang$navigation$Navigation$State, subs, _p15));
+		}();
+		return A2(
+			_elm_lang$navigation$Navigation_ops['&>'],
+			_elm_lang$core$Task$sequence(
+				A2(
+					_elm_lang$core$List$map,
+					A2(_elm_lang$navigation$Navigation$cmdHelp, router, subs),
+					cmds)),
+			stepState);
+	});
+_elm_lang$core$Native_Platform.effectManagers['Navigation'] = {pkg: 'elm-lang/navigation', init: _elm_lang$navigation$Navigation$init, onEffects: _elm_lang$navigation$Navigation$onEffects, onSelfMsg: _elm_lang$navigation$Navigation$onSelfMsg, tag: 'fx', cmdMap: _elm_lang$navigation$Navigation$cmdMap, subMap: _elm_lang$navigation$Navigation$subMap};
 
 var _elm_lang$websocket$Native_WebSocket = function() {
 
@@ -19818,7 +20224,523 @@ var _elm_lang$websocket$WebSocket$onSelfMsg = F3(
 	});
 _elm_lang$core$Native_Platform.effectManagers['WebSocket'] = {pkg: 'elm-lang/websocket', init: _elm_lang$websocket$WebSocket$init, onEffects: _elm_lang$websocket$WebSocket$onEffects, onSelfMsg: _elm_lang$websocket$WebSocket$onSelfMsg, tag: 'fx', cmdMap: _elm_lang$websocket$WebSocket$cmdMap, subMap: _elm_lang$websocket$WebSocket$subMap};
 
-var _user$project$Data_User$encode = function (user) {
+var _evancz$url_parser$UrlParser$toKeyValuePair = function (segment) {
+	var _p0 = A2(_elm_lang$core$String$split, '=', segment);
+	if (((_p0.ctor === '::') && (_p0._1.ctor === '::')) && (_p0._1._1.ctor === '[]')) {
+		return A3(
+			_elm_lang$core$Maybe$map2,
+			F2(
+				function (v0, v1) {
+					return {ctor: '_Tuple2', _0: v0, _1: v1};
+				}),
+			_elm_lang$http$Http$decodeUri(_p0._0),
+			_elm_lang$http$Http$decodeUri(_p0._1._0));
+	} else {
+		return _elm_lang$core$Maybe$Nothing;
+	}
+};
+var _evancz$url_parser$UrlParser$parseParams = function (queryString) {
+	return _elm_lang$core$Dict$fromList(
+		A2(
+			_elm_lang$core$List$filterMap,
+			_evancz$url_parser$UrlParser$toKeyValuePair,
+			A2(
+				_elm_lang$core$String$split,
+				'&',
+				A2(_elm_lang$core$String$dropLeft, 1, queryString))));
+};
+var _evancz$url_parser$UrlParser$splitUrl = function (url) {
+	var _p1 = A2(_elm_lang$core$String$split, '/', url);
+	if ((_p1.ctor === '::') && (_p1._0 === '')) {
+		return _p1._1;
+	} else {
+		return _p1;
+	}
+};
+var _evancz$url_parser$UrlParser$parseHelp = function (states) {
+	parseHelp:
+	while (true) {
+		var _p2 = states;
+		if (_p2.ctor === '[]') {
+			return _elm_lang$core$Maybe$Nothing;
+		} else {
+			var _p4 = _p2._0;
+			var _p3 = _p4.unvisited;
+			if (_p3.ctor === '[]') {
+				return _elm_lang$core$Maybe$Just(_p4.value);
+			} else {
+				if ((_p3._0 === '') && (_p3._1.ctor === '[]')) {
+					return _elm_lang$core$Maybe$Just(_p4.value);
+				} else {
+					var _v4 = _p2._1;
+					states = _v4;
+					continue parseHelp;
+				}
+			}
+		}
+	}
+};
+var _evancz$url_parser$UrlParser$parse = F3(
+	function (_p5, url, params) {
+		var _p6 = _p5;
+		return _evancz$url_parser$UrlParser$parseHelp(
+			_p6._0(
+				{
+					visited: {ctor: '[]'},
+					unvisited: _evancz$url_parser$UrlParser$splitUrl(url),
+					params: params,
+					value: _elm_lang$core$Basics$identity
+				}));
+	});
+var _evancz$url_parser$UrlParser$parseHash = F2(
+	function (parser, location) {
+		return A3(
+			_evancz$url_parser$UrlParser$parse,
+			parser,
+			A2(_elm_lang$core$String$dropLeft, 1, location.hash),
+			_evancz$url_parser$UrlParser$parseParams(location.search));
+	});
+var _evancz$url_parser$UrlParser$parsePath = F2(
+	function (parser, location) {
+		return A3(
+			_evancz$url_parser$UrlParser$parse,
+			parser,
+			location.pathname,
+			_evancz$url_parser$UrlParser$parseParams(location.search));
+	});
+var _evancz$url_parser$UrlParser$intParamHelp = function (maybeValue) {
+	var _p7 = maybeValue;
+	if (_p7.ctor === 'Nothing') {
+		return _elm_lang$core$Maybe$Nothing;
+	} else {
+		return _elm_lang$core$Result$toMaybe(
+			_elm_lang$core$String$toInt(_p7._0));
+	}
+};
+var _evancz$url_parser$UrlParser$mapHelp = F2(
+	function (func, _p8) {
+		var _p9 = _p8;
+		return {
+			visited: _p9.visited,
+			unvisited: _p9.unvisited,
+			params: _p9.params,
+			value: func(_p9.value)
+		};
+	});
+var _evancz$url_parser$UrlParser$State = F4(
+	function (a, b, c, d) {
+		return {visited: a, unvisited: b, params: c, value: d};
+	});
+var _evancz$url_parser$UrlParser$Parser = function (a) {
+	return {ctor: 'Parser', _0: a};
+};
+var _evancz$url_parser$UrlParser$s = function (str) {
+	return _evancz$url_parser$UrlParser$Parser(
+		function (_p10) {
+			var _p11 = _p10;
+			var _p12 = _p11.unvisited;
+			if (_p12.ctor === '[]') {
+				return {ctor: '[]'};
+			} else {
+				var _p13 = _p12._0;
+				return _elm_lang$core$Native_Utils.eq(_p13, str) ? {
+					ctor: '::',
+					_0: A4(
+						_evancz$url_parser$UrlParser$State,
+						{ctor: '::', _0: _p13, _1: _p11.visited},
+						_p12._1,
+						_p11.params,
+						_p11.value),
+					_1: {ctor: '[]'}
+				} : {ctor: '[]'};
+			}
+		});
+};
+var _evancz$url_parser$UrlParser$custom = F2(
+	function (tipe, stringToSomething) {
+		return _evancz$url_parser$UrlParser$Parser(
+			function (_p14) {
+				var _p15 = _p14;
+				var _p16 = _p15.unvisited;
+				if (_p16.ctor === '[]') {
+					return {ctor: '[]'};
+				} else {
+					var _p18 = _p16._0;
+					var _p17 = stringToSomething(_p18);
+					if (_p17.ctor === 'Ok') {
+						return {
+							ctor: '::',
+							_0: A4(
+								_evancz$url_parser$UrlParser$State,
+								{ctor: '::', _0: _p18, _1: _p15.visited},
+								_p16._1,
+								_p15.params,
+								_p15.value(_p17._0)),
+							_1: {ctor: '[]'}
+						};
+					} else {
+						return {ctor: '[]'};
+					}
+				}
+			});
+	});
+var _evancz$url_parser$UrlParser$string = A2(_evancz$url_parser$UrlParser$custom, 'STRING', _elm_lang$core$Result$Ok);
+var _evancz$url_parser$UrlParser$int = A2(_evancz$url_parser$UrlParser$custom, 'NUMBER', _elm_lang$core$String$toInt);
+var _evancz$url_parser$UrlParser_ops = _evancz$url_parser$UrlParser_ops || {};
+_evancz$url_parser$UrlParser_ops['</>'] = F2(
+	function (_p20, _p19) {
+		var _p21 = _p20;
+		var _p22 = _p19;
+		return _evancz$url_parser$UrlParser$Parser(
+			function (state) {
+				return A2(
+					_elm_lang$core$List$concatMap,
+					_p22._0,
+					_p21._0(state));
+			});
+	});
+var _evancz$url_parser$UrlParser$map = F2(
+	function (subValue, _p23) {
+		var _p24 = _p23;
+		return _evancz$url_parser$UrlParser$Parser(
+			function (_p25) {
+				var _p26 = _p25;
+				return A2(
+					_elm_lang$core$List$map,
+					_evancz$url_parser$UrlParser$mapHelp(_p26.value),
+					_p24._0(
+						{visited: _p26.visited, unvisited: _p26.unvisited, params: _p26.params, value: subValue}));
+			});
+	});
+var _evancz$url_parser$UrlParser$oneOf = function (parsers) {
+	return _evancz$url_parser$UrlParser$Parser(
+		function (state) {
+			return A2(
+				_elm_lang$core$List$concatMap,
+				function (_p27) {
+					var _p28 = _p27;
+					return _p28._0(state);
+				},
+				parsers);
+		});
+};
+var _evancz$url_parser$UrlParser$top = _evancz$url_parser$UrlParser$Parser(
+	function (state) {
+		return {
+			ctor: '::',
+			_0: state,
+			_1: {ctor: '[]'}
+		};
+	});
+var _evancz$url_parser$UrlParser_ops = _evancz$url_parser$UrlParser_ops || {};
+_evancz$url_parser$UrlParser_ops['<?>'] = F2(
+	function (_p30, _p29) {
+		var _p31 = _p30;
+		var _p32 = _p29;
+		return _evancz$url_parser$UrlParser$Parser(
+			function (state) {
+				return A2(
+					_elm_lang$core$List$concatMap,
+					_p32._0,
+					_p31._0(state));
+			});
+	});
+var _evancz$url_parser$UrlParser$QueryParser = function (a) {
+	return {ctor: 'QueryParser', _0: a};
+};
+var _evancz$url_parser$UrlParser$customParam = F2(
+	function (key, func) {
+		return _evancz$url_parser$UrlParser$QueryParser(
+			function (_p33) {
+				var _p34 = _p33;
+				var _p35 = _p34.params;
+				return {
+					ctor: '::',
+					_0: A4(
+						_evancz$url_parser$UrlParser$State,
+						_p34.visited,
+						_p34.unvisited,
+						_p35,
+						_p34.value(
+							func(
+								A2(_elm_lang$core$Dict$get, key, _p35)))),
+					_1: {ctor: '[]'}
+				};
+			});
+	});
+var _evancz$url_parser$UrlParser$stringParam = function (name) {
+	return A2(_evancz$url_parser$UrlParser$customParam, name, _elm_lang$core$Basics$identity);
+};
+var _evancz$url_parser$UrlParser$intParam = function (name) {
+	return A2(_evancz$url_parser$UrlParser$customParam, name, _evancz$url_parser$UrlParser$intParamHelp);
+};
+
+var _lukewestby$elm_http_builder$HttpBuilder$replace = F2(
+	function (old, $new) {
+		return function (_p0) {
+			return A2(
+				_elm_lang$core$String$join,
+				$new,
+				A2(_elm_lang$core$String$split, old, _p0));
+		};
+	});
+var _lukewestby$elm_http_builder$HttpBuilder$queryEscape = function (_p1) {
+	return A3(
+		_lukewestby$elm_http_builder$HttpBuilder$replace,
+		'%20',
+		'+',
+		_elm_lang$http$Http$encodeUri(_p1));
+};
+var _lukewestby$elm_http_builder$HttpBuilder$queryPair = function (_p2) {
+	var _p3 = _p2;
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		_lukewestby$elm_http_builder$HttpBuilder$queryEscape(_p3._0),
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			'=',
+			_lukewestby$elm_http_builder$HttpBuilder$queryEscape(_p3._1)));
+};
+var _lukewestby$elm_http_builder$HttpBuilder$joinUrlEncoded = function (args) {
+	return A2(
+		_elm_lang$core$String$join,
+		'&',
+		A2(_elm_lang$core$List$map, _lukewestby$elm_http_builder$HttpBuilder$queryPair, args));
+};
+var _lukewestby$elm_http_builder$HttpBuilder$toRequest = function (builder) {
+	var encodedParams = _lukewestby$elm_http_builder$HttpBuilder$joinUrlEncoded(builder.queryParams);
+	var fullUrl = _elm_lang$core$String$isEmpty(encodedParams) ? builder.url : A2(
+		_elm_lang$core$Basics_ops['++'],
+		builder.url,
+		A2(_elm_lang$core$Basics_ops['++'], '?', encodedParams));
+	return _elm_lang$http$Http$request(
+		{method: builder.method, url: fullUrl, headers: builder.headers, body: builder.body, expect: builder.expect, timeout: builder.timeout, withCredentials: builder.withCredentials});
+};
+var _lukewestby$elm_http_builder$HttpBuilder$toTaskPlain = function (builder) {
+	return _elm_lang$http$Http$toTask(
+		_lukewestby$elm_http_builder$HttpBuilder$toRequest(builder));
+};
+var _lukewestby$elm_http_builder$HttpBuilder$withCacheBuster = F2(
+	function (paramName, builder) {
+		return _elm_lang$core$Native_Utils.update(
+			builder,
+			{
+				cacheBuster: _elm_lang$core$Maybe$Just(paramName)
+			});
+	});
+var _lukewestby$elm_http_builder$HttpBuilder$withQueryParams = F2(
+	function (queryParams, builder) {
+		return _elm_lang$core$Native_Utils.update(
+			builder,
+			{
+				queryParams: A2(_elm_lang$core$Basics_ops['++'], builder.queryParams, queryParams)
+			});
+	});
+var _lukewestby$elm_http_builder$HttpBuilder$toTaskWithCacheBuster = F2(
+	function (paramName, builder) {
+		var request = function (timestamp) {
+			return _lukewestby$elm_http_builder$HttpBuilder$toTaskPlain(
+				A2(
+					_lukewestby$elm_http_builder$HttpBuilder$withQueryParams,
+					{
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: paramName,
+							_1: _elm_lang$core$Basics$toString(timestamp)
+						},
+						_1: {ctor: '[]'}
+					},
+					builder));
+		};
+		return A2(_elm_lang$core$Task$andThen, request, _elm_lang$core$Time$now);
+	});
+var _lukewestby$elm_http_builder$HttpBuilder$toTask = function (builder) {
+	var _p4 = builder.cacheBuster;
+	if (_p4.ctor === 'Just') {
+		return A2(_lukewestby$elm_http_builder$HttpBuilder$toTaskWithCacheBuster, _p4._0, builder);
+	} else {
+		return _lukewestby$elm_http_builder$HttpBuilder$toTaskPlain(builder);
+	}
+};
+var _lukewestby$elm_http_builder$HttpBuilder$send = F2(
+	function (tagger, builder) {
+		return A2(
+			_elm_lang$core$Task$attempt,
+			tagger,
+			_lukewestby$elm_http_builder$HttpBuilder$toTask(builder));
+	});
+var _lukewestby$elm_http_builder$HttpBuilder$withExpect = F2(
+	function (expect, builder) {
+		return _elm_lang$core$Native_Utils.update(
+			builder,
+			{expect: expect});
+	});
+var _lukewestby$elm_http_builder$HttpBuilder$withCredentials = function (builder) {
+	return _elm_lang$core$Native_Utils.update(
+		builder,
+		{withCredentials: true});
+};
+var _lukewestby$elm_http_builder$HttpBuilder$withTimeout = F2(
+	function (timeout, builder) {
+		return _elm_lang$core$Native_Utils.update(
+			builder,
+			{
+				timeout: _elm_lang$core$Maybe$Just(timeout)
+			});
+	});
+var _lukewestby$elm_http_builder$HttpBuilder$withBody = F2(
+	function (body, builder) {
+		return _elm_lang$core$Native_Utils.update(
+			builder,
+			{body: body});
+	});
+var _lukewestby$elm_http_builder$HttpBuilder$withStringBody = F2(
+	function (contentType, value) {
+		return _lukewestby$elm_http_builder$HttpBuilder$withBody(
+			A2(_elm_lang$http$Http$stringBody, contentType, value));
+	});
+var _lukewestby$elm_http_builder$HttpBuilder$withUrlEncodedBody = function (_p5) {
+	return A2(
+		_lukewestby$elm_http_builder$HttpBuilder$withStringBody,
+		'application/x-www-form-urlencoded',
+		_lukewestby$elm_http_builder$HttpBuilder$joinUrlEncoded(_p5));
+};
+var _lukewestby$elm_http_builder$HttpBuilder$withJsonBody = function (value) {
+	return _lukewestby$elm_http_builder$HttpBuilder$withBody(
+		_elm_lang$http$Http$jsonBody(value));
+};
+var _lukewestby$elm_http_builder$HttpBuilder$withMultipartStringBody = function (partPairs) {
+	return _lukewestby$elm_http_builder$HttpBuilder$withBody(
+		_elm_lang$http$Http$multipartBody(
+			A2(
+				_elm_lang$core$List$map,
+				_elm_lang$core$Basics$uncurry(_elm_lang$http$Http$stringPart),
+				partPairs)));
+};
+var _lukewestby$elm_http_builder$HttpBuilder$withHeaders = F2(
+	function (headerPairs, builder) {
+		return _elm_lang$core$Native_Utils.update(
+			builder,
+			{
+				headers: A2(
+					_elm_lang$core$Basics_ops['++'],
+					A2(
+						_elm_lang$core$List$map,
+						_elm_lang$core$Basics$uncurry(_elm_lang$http$Http$header),
+						headerPairs),
+					builder.headers)
+			});
+	});
+var _lukewestby$elm_http_builder$HttpBuilder$withHeader = F3(
+	function (key, value, builder) {
+		return _elm_lang$core$Native_Utils.update(
+			builder,
+			{
+				headers: {
+					ctor: '::',
+					_0: A2(_elm_lang$http$Http$header, key, value),
+					_1: builder.headers
+				}
+			});
+	});
+var _lukewestby$elm_http_builder$HttpBuilder$requestWithMethodAndUrl = F2(
+	function (method, url) {
+		return {
+			method: method,
+			url: url,
+			headers: {ctor: '[]'},
+			body: _elm_lang$http$Http$emptyBody,
+			expect: _elm_lang$http$Http$expectStringResponse(
+				function (_p6) {
+					return _elm_lang$core$Result$Ok(
+						{ctor: '_Tuple0'});
+				}),
+			timeout: _elm_lang$core$Maybe$Nothing,
+			withCredentials: false,
+			queryParams: {ctor: '[]'},
+			cacheBuster: _elm_lang$core$Maybe$Nothing
+		};
+	});
+var _lukewestby$elm_http_builder$HttpBuilder$get = _lukewestby$elm_http_builder$HttpBuilder$requestWithMethodAndUrl('GET');
+var _lukewestby$elm_http_builder$HttpBuilder$post = _lukewestby$elm_http_builder$HttpBuilder$requestWithMethodAndUrl('POST');
+var _lukewestby$elm_http_builder$HttpBuilder$put = _lukewestby$elm_http_builder$HttpBuilder$requestWithMethodAndUrl('PUT');
+var _lukewestby$elm_http_builder$HttpBuilder$patch = _lukewestby$elm_http_builder$HttpBuilder$requestWithMethodAndUrl('PATCH');
+var _lukewestby$elm_http_builder$HttpBuilder$delete = _lukewestby$elm_http_builder$HttpBuilder$requestWithMethodAndUrl('DELETE');
+var _lukewestby$elm_http_builder$HttpBuilder$options = _lukewestby$elm_http_builder$HttpBuilder$requestWithMethodAndUrl('OPTIONS');
+var _lukewestby$elm_http_builder$HttpBuilder$trace = _lukewestby$elm_http_builder$HttpBuilder$requestWithMethodAndUrl('TRACE');
+var _lukewestby$elm_http_builder$HttpBuilder$head = _lukewestby$elm_http_builder$HttpBuilder$requestWithMethodAndUrl('HEAD');
+var _lukewestby$elm_http_builder$HttpBuilder$RequestBuilder = F9(
+	function (a, b, c, d, e, f, g, h, i) {
+		return {method: a, headers: b, url: c, body: d, expect: e, timeout: f, withCredentials: g, queryParams: h, cacheBuster: i};
+	});
+
+var _shohamh$learnmath_frontend$Data_AuthToken$withAuthorization = F2(
+	function (maybeToken, builder) {
+		var _p0 = maybeToken;
+		if (_p0.ctor === 'Just') {
+			return A3(
+				_lukewestby$elm_http_builder$HttpBuilder$withHeader,
+				'authorization',
+				A2(_elm_lang$core$Basics_ops['++'], 'Token ', _p0._0._0),
+				builder);
+		} else {
+			return builder;
+		}
+	});
+var _shohamh$learnmath_frontend$Data_AuthToken$encode = function (_p1) {
+	var _p2 = _p1;
+	return _elm_lang$core$Json_Encode$string(_p2._0);
+};
+var _shohamh$learnmath_frontend$Data_AuthToken$AuthToken = function (a) {
+	return {ctor: 'AuthToken', _0: a};
+};
+var _shohamh$learnmath_frontend$Data_AuthToken$decoder = A2(_elm_lang$core$Json_Decode$map, _shohamh$learnmath_frontend$Data_AuthToken$AuthToken, _elm_lang$core$Json_Decode$string);
+
+var _shohamh$learnmath_frontend$Util$appendErrors = F2(
+	function (model, errors) {
+		return _elm_lang$core$Native_Utils.update(
+			model,
+			{
+				errors: A2(_elm_lang$core$Basics_ops['++'], model.errors, errors)
+			});
+	});
+var _shohamh$learnmath_frontend$Util$onClickStopPropagation = function (msg) {
+	return A3(
+		_elm_lang$html$Html_Events$onWithOptions,
+		'click',
+		_elm_lang$core$Native_Utils.update(
+			_elm_lang$html$Html_Events$defaultOptions,
+			{stopPropagation: true}),
+		_elm_lang$core$Json_Decode$succeed(msg));
+};
+var _shohamh$learnmath_frontend$Util$viewIf = F2(
+	function (condition, content) {
+		return condition ? content : _elm_lang$html$Html$text('');
+	});
+var _shohamh$learnmath_frontend$Util_ops = _shohamh$learnmath_frontend$Util_ops || {};
+_shohamh$learnmath_frontend$Util_ops['=>'] = F2(
+	function (v0, v1) {
+		return {ctor: '_Tuple2', _0: v0, _1: v1};
+	});
+var _shohamh$learnmath_frontend$Util$pair = F2(
+	function (first, second) {
+		return A2(_shohamh$learnmath_frontend$Util_ops['=>'], first, second);
+	});
+
+var _shohamh$learnmath_frontend$Data_User$usernameToHtml = function (_p0) {
+	var _p1 = _p0;
+	return _elm_lang$html$Html$text(_p1._0);
+};
+var _shohamh$learnmath_frontend$Data_User$encodeUsername = function (_p2) {
+	var _p3 = _p2;
+	return _elm_lang$core$Json_Encode$string(_p3._0);
+};
+var _shohamh$learnmath_frontend$Data_User$usernameToString = function (_p4) {
+	var _p5 = _p4;
+	return _p5._0;
+};
+var _shohamh$learnmath_frontend$Data_User$encode = function (user) {
 	return _elm_lang$core$Json_Encode$object(
 		{
 			ctor: '::',
@@ -19832,46 +20754,628 @@ var _user$project$Data_User$encode = function (user) {
 				_0: {
 					ctor: '_Tuple2',
 					_0: 'token',
-					_1: _elm_lang$core$Json_Encode$string(user.token)
+					_1: _shohamh$learnmath_frontend$Data_AuthToken$encode(user.token)
 				},
 				_1: {
 					ctor: '::',
 					_0: {
 						ctor: '_Tuple2',
 						_0: 'username',
-						_1: _elm_lang$core$Json_Encode$string(user.username)
+						_1: _shohamh$learnmath_frontend$Data_User$encodeUsername(user.username)
 					},
 					_1: {ctor: '[]'}
 				}
 			}
 		});
 };
-var _user$project$Data_User$User = F3(
+var _shohamh$learnmath_frontend$Data_User$User = F3(
 	function (a, b, c) {
 		return {email: a, token: b, username: c};
 	});
-var _user$project$Data_User$decoder = A3(
+var _shohamh$learnmath_frontend$Data_User$Username = function (a) {
+	return {ctor: 'Username', _0: a};
+};
+var _shohamh$learnmath_frontend$Data_User$usernameParser = A2(
+	_evancz$url_parser$UrlParser$custom,
+	'USERNAME',
+	function (_p6) {
+		return _elm_lang$core$Result$Ok(
+			_shohamh$learnmath_frontend$Data_User$Username(_p6));
+	});
+var _shohamh$learnmath_frontend$Data_User$usernameDecoder = A2(_elm_lang$core$Json_Decode$map, _shohamh$learnmath_frontend$Data_User$Username, _elm_lang$core$Json_Decode$string);
+var _shohamh$learnmath_frontend$Data_User$decoder = A3(
 	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
 	'username',
-	_elm_lang$core$Json_Decode$string,
+	_shohamh$learnmath_frontend$Data_User$usernameDecoder,
 	A3(
 		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
 		'token',
-		_elm_lang$core$Json_Decode$string,
+		_shohamh$learnmath_frontend$Data_AuthToken$decoder,
 		A3(
 			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
 			'email',
 			_elm_lang$core$Json_Decode$string,
-			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_user$project$Data_User$User))));
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_shohamh$learnmath_frontend$Data_User$User))));
 
-var _user$project$Ports$storeSession = _elm_lang$core$Native_Platform.outgoingPort(
+var _shohamh$learnmath_frontend$Data_Session$attempt = F3(
+	function (attemptedAction, toCmd, session) {
+		var _p0 = A2(
+			_elm_lang$core$Maybe$map,
+			function (_) {
+				return _.token;
+			},
+			session.user);
+		if (_p0.ctor === 'Nothing') {
+			return A2(
+				_shohamh$learnmath_frontend$Util_ops['=>'],
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$core$Basics_ops['++'],
+						'You have been signed out. Please sign back in to ',
+						A2(_elm_lang$core$Basics_ops['++'], attemptedAction, '.')),
+					_1: {ctor: '[]'}
+				},
+				_elm_lang$core$Platform_Cmd$none);
+		} else {
+			return A2(
+				_shohamh$learnmath_frontend$Util_ops['=>'],
+				{ctor: '[]'},
+				toCmd(_p0._0));
+		}
+	});
+var _shohamh$learnmath_frontend$Data_Session$Session = function (a) {
+	return {user: a};
+};
+
+var _shohamh$learnmath_frontend$Route$routeToString = function (page) {
+	var pieces = function () {
+		var _p0 = page;
+		switch (_p0.ctor) {
+			case 'Home':
+				return {ctor: '[]'};
+			case 'Login':
+				return {
+					ctor: '::',
+					_0: 'login',
+					_1: {ctor: '[]'}
+				};
+			case 'Logout':
+				return {
+					ctor: '::',
+					_0: 'logout',
+					_1: {ctor: '[]'}
+				};
+			case 'Register':
+				return {
+					ctor: '::',
+					_0: 'register',
+					_1: {ctor: '[]'}
+				};
+			default:
+				return {
+					ctor: '::',
+					_0: 'question',
+					_1: {ctor: '[]'}
+				};
+		}
+	}();
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		'#/',
+		A2(_elm_lang$core$String$join, '/', pieces));
+};
+var _shohamh$learnmath_frontend$Route$href = function (route) {
+	return _elm_lang$html$Html_Attributes$href(
+		_shohamh$learnmath_frontend$Route$routeToString(route));
+};
+var _shohamh$learnmath_frontend$Route$modifyUrl = function (_p1) {
+	return _elm_lang$navigation$Navigation$modifyUrl(
+		_shohamh$learnmath_frontend$Route$routeToString(_p1));
+};
+var _shohamh$learnmath_frontend$Route$Question = {ctor: 'Question'};
+var _shohamh$learnmath_frontend$Route$Register = {ctor: 'Register'};
+var _shohamh$learnmath_frontend$Route$Logout = {ctor: 'Logout'};
+var _shohamh$learnmath_frontend$Route$Login = {ctor: 'Login'};
+var _shohamh$learnmath_frontend$Route$Home = {ctor: 'Home'};
+var _shohamh$learnmath_frontend$Route$route = _evancz$url_parser$UrlParser$oneOf(
+	{
+		ctor: '::',
+		_0: A2(
+			_evancz$url_parser$UrlParser$map,
+			_shohamh$learnmath_frontend$Route$Home,
+			_evancz$url_parser$UrlParser$s('')),
+		_1: {
+			ctor: '::',
+			_0: A2(
+				_evancz$url_parser$UrlParser$map,
+				_shohamh$learnmath_frontend$Route$Login,
+				_evancz$url_parser$UrlParser$s('login')),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_evancz$url_parser$UrlParser$map,
+					_shohamh$learnmath_frontend$Route$Logout,
+					_evancz$url_parser$UrlParser$s('logout')),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_evancz$url_parser$UrlParser$map,
+						_shohamh$learnmath_frontend$Route$Register,
+						_evancz$url_parser$UrlParser$s('register')),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_evancz$url_parser$UrlParser$map,
+							_shohamh$learnmath_frontend$Route$Question,
+							_evancz$url_parser$UrlParser$s('question')),
+						_1: {ctor: '[]'}
+					}
+				}
+			}
+		}
+	});
+var _shohamh$learnmath_frontend$Route$fromLocation = function (location) {
+	return _elm_lang$core$String$isEmpty(location.hash) ? _elm_lang$core$Maybe$Just(_shohamh$learnmath_frontend$Route$Home) : A2(_evancz$url_parser$UrlParser$parseHash, _shohamh$learnmath_frontend$Route$route, location);
+};
+
+var _shohamh$learnmath_frontend$Views_Spinner$spinner = A2(
+	_elm_lang$html$Html$li,
+	{
+		ctor: '::',
+		_0: _elm_lang$html$Html_Attributes$class('sk-three-bounce'),
+		_1: {
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$style(
+				{
+					ctor: '::',
+					_0: A2(_shohamh$learnmath_frontend$Util_ops['=>'], 'float', 'left'),
+					_1: {
+						ctor: '::',
+						_0: A2(_shohamh$learnmath_frontend$Util_ops['=>'], 'margin', '8px'),
+						_1: {ctor: '[]'}
+					}
+				}),
+			_1: {ctor: '[]'}
+		}
+	},
+	{
+		ctor: '::',
+		_0: A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('sk-child sk-bounce1'),
+				_1: {ctor: '[]'}
+			},
+			{ctor: '[]'}),
+		_1: {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('sk-child sk-bounce2'),
+					_1: {ctor: '[]'}
+				},
+				{ctor: '[]'}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('sk-child sk-bounce3'),
+						_1: {ctor: '[]'}
+					},
+					{ctor: '[]'}),
+				_1: {ctor: '[]'}
+			}
+		}
+	});
+
+var _shohamh$learnmath_frontend$Views_Page$bodyId = 'page-body';
+var _shohamh$learnmath_frontend$Views_Page$navbarLink = F3(
+	function (isActive, route, linkContent) {
+		return A2(
+			_elm_lang$html$Html$li,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$classList(
+					{
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'nav-item', _1: true},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'active', _1: isActive},
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$a,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('nav-link'),
+						_1: {
+							ctor: '::',
+							_0: _shohamh$learnmath_frontend$Route$href(route),
+							_1: {ctor: '[]'}
+						}
+					},
+					linkContent),
+				_1: {ctor: '[]'}
+			});
+	});
+var _shohamh$learnmath_frontend$Views_Page$viewFooter = A2(
+	_elm_lang$html$Html$footer,
+	{ctor: '[]'},
+	{
+		ctor: '::',
+		_0: A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('container'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$a,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('logo-font'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$href('/'),
+							_1: {ctor: '[]'}
+						}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('conduit'),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$span,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('attribution'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('An interactive learning project from '),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$a,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$href('https://thinkster.io'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Thinkster'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('. Code & design licensed under MIT.'),
+									_1: {ctor: '[]'}
+								}
+							}
+						}),
+					_1: {ctor: '[]'}
+				}
+			}),
+		_1: {ctor: '[]'}
+	});
+var _shohamh$learnmath_frontend$Views_Page$Question = {ctor: 'Question'};
+var _shohamh$learnmath_frontend$Views_Page$Register = {ctor: 'Register'};
+var _shohamh$learnmath_frontend$Views_Page$Login = {ctor: 'Login'};
+var _shohamh$learnmath_frontend$Views_Page$viewSignIn = F2(
+	function (page, user) {
+		var _p0 = user;
+		if (_p0.ctor === 'Nothing') {
+			return {
+				ctor: '::',
+				_0: A3(
+					_shohamh$learnmath_frontend$Views_Page$navbarLink,
+					_elm_lang$core$Native_Utils.eq(page, _shohamh$learnmath_frontend$Views_Page$Login),
+					_shohamh$learnmath_frontend$Route$Login,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('Sign in'),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A3(
+						_shohamh$learnmath_frontend$Views_Page$navbarLink,
+						_elm_lang$core$Native_Utils.eq(page, _shohamh$learnmath_frontend$Views_Page$Register),
+						_shohamh$learnmath_frontend$Route$Register,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('Sign up'),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
+			};
+		} else {
+			return {
+				ctor: '::',
+				_0: A3(
+					_shohamh$learnmath_frontend$Views_Page$navbarLink,
+					false,
+					_shohamh$learnmath_frontend$Route$Logout,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('Sign out'),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			};
+		}
+	});
+var _shohamh$learnmath_frontend$Views_Page$Home = {ctor: 'Home'};
+var _shohamh$learnmath_frontend$Views_Page$viewHeader = F3(
+	function (page, user, isLoading) {
+		return A2(
+			_elm_lang$html$Html$nav,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('navbar navbar-light'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('container'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$a,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('navbar-brand'),
+								_1: {
+									ctor: '::',
+									_0: _shohamh$learnmath_frontend$Route$href(_shohamh$learnmath_frontend$Route$Home),
+									_1: {ctor: '[]'}
+								}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('conduit'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$ul,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('nav navbar-nav pull-xs-right'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: A3(_elm_lang$html$Html_Lazy$lazy2, _shohamh$learnmath_frontend$Util$viewIf, isLoading, _shohamh$learnmath_frontend$Views_Spinner$spinner),
+									_1: {
+										ctor: '::',
+										_0: A3(
+											_shohamh$learnmath_frontend$Views_Page$navbarLink,
+											_elm_lang$core$Native_Utils.eq(page, _shohamh$learnmath_frontend$Views_Page$Home),
+											_shohamh$learnmath_frontend$Route$Home,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('Home'),
+												_1: {ctor: '[]'}
+											}),
+										_1: A2(_shohamh$learnmath_frontend$Views_Page$viewSignIn, page, user)
+									}
+								}),
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {ctor: '[]'}
+			});
+	});
+var _shohamh$learnmath_frontend$Views_Page$frame = F4(
+	function (isLoading, user, page, content) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('page-frame'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A3(_shohamh$learnmath_frontend$Views_Page$viewHeader, page, user, isLoading),
+				_1: {
+					ctor: '::',
+					_0: content,
+					_1: {
+						ctor: '::',
+						_0: _shohamh$learnmath_frontend$Views_Page$viewFooter,
+						_1: {ctor: '[]'}
+					}
+				}
+			});
+	});
+var _shohamh$learnmath_frontend$Views_Page$Other = {ctor: 'Other'};
+
+var _shohamh$learnmath_frontend$Page_Errored$view = F2(
+	function (session, _p0) {
+		var _p1 = _p0;
+		return A2(
+			_elm_lang$html$Html$main_,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$id('content'),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('container'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$tabindex(-1),
+						_1: {ctor: '[]'}
+					}
+				}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$h1,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('Error Loading Page'),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('row'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$p,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text(_p1._0.errorMessage),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _shohamh$learnmath_frontend$Page_Errored$Model = F2(
+	function (a, b) {
+		return {activePage: a, errorMessage: b};
+	});
+var _shohamh$learnmath_frontend$Page_Errored$PageLoadError = function (a) {
+	return {ctor: 'PageLoadError', _0: a};
+};
+var _shohamh$learnmath_frontend$Page_Errored$pageLoadError = F2(
+	function (activePage, errorMessage) {
+		return _shohamh$learnmath_frontend$Page_Errored$PageLoadError(
+			{activePage: activePage, errorMessage: errorMessage});
+	});
+
+var _shohamh$learnmath_frontend$Page_Home$update = F3(
+	function (session, msg, model) {
+		var _p0 = msg;
+		return A2(
+			_elm_lang$core$Platform_Cmd_ops['!'],
+			model,
+			{ctor: '[]'});
+	});
+var _shohamh$learnmath_frontend$Page_Home$view = F2(
+	function (session, model) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('home-page'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('container page'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('row'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$div,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('col-md-3'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$div,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$class('sidebar'),
+												_1: {ctor: '[]'}
+											},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('hi'),
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			});
+	});
+var _shohamh$learnmath_frontend$Page_Home$Model = function (a) {
+	return {a: a};
+};
+var _shohamh$learnmath_frontend$Page_Home$init = function (session) {
+	var handleLoadError = function (_p1) {
+		return A2(_shohamh$learnmath_frontend$Page_Errored$pageLoadError, _shohamh$learnmath_frontend$Views_Page$Home, 'Homepage is currently unavailable.');
+	};
+	return A2(
+		_elm_lang$core$Task$mapError,
+		handleLoadError,
+		_elm_lang$core$Task$succeed(
+			_shohamh$learnmath_frontend$Page_Home$Model(3)));
+};
+var _shohamh$learnmath_frontend$Page_Home$NoOp = {ctor: 'NoOp'};
+
+var _shohamh$learnmath_frontend$Ports$storeSession = _elm_lang$core$Native_Platform.outgoingPort(
 	'storeSession',
 	function (v) {
 		return (v.ctor === 'Nothing') ? null : v._0;
 	});
-var _user$project$Ports$onSessionChange = _elm_lang$core$Native_Platform.incomingPort('onSessionChange', _elm_lang$core$Json_Decode$value);
+var _shohamh$learnmath_frontend$Ports$onSessionChange = _elm_lang$core$Native_Platform.incomingPort('onSessionChange', _elm_lang$core$Json_Decode$value);
 
-var _user$project$Forms_Login$viewErrorMessages = function (errorMessages) {
+var _shohamh$learnmath_frontend$Page_Login$viewErrorMessages = function (errorMessages) {
 	return A2(
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},
@@ -19883,7 +21387,7 @@ var _user$project$Forms_Login$viewErrorMessages = function (errorMessages) {
 				{ctor: '[]'}),
 			A2(_elm_lang$core$List$map, _elm_lang$html$Html$text, errorMessages)));
 };
-var _user$project$Forms_Login$requestEncoder = function (requestData) {
+var _shohamh$learnmath_frontend$Page_Login$requestEncoder = function (requestData) {
 	return _elm_lang$core$Json_Encode$object(
 		{
 			ctor: '::',
@@ -19903,37 +21407,37 @@ var _user$project$Forms_Login$requestEncoder = function (requestData) {
 			}
 		});
 };
-var _user$project$Forms_Login$model = {
+var _shohamh$learnmath_frontend$Page_Login$model = {
 	username: '',
 	password: '',
 	successMessage: '',
 	errorMessages: {ctor: '[]'},
 	mdl: _debois$elm_mdl$Material$model
 };
-var _user$project$Forms_Login$storeSession = function (user) {
-	return _user$project$Ports$storeSession(
+var _shohamh$learnmath_frontend$Page_Login$storeSession = function (user) {
+	return _shohamh$learnmath_frontend$Ports$storeSession(
 		_elm_lang$core$Maybe$Just(
 			A2(
 				_elm_lang$core$Json_Encode$encode,
 				0,
-				_user$project$Data_User$encode(user))));
+				_shohamh$learnmath_frontend$Data_User$encode(user))));
 };
-var _user$project$Forms_Login$Model = F5(
+var _shohamh$learnmath_frontend$Page_Login$Model = F5(
 	function (a, b, c, d, e) {
 		return {username: a, password: b, successMessage: c, errorMessages: d, mdl: e};
 	});
-var _user$project$Forms_Login$RequestData = F2(
+var _shohamh$learnmath_frontend$Page_Login$RequestData = F2(
 	function (a, b) {
 		return {username: a, password: b};
 	});
-var _user$project$Forms_Login$requestModel = function (model) {
-	return A2(_user$project$Forms_Login$RequestData, model.username, model.password);
+var _shohamh$learnmath_frontend$Page_Login$requestModel = function (model) {
+	return A2(_shohamh$learnmath_frontend$Page_Login$RequestData, model.username, model.password);
 };
-var _user$project$Forms_Login$ResponseData = F2(
+var _shohamh$learnmath_frontend$Page_Login$ResponseData = F2(
 	function (a, b) {
 		return {success: a, error_messages: b};
 	});
-var _user$project$Forms_Login$responseDecoder = A3(
+var _shohamh$learnmath_frontend$Page_Login$responseDecoder = A3(
 	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
 	'error_messages',
 	_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string),
@@ -19941,56 +21445,184 @@ var _user$project$Forms_Login$responseDecoder = A3(
 		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
 		'success',
 		_elm_lang$core$Json_Decode$bool,
-		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_user$project$Forms_Login$ResponseData)));
-var _user$project$Forms_Login$Mdl = function (a) {
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_shohamh$learnmath_frontend$Page_Login$ResponseData)));
+var _shohamh$learnmath_frontend$Page_Login$Mdl = function (a) {
 	return {ctor: 'Mdl', _0: a};
 };
-var _user$project$Forms_Login$SubmitResult = function (a) {
+var _shohamh$learnmath_frontend$Page_Login$SubmitResult = function (a) {
 	return {ctor: 'SubmitResult', _0: a};
 };
-var _user$project$Forms_Login$send = function (requestData) {
+var _shohamh$learnmath_frontend$Page_Login$send = function (requestData) {
 	var body = _elm_lang$http$Http$jsonBody(
-		_user$project$Forms_Login$requestEncoder(requestData));
+		_shohamh$learnmath_frontend$Page_Login$requestEncoder(requestData));
 	var url = 'http://learnmath.pythonanywhere.com/login';
-	var request = A3(_elm_lang$http$Http$post, url, body, _user$project$Forms_Login$responseDecoder);
-	return A2(_elm_lang$http$Http$send, _user$project$Forms_Login$SubmitResult, request);
+	var request = A3(_elm_lang$http$Http$post, url, body, _shohamh$learnmath_frontend$Page_Login$responseDecoder);
+	return A2(_elm_lang$http$Http$send, _shohamh$learnmath_frontend$Page_Login$SubmitResult, request);
 };
-var _user$project$Forms_Login$update = F2(
+var _shohamh$learnmath_frontend$Page_Login$Submit = {ctor: 'Submit'};
+var _shohamh$learnmath_frontend$Page_Login$UpdatePassword = function (a) {
+	return {ctor: 'UpdatePassword', _0: a};
+};
+var _shohamh$learnmath_frontend$Page_Login$UpdateUsername = function (a) {
+	return {ctor: 'UpdateUsername', _0: a};
+};
+var _shohamh$learnmath_frontend$Page_Login$view = F2(
+	function (session, model) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A5(
+					_debois$elm_mdl$Material_Textfield$render,
+					_shohamh$learnmath_frontend$Page_Login$Mdl,
+					{
+						ctor: '::',
+						_0: 0,
+						_1: {ctor: '[]'}
+					},
+					model.mdl,
+					{
+						ctor: '::',
+						_0: _debois$elm_mdl$Material_Textfield$label('Username'),
+						_1: {
+							ctor: '::',
+							_0: _debois$elm_mdl$Material_Textfield$floatingLabel,
+							_1: {
+								ctor: '::',
+								_0: _debois$elm_mdl$Material_Textfield$text_,
+								_1: {
+									ctor: '::',
+									_0: _debois$elm_mdl$Material_Options$onInput(_shohamh$learnmath_frontend$Page_Login$UpdateUsername),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					},
+					{ctor: '[]'}),
+				_1: {
+					ctor: '::',
+					_0: A5(
+						_debois$elm_mdl$Material_Textfield$render,
+						_shohamh$learnmath_frontend$Page_Login$Mdl,
+						{
+							ctor: '::',
+							_0: 1,
+							_1: {ctor: '[]'}
+						},
+						model.mdl,
+						{
+							ctor: '::',
+							_0: _debois$elm_mdl$Material_Textfield$label('Password'),
+							_1: {
+								ctor: '::',
+								_0: _debois$elm_mdl$Material_Textfield$floatingLabel,
+								_1: {
+									ctor: '::',
+									_0: _debois$elm_mdl$Material_Textfield$password,
+									_1: {
+										ctor: '::',
+										_0: _debois$elm_mdl$Material_Options$onInput(_shohamh$learnmath_frontend$Page_Login$UpdatePassword),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {
+						ctor: '::',
+						_0: A5(
+							_debois$elm_mdl$Material_Button$render,
+							_shohamh$learnmath_frontend$Page_Login$Mdl,
+							{
+								ctor: '::',
+								_0: 2,
+								_1: {ctor: '[]'}
+							},
+							model.mdl,
+							{
+								ctor: '::',
+								_0: _debois$elm_mdl$Material_Button$raised,
+								_1: {
+									ctor: '::',
+									_0: _debois$elm_mdl$Material_Button$colored,
+									_1: {
+										ctor: '::',
+										_0: _debois$elm_mdl$Material_Button$ripple,
+										_1: {
+											ctor: '::',
+											_0: _debois$elm_mdl$Material_Options$onClick(_shohamh$learnmath_frontend$Page_Login$Submit),
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Login'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: _shohamh$learnmath_frontend$Page_Login$viewErrorMessages(model.errorMessages),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(model.successMessage),
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				}
+			});
+	});
+var _shohamh$learnmath_frontend$Page_Login$SetUser = function (a) {
+	return {ctor: 'SetUser', _0: a};
+};
+var _shohamh$learnmath_frontend$Page_Login$NoOp = {ctor: 'NoOp'};
+var _shohamh$learnmath_frontend$Page_Login$update = F2(
 	function (msg, model) {
 		var _p0 = msg;
 		switch (_p0.ctor) {
 			case 'Mdl':
-				return A3(_debois$elm_mdl$Material$update, _user$project$Forms_Login$Mdl, _p0._0, model);
+				return A2(
+					_shohamh$learnmath_frontend$Util_ops['=>'],
+					A3(_debois$elm_mdl$Material$update, _shohamh$learnmath_frontend$Page_Login$Mdl, _p0._0, model),
+					_shohamh$learnmath_frontend$Page_Login$NoOp);
 			case 'UpdateUsername':
 				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{username: _p0._0}),
-					{ctor: '[]'});
+					_shohamh$learnmath_frontend$Util_ops['=>'],
+					A2(
+						_shohamh$learnmath_frontend$Util_ops['=>'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{username: _p0._0}),
+						_elm_lang$core$Platform_Cmd$none),
+					_shohamh$learnmath_frontend$Page_Login$NoOp);
 			case 'UpdatePassword':
 				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{password: _p0._0}),
-					{ctor: '[]'});
+					_shohamh$learnmath_frontend$Util_ops['=>'],
+					A2(
+						_shohamh$learnmath_frontend$Util_ops['=>'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{password: _p0._0}),
+						_elm_lang$core$Platform_Cmd$none),
+					_shohamh$learnmath_frontend$Page_Login$NoOp);
 			case 'Submit':
-				var requestData = _user$project$Forms_Login$requestModel(model);
+				var requestData = _shohamh$learnmath_frontend$Page_Login$requestModel(model);
 				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					model,
-					{
-						ctor: '::',
-						_0: _user$project$Forms_Login$send(requestData),
-						_1: {ctor: '[]'}
-					});
+					_shohamh$learnmath_frontend$Util_ops['=>'],
+					A2(
+						_shohamh$learnmath_frontend$Util_ops['=>'],
+						model,
+						_shohamh$learnmath_frontend$Page_Login$send(requestData)),
+					_shohamh$learnmath_frontend$Page_Login$NoOp);
 			default:
 				if (_p0._0.ctor === 'Ok') {
 					return A2(
-						_elm_lang$core$Platform_Cmd_ops['!'],
-						model,
-						{ctor: '[]'});
+						_shohamh$learnmath_frontend$Util_ops['=>'],
+						A2(_shohamh$learnmath_frontend$Util_ops['=>'], model, _elm_lang$core$Platform_Cmd$none),
+						_shohamh$learnmath_frontend$Page_Login$NoOp);
 				} else {
 					var errorMessage = function () {
 						var _p1 = _p0._0._0;
@@ -20011,140 +21643,93 @@ var _user$project$Forms_Login$update = F2(
 						}
 					}();
 					return A2(
-						_elm_lang$core$Platform_Cmd_ops['!'],
-						_elm_lang$core$Native_Utils.update(
-							model,
-							{
-								errorMessages: A2(
-									_elm_lang$core$List$append,
-									model.errorMessages,
-									{
-										ctor: '::',
-										_0: errorMessage,
-										_1: {ctor: '[]'}
-									})
-							}),
-						{ctor: '[]'});
+						_shohamh$learnmath_frontend$Util_ops['=>'],
+						A2(
+							_shohamh$learnmath_frontend$Util_ops['=>'],
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{
+									errorMessages: A2(
+										_elm_lang$core$List$append,
+										model.errorMessages,
+										{
+											ctor: '::',
+											_0: errorMessage,
+											_1: {ctor: '[]'}
+										})
+								}),
+							_elm_lang$core$Platform_Cmd$none),
+						_shohamh$learnmath_frontend$Page_Login$NoOp);
 				}
 		}
 	});
-var _user$project$Forms_Login$Submit = {ctor: 'Submit'};
-var _user$project$Forms_Login$UpdatePassword = function (a) {
-	return {ctor: 'UpdatePassword', _0: a};
+
+var _shohamh$learnmath_frontend$Views_Assets$src = function (_p0) {
+	var _p1 = _p0;
+	return _elm_lang$html$Html_Attributes$src(_p1._0);
 };
-var _user$project$Forms_Login$UpdateUsername = function (a) {
-	return {ctor: 'UpdateUsername', _0: a};
+var _shohamh$learnmath_frontend$Views_Assets$Image = function (a) {
+	return {ctor: 'Image', _0: a};
 };
-var _user$project$Forms_Login$viewForm = function (model) {
+var _shohamh$learnmath_frontend$Views_Assets$error = _shohamh$learnmath_frontend$Views_Assets$Image('https://www.packagor.com/wp-content/uploads/2017/03/404-error-not-found.jpg');
+
+var _shohamh$learnmath_frontend$Page_NotFound$view = function (session) {
 	return A2(
-		_elm_lang$html$Html$div,
-		{ctor: '[]'},
+		_elm_lang$html$Html$main_,
 		{
 			ctor: '::',
-			_0: A5(
-				_debois$elm_mdl$Material_Textfield$render,
-				_user$project$Forms_Login$Mdl,
-				{
-					ctor: '::',
-					_0: 0,
-					_1: {ctor: '[]'}
-				},
-				model.mdl,
-				{
-					ctor: '::',
-					_0: _debois$elm_mdl$Material_Textfield$label('Username'),
-					_1: {
-						ctor: '::',
-						_0: _debois$elm_mdl$Material_Textfield$floatingLabel,
-						_1: {
-							ctor: '::',
-							_0: _debois$elm_mdl$Material_Textfield$text_,
-							_1: {
-								ctor: '::',
-								_0: _debois$elm_mdl$Material_Options$onInput(_user$project$Forms_Login$UpdateUsername),
-								_1: {ctor: '[]'}
-							}
-						}
-					}
-				},
-				{ctor: '[]'}),
+			_0: _elm_lang$html$Html_Attributes$id('content'),
 			_1: {
 				ctor: '::',
-				_0: A5(
-					_debois$elm_mdl$Material_Textfield$render,
-					_user$project$Forms_Login$Mdl,
-					{
-						ctor: '::',
-						_0: 1,
-						_1: {ctor: '[]'}
-					},
-					model.mdl,
-					{
-						ctor: '::',
-						_0: _debois$elm_mdl$Material_Textfield$label('Password'),
-						_1: {
-							ctor: '::',
-							_0: _debois$elm_mdl$Material_Textfield$floatingLabel,
-							_1: {
-								ctor: '::',
-								_0: _debois$elm_mdl$Material_Textfield$password,
-								_1: {
-									ctor: '::',
-									_0: _debois$elm_mdl$Material_Options$onInput(_user$project$Forms_Login$UpdatePassword),
-									_1: {ctor: '[]'}
-								}
-							}
-						}
-					},
-					{ctor: '[]'}),
+				_0: _elm_lang$html$Html_Attributes$class('container'),
 				_1: {
 					ctor: '::',
-					_0: A5(
-						_debois$elm_mdl$Material_Button$render,
-						_user$project$Forms_Login$Mdl,
-						{
-							ctor: '::',
-							_0: 2,
-							_1: {ctor: '[]'}
-						},
-						model.mdl,
-						{
-							ctor: '::',
-							_0: _debois$elm_mdl$Material_Button$raised,
-							_1: {
+					_0: _elm_lang$html$Html_Attributes$tabindex(-1),
+					_1: {ctor: '[]'}
+				}
+			}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$h1,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('Not Found'),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('row'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$img,
+							{
 								ctor: '::',
-								_0: _debois$elm_mdl$Material_Button$colored,
+								_0: _shohamh$learnmath_frontend$Views_Assets$src(_shohamh$learnmath_frontend$Views_Assets$error),
 								_1: {
 									ctor: '::',
-									_0: _debois$elm_mdl$Material_Button$ripple,
-									_1: {
-										ctor: '::',
-										_0: _debois$elm_mdl$Material_Options$onClick(_user$project$Forms_Login$Submit),
-										_1: {ctor: '[]'}
-									}
+									_0: _elm_lang$html$Html_Attributes$alt('giant laser walrus wreaking havoc'),
+									_1: {ctor: '[]'}
 								}
-							}
-						},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('Login'),
-							_1: {ctor: '[]'}
-						}),
-					_1: {
-						ctor: '::',
-						_0: _user$project$Forms_Login$viewErrorMessages(model.errorMessages),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html$text(model.successMessage),
-							_1: {ctor: '[]'}
-						}
-					}
-				}
+							},
+							{ctor: '[]'}),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
 			}
 		});
 };
 
-var _user$project$Forms_Question$requestEncoder = function (requestData) {
+var _shohamh$learnmath_frontend$Page_Question$requestEncoder = function (requestData) {
 	return _elm_lang$core$Json_Encode$object(
 		{
 			ctor: '::',
@@ -20164,29 +21749,29 @@ var _user$project$Forms_Question$requestEncoder = function (requestData) {
 			}
 		});
 };
-var _user$project$Forms_Question$model = {
+var _shohamh$learnmath_frontend$Page_Question$model = {
 	username: '',
 	password: '',
 	successMessage: '',
 	errorMessages: {ctor: '[]'},
 	mdl: _debois$elm_mdl$Material$model
 };
-var _user$project$Forms_Question$Model = F5(
+var _shohamh$learnmath_frontend$Page_Question$Model = F5(
 	function (a, b, c, d, e) {
 		return {username: a, password: b, successMessage: c, errorMessages: d, mdl: e};
 	});
-var _user$project$Forms_Question$RequestData = F2(
+var _shohamh$learnmath_frontend$Page_Question$RequestData = F2(
 	function (a, b) {
 		return {username: a, password: b};
 	});
-var _user$project$Forms_Question$requestModel = function (model) {
-	return A2(_user$project$Forms_Question$RequestData, model.username, model.password);
+var _shohamh$learnmath_frontend$Page_Question$requestModel = function (model) {
+	return A2(_shohamh$learnmath_frontend$Page_Question$RequestData, model.username, model.password);
 };
-var _user$project$Forms_Question$ResponseData = F2(
+var _shohamh$learnmath_frontend$Page_Question$ResponseData = F2(
 	function (a, b) {
 		return {success: a, error_messages: b};
 	});
-var _user$project$Forms_Question$responseDecoder = A3(
+var _shohamh$learnmath_frontend$Page_Question$responseDecoder = A3(
 	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
 	'error_messages',
 	_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string),
@@ -20194,37 +21779,37 @@ var _user$project$Forms_Question$responseDecoder = A3(
 		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
 		'success',
 		_elm_lang$core$Json_Decode$bool,
-		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_user$project$Forms_Question$ResponseData)));
-var _user$project$Forms_Question$Mdl = function (a) {
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_shohamh$learnmath_frontend$Page_Question$ResponseData)));
+var _shohamh$learnmath_frontend$Page_Question$Mdl = function (a) {
 	return {ctor: 'Mdl', _0: a};
 };
-var _user$project$Forms_Question$MyscriptReceive = function (a) {
+var _shohamh$learnmath_frontend$Page_Question$MyscriptReceive = function (a) {
 	return {ctor: 'MyscriptReceive', _0: a};
 };
-var _user$project$Forms_Question$subs = function (model) {
+var _shohamh$learnmath_frontend$Page_Question$subs = function (model) {
 	return _elm_lang$core$Platform_Sub$batch(
 		{
 			ctor: '::',
-			_0: A2(_elm_lang$websocket$WebSocket$listen, 'wss://cloud.myscript.com/api/v3.0/recognition/ws/math', _user$project$Forms_Question$MyscriptReceive),
+			_0: A2(_elm_lang$websocket$WebSocket$listen, 'wss://cloud.myscript.com/api/v3.0/recognition/ws/math', _shohamh$learnmath_frontend$Page_Question$MyscriptReceive),
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$Forms_Question$SubmitResult = function (a) {
+var _shohamh$learnmath_frontend$Page_Question$SubmitResult = function (a) {
 	return {ctor: 'SubmitResult', _0: a};
 };
-var _user$project$Forms_Question$send = function (requestData) {
+var _shohamh$learnmath_frontend$Page_Question$send = function (requestData) {
 	var body = _elm_lang$http$Http$jsonBody(
-		_user$project$Forms_Question$requestEncoder(requestData));
+		_shohamh$learnmath_frontend$Page_Question$requestEncoder(requestData));
 	var url = 'http://learnmath.pythonanywhere.com/login';
-	var request = A3(_elm_lang$http$Http$post, url, body, _user$project$Forms_Question$responseDecoder);
-	return A2(_elm_lang$http$Http$send, _user$project$Forms_Question$SubmitResult, request);
+	var request = A3(_elm_lang$http$Http$post, url, body, _shohamh$learnmath_frontend$Page_Question$responseDecoder);
+	return A2(_elm_lang$http$Http$send, _shohamh$learnmath_frontend$Page_Question$SubmitResult, request);
 };
-var _user$project$Forms_Question$update = F2(
+var _shohamh$learnmath_frontend$Page_Question$update = F2(
 	function (msg, model) {
 		var _p0 = msg;
 		switch (_p0.ctor) {
 			case 'Mdl':
-				return A3(_debois$elm_mdl$Material$update, _user$project$Forms_Question$Mdl, _p0._0, model);
+				return A3(_debois$elm_mdl$Material$update, _shohamh$learnmath_frontend$Page_Question$Mdl, _p0._0, model);
 			case 'UpdateUsername':
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
@@ -20240,13 +21825,13 @@ var _user$project$Forms_Question$update = F2(
 						{password: _p0._0}),
 					{ctor: '[]'});
 			case 'Submit':
-				var requestData = _user$project$Forms_Question$requestModel(model);
+				var requestData = _shohamh$learnmath_frontend$Page_Question$requestModel(model);
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					model,
 					{
 						ctor: '::',
-						_0: A3(_elm_lang$core$Debug$log, 'hi', _user$project$Forms_Question$send, requestData),
+						_0: A3(_elm_lang$core$Debug$log, 'hi', _shohamh$learnmath_frontend$Page_Question$send, requestData),
 						_1: {ctor: '[]'}
 					});
 			case 'SubmitResult':
@@ -20278,69 +21863,41 @@ var _user$project$Forms_Question$update = F2(
 					});
 		}
 	});
-var _user$project$Forms_Question$Submit = {ctor: 'Submit'};
-var _user$project$Forms_Question$UpdatePassword = function (a) {
+var _shohamh$learnmath_frontend$Page_Question$Submit = {ctor: 'Submit'};
+var _shohamh$learnmath_frontend$Page_Question$UpdatePassword = function (a) {
 	return {ctor: 'UpdatePassword', _0: a};
 };
-var _user$project$Forms_Question$UpdateUsername = function (a) {
+var _shohamh$learnmath_frontend$Page_Question$UpdateUsername = function (a) {
 	return {ctor: 'UpdateUsername', _0: a};
 };
-var _user$project$Forms_Question$viewForm = function (model) {
-	return A2(
-		_elm_lang$html$Html$div,
-		{ctor: '[]'},
-		{
-			ctor: '::',
-			_0: A5(
-				_debois$elm_mdl$Material_Textfield$render,
-				_user$project$Forms_Question$Mdl,
-				{
-					ctor: '::',
-					_0: 0,
-					_1: {ctor: '[]'}
-				},
-				model.mdl,
-				{
-					ctor: '::',
-					_0: _debois$elm_mdl$Material_Textfield$label('Username'),
-					_1: {
-						ctor: '::',
-						_0: _debois$elm_mdl$Material_Textfield$floatingLabel,
-						_1: {
-							ctor: '::',
-							_0: _debois$elm_mdl$Material_Textfield$text_,
-							_1: {
-								ctor: '::',
-								_0: _debois$elm_mdl$Material_Options$onInput(_user$project$Forms_Question$UpdateUsername),
-								_1: {ctor: '[]'}
-							}
-						}
-					}
-				},
-				{ctor: '[]'}),
-			_1: {
+var _shohamh$learnmath_frontend$Page_Question$view = F2(
+	function (session, model) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			{
 				ctor: '::',
 				_0: A5(
 					_debois$elm_mdl$Material_Textfield$render,
-					_user$project$Forms_Question$Mdl,
+					_shohamh$learnmath_frontend$Page_Question$Mdl,
 					{
 						ctor: '::',
-						_0: 1,
+						_0: 0,
 						_1: {ctor: '[]'}
 					},
 					model.mdl,
 					{
 						ctor: '::',
-						_0: _debois$elm_mdl$Material_Textfield$label('Password'),
+						_0: _debois$elm_mdl$Material_Textfield$label('Username'),
 						_1: {
 							ctor: '::',
 							_0: _debois$elm_mdl$Material_Textfield$floatingLabel,
 							_1: {
 								ctor: '::',
-								_0: _debois$elm_mdl$Material_Textfield$password,
+								_0: _debois$elm_mdl$Material_Textfield$text_,
 								_1: {
 									ctor: '::',
-									_0: _debois$elm_mdl$Material_Options$onInput(_user$project$Forms_Question$UpdatePassword),
+									_0: _debois$elm_mdl$Material_Options$onInput(_shohamh$learnmath_frontend$Page_Question$UpdateUsername),
 									_1: {ctor: '[]'}
 								}
 							}
@@ -20350,59 +21907,88 @@ var _user$project$Forms_Question$viewForm = function (model) {
 				_1: {
 					ctor: '::',
 					_0: A5(
-						_debois$elm_mdl$Material_Button$render,
-						_user$project$Forms_Question$Mdl,
+						_debois$elm_mdl$Material_Textfield$render,
+						_shohamh$learnmath_frontend$Page_Question$Mdl,
 						{
 							ctor: '::',
-							_0: 2,
+							_0: 1,
 							_1: {ctor: '[]'}
 						},
 						model.mdl,
 						{
 							ctor: '::',
-							_0: _debois$elm_mdl$Material_Button$raised,
+							_0: _debois$elm_mdl$Material_Textfield$label('Password'),
 							_1: {
 								ctor: '::',
-								_0: _debois$elm_mdl$Material_Button$colored,
+								_0: _debois$elm_mdl$Material_Textfield$floatingLabel,
 								_1: {
 									ctor: '::',
-									_0: _debois$elm_mdl$Material_Button$ripple,
+									_0: _debois$elm_mdl$Material_Textfield$password,
 									_1: {
 										ctor: '::',
-										_0: _debois$elm_mdl$Material_Options$onClick(_user$project$Forms_Question$Submit),
+										_0: _debois$elm_mdl$Material_Options$onInput(_shohamh$learnmath_frontend$Page_Question$UpdatePassword),
 										_1: {ctor: '[]'}
 									}
 								}
 							}
 						},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('Login'),
-							_1: {ctor: '[]'}
-						}),
+						{ctor: '[]'}),
 					_1: {
 						ctor: '::',
-						_0: A3(
-							_elm_lang$html$Html$node,
-							'myscript-math-web',
+						_0: A5(
+							_debois$elm_mdl$Material_Button$render,
+							_shohamh$learnmath_frontend$Page_Question$Mdl,
 							{
 								ctor: '::',
-								_0: A2(_elm_lang$html$Html_Attributes$attribute, 'applicationkey', '22bd37fa-2ee4-4bfd-98d9-137a39b81720'),
+								_0: 2,
+								_1: {ctor: '[]'}
+							},
+							model.mdl,
+							{
+								ctor: '::',
+								_0: _debois$elm_mdl$Material_Button$raised,
 								_1: {
 									ctor: '::',
-									_0: A2(_elm_lang$html$Html_Attributes$attribute, 'hmackey', 'b79d64ad-89ba-4eed-a302-dee159005446'),
-									_1: {ctor: '[]'}
+									_0: _debois$elm_mdl$Material_Button$colored,
+									_1: {
+										ctor: '::',
+										_0: _debois$elm_mdl$Material_Button$ripple,
+										_1: {
+											ctor: '::',
+											_0: _debois$elm_mdl$Material_Options$onClick(_shohamh$learnmath_frontend$Page_Question$Submit),
+											_1: {ctor: '[]'}
+										}
+									}
 								}
 							},
-							{ctor: '[]'}),
-						_1: {ctor: '[]'}
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Login'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A3(
+								_elm_lang$html$Html$node,
+								'myscript-math-web',
+								{
+									ctor: '::',
+									_0: A2(_elm_lang$html$Html_Attributes$attribute, 'applicationkey', '22bd37fa-2ee4-4bfd-98d9-137a39b81720'),
+									_1: {
+										ctor: '::',
+										_0: A2(_elm_lang$html$Html_Attributes$attribute, 'hmackey', 'b79d64ad-89ba-4eed-a302-dee159005446'),
+										_1: {ctor: '[]'}
+									}
+								},
+								{ctor: '[]'}),
+							_1: {ctor: '[]'}
+						}
 					}
 				}
-			}
-		});
-};
+			});
+	});
 
-var _user$project$Forms_Register$viewErrorMessages = function (errorMessages) {
+var _shohamh$learnmath_frontend$Page_Register$viewErrorMessages = function (errorMessages) {
 	return A2(
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},
@@ -20414,7 +22000,7 @@ var _user$project$Forms_Register$viewErrorMessages = function (errorMessages) {
 				{ctor: '[]'}),
 			A2(_elm_lang$core$List$map, _elm_lang$html$Html$text, errorMessages)));
 };
-var _user$project$Forms_Register$requestEncoder = function (requestData) {
+var _shohamh$learnmath_frontend$Page_Register$requestEncoder = function (requestData) {
 	return _elm_lang$core$Json_Encode$object(
 		{
 			ctor: '::',
@@ -20442,7 +22028,7 @@ var _user$project$Forms_Register$requestEncoder = function (requestData) {
 			}
 		});
 };
-var _user$project$Forms_Register$model = {
+var _shohamh$learnmath_frontend$Page_Register$model = {
 	username: '',
 	password: '',
 	passwordAgain: '',
@@ -20451,22 +22037,22 @@ var _user$project$Forms_Register$model = {
 	errorMessages: {ctor: '[]'},
 	mdl: _debois$elm_mdl$Material$model
 };
-var _user$project$Forms_Register$Model = F7(
+var _shohamh$learnmath_frontend$Page_Register$Model = F7(
 	function (a, b, c, d, e, f, g) {
 		return {username: a, password: b, passwordAgain: c, email: d, successMessage: e, errorMessages: f, mdl: g};
 	});
-var _user$project$Forms_Register$RequestData = F3(
+var _shohamh$learnmath_frontend$Page_Register$RequestData = F3(
 	function (a, b, c) {
 		return {username: a, password: b, email: c};
 	});
-var _user$project$Forms_Register$requestModel = function (model) {
-	return A3(_user$project$Forms_Register$RequestData, model.username, model.password, model.email);
+var _shohamh$learnmath_frontend$Page_Register$requestModel = function (model) {
+	return A3(_shohamh$learnmath_frontend$Page_Register$RequestData, model.username, model.password, model.email);
 };
-var _user$project$Forms_Register$ResponseData = F2(
+var _shohamh$learnmath_frontend$Page_Register$ResponseData = F2(
 	function (a, b) {
 		return {success: a, errorMessages: b};
 	});
-var _user$project$Forms_Register$responseDecoder = A3(
+var _shohamh$learnmath_frontend$Page_Register$responseDecoder = A3(
 	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
 	'error_messages',
 	_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string),
@@ -20474,83 +22060,300 @@ var _user$project$Forms_Register$responseDecoder = A3(
 		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
 		'success',
 		_elm_lang$core$Json_Decode$bool,
-		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_user$project$Forms_Register$ResponseData)));
-var _user$project$Forms_Register$Mdl = function (a) {
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_shohamh$learnmath_frontend$Page_Register$ResponseData)));
+var _shohamh$learnmath_frontend$Page_Register$Mdl = function (a) {
 	return {ctor: 'Mdl', _0: a};
 };
-var _user$project$Forms_Register$SubmitResult = function (a) {
+var _shohamh$learnmath_frontend$Page_Register$SubmitResult = function (a) {
 	return {ctor: 'SubmitResult', _0: a};
 };
-var _user$project$Forms_Register$send = function (requestData) {
+var _shohamh$learnmath_frontend$Page_Register$send = function (requestData) {
 	var body = _elm_lang$http$Http$jsonBody(
-		_user$project$Forms_Register$requestEncoder(requestData));
+		_shohamh$learnmath_frontend$Page_Register$requestEncoder(requestData));
 	var url = 'http://learnmath.pythonanywhere.com/register';
-	var request = A3(_elm_lang$http$Http$post, url, body, _user$project$Forms_Register$responseDecoder);
-	return A2(_elm_lang$http$Http$send, _user$project$Forms_Register$SubmitResult, request);
+	var request = A3(_elm_lang$http$Http$post, url, body, _shohamh$learnmath_frontend$Page_Register$responseDecoder);
+	return A2(_elm_lang$http$Http$send, _shohamh$learnmath_frontend$Page_Register$SubmitResult, request);
 };
-var _user$project$Forms_Register$update = F2(
+var _shohamh$learnmath_frontend$Page_Register$Submit = {ctor: 'Submit'};
+var _shohamh$learnmath_frontend$Page_Register$UpdateEmail = function (a) {
+	return {ctor: 'UpdateEmail', _0: a};
+};
+var _shohamh$learnmath_frontend$Page_Register$UpdatePasswordAgain = function (a) {
+	return {ctor: 'UpdatePasswordAgain', _0: a};
+};
+var _shohamh$learnmath_frontend$Page_Register$UpdatePassword = function (a) {
+	return {ctor: 'UpdatePassword', _0: a};
+};
+var _shohamh$learnmath_frontend$Page_Register$UpdateUsername = function (a) {
+	return {ctor: 'UpdateUsername', _0: a};
+};
+var _shohamh$learnmath_frontend$Page_Register$view = F2(
+	function (session, model) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A5(
+					_debois$elm_mdl$Material_Textfield$render,
+					_shohamh$learnmath_frontend$Page_Register$Mdl,
+					{
+						ctor: '::',
+						_0: 0,
+						_1: {ctor: '[]'}
+					},
+					model.mdl,
+					{
+						ctor: '::',
+						_0: _debois$elm_mdl$Material_Textfield$label('Username'),
+						_1: {
+							ctor: '::',
+							_0: _debois$elm_mdl$Material_Textfield$floatingLabel,
+							_1: {
+								ctor: '::',
+								_0: _debois$elm_mdl$Material_Textfield$text_,
+								_1: {
+									ctor: '::',
+									_0: _debois$elm_mdl$Material_Options$onInput(_shohamh$learnmath_frontend$Page_Register$UpdateUsername),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					},
+					{ctor: '[]'}),
+				_1: {
+					ctor: '::',
+					_0: A5(
+						_debois$elm_mdl$Material_Textfield$render,
+						_shohamh$learnmath_frontend$Page_Register$Mdl,
+						{
+							ctor: '::',
+							_0: 1,
+							_1: {ctor: '[]'}
+						},
+						model.mdl,
+						{
+							ctor: '::',
+							_0: _debois$elm_mdl$Material_Textfield$label('Password'),
+							_1: {
+								ctor: '::',
+								_0: _debois$elm_mdl$Material_Textfield$floatingLabel,
+								_1: {
+									ctor: '::',
+									_0: _debois$elm_mdl$Material_Textfield$password,
+									_1: {
+										ctor: '::',
+										_0: _debois$elm_mdl$Material_Options$onInput(_shohamh$learnmath_frontend$Page_Register$UpdatePassword),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_debois$elm_mdl$Material_Options$when,
+												!_elm_lang$core$Native_Utils.eq(model.password, model.passwordAgain),
+												_debois$elm_mdl$Material_Textfield$error('Passwords don\'t match.')),
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {
+						ctor: '::',
+						_0: A5(
+							_debois$elm_mdl$Material_Textfield$render,
+							_shohamh$learnmath_frontend$Page_Register$Mdl,
+							{
+								ctor: '::',
+								_0: 2,
+								_1: {ctor: '[]'}
+							},
+							model.mdl,
+							{
+								ctor: '::',
+								_0: _debois$elm_mdl$Material_Textfield$label('Confirm password'),
+								_1: {
+									ctor: '::',
+									_0: _debois$elm_mdl$Material_Textfield$floatingLabel,
+									_1: {
+										ctor: '::',
+										_0: _debois$elm_mdl$Material_Textfield$password,
+										_1: {
+											ctor: '::',
+											_0: _debois$elm_mdl$Material_Options$onInput(_shohamh$learnmath_frontend$Page_Register$UpdatePasswordAgain),
+											_1: {
+												ctor: '::',
+												_0: A2(
+													_debois$elm_mdl$Material_Options$when,
+													!_elm_lang$core$Native_Utils.eq(model.password, model.passwordAgain),
+													_debois$elm_mdl$Material_Textfield$error('Passwords don\'t match.')),
+												_1: {ctor: '[]'}
+											}
+										}
+									}
+								}
+							},
+							{ctor: '[]'}),
+						_1: {
+							ctor: '::',
+							_0: A5(
+								_debois$elm_mdl$Material_Textfield$render,
+								_shohamh$learnmath_frontend$Page_Register$Mdl,
+								{
+									ctor: '::',
+									_0: 3,
+									_1: {ctor: '[]'}
+								},
+								model.mdl,
+								{
+									ctor: '::',
+									_0: _debois$elm_mdl$Material_Textfield$label('Email'),
+									_1: {
+										ctor: '::',
+										_0: _debois$elm_mdl$Material_Textfield$floatingLabel,
+										_1: {
+											ctor: '::',
+											_0: _debois$elm_mdl$Material_Textfield$email,
+											_1: {
+												ctor: '::',
+												_0: _debois$elm_mdl$Material_Options$onInput(_shohamh$learnmath_frontend$Page_Register$UpdateEmail),
+												_1: {ctor: '[]'}
+											}
+										}
+									}
+								},
+								{ctor: '[]'}),
+							_1: {
+								ctor: '::',
+								_0: A5(
+									_debois$elm_mdl$Material_Button$render,
+									_shohamh$learnmath_frontend$Page_Register$Mdl,
+									{
+										ctor: '::',
+										_0: 4,
+										_1: {ctor: '[]'}
+									},
+									model.mdl,
+									{
+										ctor: '::',
+										_0: _debois$elm_mdl$Material_Button$raised,
+										_1: {
+											ctor: '::',
+											_0: _debois$elm_mdl$Material_Button$colored,
+											_1: {
+												ctor: '::',
+												_0: _debois$elm_mdl$Material_Button$ripple,
+												_1: {
+													ctor: '::',
+													_0: _debois$elm_mdl$Material_Options$onClick(_shohamh$learnmath_frontend$Page_Register$Submit),
+													_1: {ctor: '[]'}
+												}
+											}
+										}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Register'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {
+									ctor: '::',
+									_0: _shohamh$learnmath_frontend$Page_Register$viewErrorMessages(model.errorMessages),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html$text(model.successMessage),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
+					}
+				}
+			});
+	});
+var _shohamh$learnmath_frontend$Page_Register$SetUser = function (a) {
+	return {ctor: 'SetUser', _0: a};
+};
+var _shohamh$learnmath_frontend$Page_Register$NoOp = {ctor: 'NoOp'};
+var _shohamh$learnmath_frontend$Page_Register$update = F2(
 	function (msg, model) {
 		var _p0 = msg;
 		switch (_p0.ctor) {
 			case 'Mdl':
-				return A3(_debois$elm_mdl$Material$update, _user$project$Forms_Register$Mdl, _p0._0, model);
+				return A2(
+					_shohamh$learnmath_frontend$Util_ops['=>'],
+					A3(_debois$elm_mdl$Material$update, _shohamh$learnmath_frontend$Page_Register$Mdl, _p0._0, model),
+					_shohamh$learnmath_frontend$Page_Register$NoOp);
 			case 'UpdateUsername':
 				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{username: _p0._0}),
-					{ctor: '[]'});
+					_shohamh$learnmath_frontend$Util_ops['=>'],
+					A2(
+						_shohamh$learnmath_frontend$Util_ops['=>'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{username: _p0._0}),
+						_elm_lang$core$Platform_Cmd$none),
+					_shohamh$learnmath_frontend$Page_Register$NoOp);
 			case 'UpdatePassword':
 				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{password: _p0._0}),
-					{ctor: '[]'});
+					_shohamh$learnmath_frontend$Util_ops['=>'],
+					A2(
+						_shohamh$learnmath_frontend$Util_ops['=>'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{password: _p0._0}),
+						_elm_lang$core$Platform_Cmd$none),
+					_shohamh$learnmath_frontend$Page_Register$NoOp);
 			case 'UpdatePasswordAgain':
 				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{passwordAgain: _p0._0}),
-					{ctor: '[]'});
+					_shohamh$learnmath_frontend$Util_ops['=>'],
+					A2(
+						_shohamh$learnmath_frontend$Util_ops['=>'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{passwordAgain: _p0._0}),
+						_elm_lang$core$Platform_Cmd$none),
+					_shohamh$learnmath_frontend$Page_Register$NoOp);
 			case 'UpdateEmail':
 				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{email: _p0._0}),
-					{ctor: '[]'});
+					_shohamh$learnmath_frontend$Util_ops['=>'],
+					A2(
+						_shohamh$learnmath_frontend$Util_ops['=>'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{email: _p0._0}),
+						_elm_lang$core$Platform_Cmd$none),
+					_shohamh$learnmath_frontend$Page_Register$NoOp);
 			case 'Submit':
-				var requestData = _user$project$Forms_Register$requestModel(model);
+				var requestData = _shohamh$learnmath_frontend$Page_Register$requestModel(model);
 				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					model,
-					{
-						ctor: '::',
-						_0: _user$project$Forms_Register$send(requestData),
-						_1: {ctor: '[]'}
-					});
+					_shohamh$learnmath_frontend$Util_ops['=>'],
+					A2(
+						_shohamh$learnmath_frontend$Util_ops['=>'],
+						model,
+						_shohamh$learnmath_frontend$Page_Register$send(requestData)),
+					_shohamh$learnmath_frontend$Page_Register$NoOp);
 			default:
 				if (_p0._0.ctor === 'Ok') {
 					var _p2 = _p0._0._0;
 					return A2(
-						_elm_lang$core$Platform_Cmd_ops['!'],
-						_elm_lang$core$Native_Utils.update(
-							model,
-							{
-								successMessage: function () {
-									var _p1 = _p2.success;
-									if (_p1 === true) {
-										return 'Registration was successful.';
-									} else {
-										return 'Registration failed.';
-									}
-								}(),
-								errorMessages: _p2.errorMessages
-							}),
-						{ctor: '[]'});
+						_shohamh$learnmath_frontend$Util_ops['=>'],
+						A2(
+							_shohamh$learnmath_frontend$Util_ops['=>'],
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{
+									successMessage: function () {
+										var _p1 = _p2.success;
+										if (_p1 === true) {
+											return 'Registration was successful.';
+										} else {
+											return 'Registration failed.';
+										}
+									}(),
+									errorMessages: _p2.errorMessages
+								}),
+							_elm_lang$core$Platform_Cmd$none),
+						_shohamh$learnmath_frontend$Page_Register$NoOp);
 				} else {
 					var errorMessage = function () {
 						var _p3 = _p0._0._0;
@@ -20571,220 +22374,33 @@ var _user$project$Forms_Register$update = F2(
 						}
 					}();
 					return A2(
-						_elm_lang$core$Platform_Cmd_ops['!'],
-						_elm_lang$core$Native_Utils.update(
-							model,
-							{
-								errorMessages: A2(
-									_elm_lang$core$List$append,
-									model.errorMessages,
-									{
-										ctor: '::',
-										_0: errorMessage,
-										_1: {ctor: '[]'}
-									})
-							}),
-						{ctor: '[]'});
+						_shohamh$learnmath_frontend$Util_ops['=>'],
+						A2(
+							_shohamh$learnmath_frontend$Util_ops['=>'],
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{
+									errorMessages: A2(
+										_elm_lang$core$List$append,
+										model.errorMessages,
+										{
+											ctor: '::',
+											_0: errorMessage,
+											_1: {ctor: '[]'}
+										})
+								}),
+							_elm_lang$core$Platform_Cmd$none),
+						_shohamh$learnmath_frontend$Page_Register$NoOp);
 				}
 		}
 	});
-var _user$project$Forms_Register$Submit = {ctor: 'Submit'};
-var _user$project$Forms_Register$UpdateEmail = function (a) {
-	return {ctor: 'UpdateEmail', _0: a};
-};
-var _user$project$Forms_Register$UpdatePasswordAgain = function (a) {
-	return {ctor: 'UpdatePasswordAgain', _0: a};
-};
-var _user$project$Forms_Register$UpdatePassword = function (a) {
-	return {ctor: 'UpdatePassword', _0: a};
-};
-var _user$project$Forms_Register$UpdateUsername = function (a) {
-	return {ctor: 'UpdateUsername', _0: a};
-};
-var _user$project$Forms_Register$viewForm = function (model) {
-	return A2(
-		_elm_lang$html$Html$div,
-		{ctor: '[]'},
-		{
-			ctor: '::',
-			_0: A5(
-				_debois$elm_mdl$Material_Textfield$render,
-				_user$project$Forms_Register$Mdl,
-				{
-					ctor: '::',
-					_0: 0,
-					_1: {ctor: '[]'}
-				},
-				model.mdl,
-				{
-					ctor: '::',
-					_0: _debois$elm_mdl$Material_Textfield$label('Username'),
-					_1: {
-						ctor: '::',
-						_0: _debois$elm_mdl$Material_Textfield$floatingLabel,
-						_1: {
-							ctor: '::',
-							_0: _debois$elm_mdl$Material_Textfield$text_,
-							_1: {
-								ctor: '::',
-								_0: _debois$elm_mdl$Material_Options$onInput(_user$project$Forms_Register$UpdateUsername),
-								_1: {ctor: '[]'}
-							}
-						}
-					}
-				},
-				{ctor: '[]'}),
-			_1: {
-				ctor: '::',
-				_0: A5(
-					_debois$elm_mdl$Material_Textfield$render,
-					_user$project$Forms_Register$Mdl,
-					{
-						ctor: '::',
-						_0: 1,
-						_1: {ctor: '[]'}
-					},
-					model.mdl,
-					{
-						ctor: '::',
-						_0: _debois$elm_mdl$Material_Textfield$label('Password'),
-						_1: {
-							ctor: '::',
-							_0: _debois$elm_mdl$Material_Textfield$floatingLabel,
-							_1: {
-								ctor: '::',
-								_0: _debois$elm_mdl$Material_Textfield$password,
-								_1: {
-									ctor: '::',
-									_0: _debois$elm_mdl$Material_Options$onInput(_user$project$Forms_Register$UpdatePassword),
-									_1: {
-										ctor: '::',
-										_0: A2(
-											_debois$elm_mdl$Material_Options$when,
-											!_elm_lang$core$Native_Utils.eq(model.password, model.passwordAgain),
-											_debois$elm_mdl$Material_Textfield$error('Passwords don\'t match.')),
-										_1: {ctor: '[]'}
-									}
-								}
-							}
-						}
-					},
-					{ctor: '[]'}),
-				_1: {
-					ctor: '::',
-					_0: A5(
-						_debois$elm_mdl$Material_Textfield$render,
-						_user$project$Forms_Register$Mdl,
-						{
-							ctor: '::',
-							_0: 2,
-							_1: {ctor: '[]'}
-						},
-						model.mdl,
-						{
-							ctor: '::',
-							_0: _debois$elm_mdl$Material_Textfield$label('Confirm password'),
-							_1: {
-								ctor: '::',
-								_0: _debois$elm_mdl$Material_Textfield$floatingLabel,
-								_1: {
-									ctor: '::',
-									_0: _debois$elm_mdl$Material_Textfield$password,
-									_1: {
-										ctor: '::',
-										_0: _debois$elm_mdl$Material_Options$onInput(_user$project$Forms_Register$UpdatePasswordAgain),
-										_1: {
-											ctor: '::',
-											_0: A2(
-												_debois$elm_mdl$Material_Options$when,
-												!_elm_lang$core$Native_Utils.eq(model.password, model.passwordAgain),
-												_debois$elm_mdl$Material_Textfield$error('Passwords don\'t match.')),
-											_1: {ctor: '[]'}
-										}
-									}
-								}
-							}
-						},
-						{ctor: '[]'}),
-					_1: {
-						ctor: '::',
-						_0: A5(
-							_debois$elm_mdl$Material_Textfield$render,
-							_user$project$Forms_Register$Mdl,
-							{
-								ctor: '::',
-								_0: 3,
-								_1: {ctor: '[]'}
-							},
-							model.mdl,
-							{
-								ctor: '::',
-								_0: _debois$elm_mdl$Material_Textfield$label('Email'),
-								_1: {
-									ctor: '::',
-									_0: _debois$elm_mdl$Material_Textfield$floatingLabel,
-									_1: {
-										ctor: '::',
-										_0: _debois$elm_mdl$Material_Textfield$email,
-										_1: {
-											ctor: '::',
-											_0: _debois$elm_mdl$Material_Options$onInput(_user$project$Forms_Register$UpdateEmail),
-											_1: {ctor: '[]'}
-										}
-									}
-								}
-							},
-							{ctor: '[]'}),
-						_1: {
-							ctor: '::',
-							_0: A5(
-								_debois$elm_mdl$Material_Button$render,
-								_user$project$Forms_Register$Mdl,
-								{
-									ctor: '::',
-									_0: 4,
-									_1: {ctor: '[]'}
-								},
-								model.mdl,
-								{
-									ctor: '::',
-									_0: _debois$elm_mdl$Material_Button$raised,
-									_1: {
-										ctor: '::',
-										_0: _debois$elm_mdl$Material_Button$colored,
-										_1: {
-											ctor: '::',
-											_0: _debois$elm_mdl$Material_Button$ripple,
-											_1: {
-												ctor: '::',
-												_0: _debois$elm_mdl$Material_Options$onClick(_user$project$Forms_Register$Submit),
-												_1: {ctor: '[]'}
-											}
-										}
-									}
-								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text('Register'),
-									_1: {ctor: '[]'}
-								}),
-							_1: {
-								ctor: '::',
-								_0: _user$project$Forms_Register$viewErrorMessages(model.errorMessages),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html$text(model.successMessage),
-									_1: {ctor: '[]'}
-								}
-							}
-						}
-					}
-				}
-			}
-		});
-};
 
-var _user$project$Main$stylesheet = function () {
+var _shohamh$learnmath_frontend$Main$sessionChange = _shohamh$learnmath_frontend$Ports$onSessionChange(
+	function (_p0) {
+		return _elm_lang$core$Result$toMaybe(
+			A2(_elm_lang$core$Json_Decode$decodeValue, _shohamh$learnmath_frontend$Data_User$decoder, _p0));
+	});
+var _shohamh$learnmath_frontend$Main$stylesheet = function () {
 	var children = {ctor: '[]'};
 	var attrs = {
 		ctor: '::',
@@ -20802,194 +22418,493 @@ var _user$project$Main$stylesheet = function () {
 	var tag = 'link';
 	return A3(_elm_lang$html$Html$node, tag, attrs, children);
 }();
-var _user$project$Main$tabTitles = {
-	ctor: '::',
-	_0: _elm_lang$html$Html$text('Register'),
-	_1: {
-		ctor: '::',
-		_0: _elm_lang$html$Html$text('Login'),
-		_1: {
-			ctor: '::',
-			_0: _elm_lang$html$Html$text('Question'),
-			_1: {ctor: '[]'}
-		}
+var _shohamh$learnmath_frontend$Main$getPage = function (pageState) {
+	var _p1 = pageState;
+	if (_p1.ctor === 'Loaded') {
+		return _p1._0;
+	} else {
+		return _p1._0;
 	}
 };
-var _user$project$Main$model = {count: 0, selectedTab: 0, registerForm: _user$project$Forms_Register$model, loginForm: _user$project$Forms_Login$model, questionForm: _user$project$Forms_Question$model, mdl: _debois$elm_mdl$Material$model};
-var _user$project$Main$Model = F6(
-	function (a, b, c, d, e, f) {
-		return {count: a, selectedTab: b, registerForm: c, loginForm: d, questionForm: e, mdl: f};
+var _shohamh$learnmath_frontend$Main$decodeUserFromJson = function (json) {
+	return A2(
+		_elm_lang$core$Maybe$andThen,
+		function (_p2) {
+			return _elm_lang$core$Result$toMaybe(
+				A2(_elm_lang$core$Json_Decode$decodeString, _shohamh$learnmath_frontend$Data_User$decoder, _p2));
+		},
+		_elm_lang$core$Result$toMaybe(
+			A2(_elm_lang$core$Json_Decode$decodeValue, _elm_lang$core$Json_Decode$string, json)));
+};
+var _shohamh$learnmath_frontend$Main$Model = F3(
+	function (a, b, c) {
+		return {pageState: a, session: b, mdl: c};
 	});
-var _user$project$Main$Mdl = function (a) {
+var _shohamh$learnmath_frontend$Main$Question = function (a) {
+	return {ctor: 'Question', _0: a};
+};
+var _shohamh$learnmath_frontend$Main$Register = function (a) {
+	return {ctor: 'Register', _0: a};
+};
+var _shohamh$learnmath_frontend$Main$Login = function (a) {
+	return {ctor: 'Login', _0: a};
+};
+var _shohamh$learnmath_frontend$Main$Home = function (a) {
+	return {ctor: 'Home', _0: a};
+};
+var _shohamh$learnmath_frontend$Main$Errored = function (a) {
+	return {ctor: 'Errored', _0: a};
+};
+var _shohamh$learnmath_frontend$Main$NotFound = {ctor: 'NotFound'};
+var _shohamh$learnmath_frontend$Main$Blank = {ctor: 'Blank'};
+var _shohamh$learnmath_frontend$Main$initialPage = _shohamh$learnmath_frontend$Main$Blank;
+var _shohamh$learnmath_frontend$Main$Mdl = function (a) {
 	return {ctor: 'Mdl', _0: a};
 };
-var _user$project$Main$QuestionFormHandler = function (a) {
-	return {ctor: 'QuestionFormHandler', _0: a};
+var _shohamh$learnmath_frontend$Main$HomeLoaded = function (a) {
+	return {ctor: 'HomeLoaded', _0: a};
 };
-var _user$project$Main$subs = function (model) {
+var _shohamh$learnmath_frontend$Main$SetRoute = function (a) {
+	return {ctor: 'SetRoute', _0: a};
+};
+var _shohamh$learnmath_frontend$Main$SetUser = function (a) {
+	return {ctor: 'SetUser', _0: a};
+};
+var _shohamh$learnmath_frontend$Main$QuestionMsg = function (a) {
+	return {ctor: 'QuestionMsg', _0: a};
+};
+var _shohamh$learnmath_frontend$Main$pageSubscriptions = function (page) {
+	var _p3 = page;
+	switch (_p3.ctor) {
+		case 'Blank':
+			return _elm_lang$core$Platform_Sub$none;
+		case 'Errored':
+			return _elm_lang$core$Platform_Sub$none;
+		case 'NotFound':
+			return _elm_lang$core$Platform_Sub$none;
+		case 'Home':
+			return _elm_lang$core$Platform_Sub$none;
+		case 'Login':
+			return _elm_lang$core$Platform_Sub$none;
+		case 'Register':
+			return _elm_lang$core$Platform_Sub$none;
+		default:
+			return A2(
+				_elm_lang$core$Platform_Sub$map,
+				_shohamh$learnmath_frontend$Main$QuestionMsg,
+				_shohamh$learnmath_frontend$Page_Question$subs(_p3._0));
+	}
+};
+var _shohamh$learnmath_frontend$Main$subs = function (model) {
 	return _elm_lang$core$Platform_Sub$batch(
 		{
 			ctor: '::',
-			_0: A2(
-				_elm_lang$core$Platform_Sub$map,
-				_user$project$Main$QuestionFormHandler,
-				_user$project$Forms_Question$subs(model.questionForm)),
+			_0: _shohamh$learnmath_frontend$Main$pageSubscriptions(
+				_shohamh$learnmath_frontend$Main$getPage(model.pageState)),
 			_1: {
 				ctor: '::',
-				_0: A2(_debois$elm_mdl$Material_Layout$subs, _user$project$Main$Mdl, model.mdl),
-				_1: {ctor: '[]'}
-			}
-		});
-};
-var _user$project$Main$LoginFormHandler = function (a) {
-	return {ctor: 'LoginFormHandler', _0: a};
-};
-var _user$project$Main$RegisterFormHandler = function (a) {
-	return {ctor: 'RegisterFormHandler', _0: a};
-};
-var _user$project$Main$update = F2(
-	function (msg, model) {
-		var _p0 = msg;
-		switch (_p0.ctor) {
-			case 'SelectTab':
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{selectedTab: _p0._0}),
-					{ctor: '[]'});
-			case 'RegisterFormHandler':
-				var _p1 = A2(_user$project$Forms_Register$update, _p0._0, model.registerForm);
-				var newmodel = _p1._0;
-				var cmd = _p1._1;
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{registerForm: newmodel}),
-					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$RegisterFormHandler, cmd)
-				};
-			case 'LoginFormHandler':
-				var _p2 = A2(_user$project$Forms_Login$update, _p0._0, model.loginForm);
-				var newmodel = _p2._0;
-				var cmd = _p2._1;
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{loginForm: newmodel}),
-					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$LoginFormHandler, cmd)
-				};
-			case 'QuestionFormHandler':
-				var _p3 = A2(_user$project$Forms_Question$update, _p0._0, model.questionForm);
-				var newmodel = _p3._0;
-				var cmd = _p3._1;
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{questionForm: newmodel}),
-					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$QuestionFormHandler, cmd)
-				};
-			default:
-				return A3(_debois$elm_mdl$Material$update, _user$project$Main$Mdl, _p0._0, model);
-		}
-	});
-var _user$project$Main$viewBody = function (model) {
-	return A2(
-		_elm_lang$html$Html$div,
-		{ctor: '[]'},
-		{
-			ctor: '::',
-			_0: function () {
-				var _p4 = model.selectedTab;
-				switch (_p4) {
-					case 0:
-						return A2(
-							_elm_lang$html$Html$map,
-							_user$project$Main$RegisterFormHandler,
-							_user$project$Forms_Register$viewForm(model.registerForm));
-					case 1:
-						return A2(
-							_elm_lang$html$Html$map,
-							_user$project$Main$LoginFormHandler,
-							_user$project$Forms_Login$viewForm(model.loginForm));
-					case 2:
-						return A2(
-							_elm_lang$html$Html$map,
-							_user$project$Main$QuestionFormHandler,
-							_user$project$Forms_Question$viewForm(model.questionForm));
-					default:
-						return _elm_lang$html$Html$text('404');
-				}
-			}(),
-			_1: {ctor: '[]'}
-		});
-};
-var _user$project$Main$SelectTab = function (a) {
-	return {ctor: 'SelectTab', _0: a};
-};
-var _user$project$Main$view = function (model) {
-	return A4(
-		_debois$elm_mdl$Material_Layout$render,
-		_user$project$Main$Mdl,
-		model.mdl,
-		{
-			ctor: '::',
-			_0: _debois$elm_mdl$Material_Layout$fixedHeader,
-			_1: {
-				ctor: '::',
-				_0: _debois$elm_mdl$Material_Layout$onSelectTab(_user$project$Main$SelectTab),
+				_0: A2(_elm_lang$core$Platform_Sub$map, _shohamh$learnmath_frontend$Main$SetUser, _shohamh$learnmath_frontend$Main$sessionChange),
 				_1: {
 					ctor: '::',
-					_0: _debois$elm_mdl$Material_Layout$selectedTab(model.selectedTab),
+					_0: A2(_debois$elm_mdl$Material_Layout$subs, _shohamh$learnmath_frontend$Main$Mdl, model.mdl),
 					_1: {ctor: '[]'}
 				}
 			}
-		},
-		{
-			header: {
-				ctor: '::',
-				_0: _elm_lang$html$Html$text('LearnMath'),
-				_1: {ctor: '[]'}
-			},
-			drawer: {
-				ctor: '::',
-				_0: _elm_lang$html$Html$text('drawer text'),
-				_1: {ctor: '[]'}
-			},
-			tabs: {
-				ctor: '_Tuple2',
-				_0: _user$project$Main$tabTitles,
-				_1: {ctor: '[]'}
-			},
-			main: {
-				ctor: '::',
-				_0: _user$project$Main$viewBody(model),
-				_1: {ctor: '[]'}
-			}
 		});
 };
-var _user$project$Main$main = _elm_lang$html$Html$program(
-	{
-		init: {
-			ctor: '_Tuple2',
-			_0: _elm_lang$core$Native_Utils.update(
-				_user$project$Main$model,
+var _shohamh$learnmath_frontend$Main$RegisterMsg = function (a) {
+	return {ctor: 'RegisterMsg', _0: a};
+};
+var _shohamh$learnmath_frontend$Main$LoginMsg = function (a) {
+	return {ctor: 'LoginMsg', _0: a};
+};
+var _shohamh$learnmath_frontend$Main$HomeMsg = function (a) {
+	return {ctor: 'HomeMsg', _0: a};
+};
+var _shohamh$learnmath_frontend$Main$viewPage = F3(
+	function (session, isLoading, page) {
+		var frame = A2(_shohamh$learnmath_frontend$Views_Page$frame, isLoading, session.user);
+		var _p4 = page;
+		switch (_p4.ctor) {
+			case 'NotFound':
+				return A2(
+					frame,
+					_shohamh$learnmath_frontend$Views_Page$Other,
+					_shohamh$learnmath_frontend$Page_NotFound$view(session));
+			case 'Blank':
+				return A2(
+					frame,
+					_shohamh$learnmath_frontend$Views_Page$Other,
+					_elm_lang$html$Html$text('loading...'));
+			case 'Errored':
+				return A2(
+					frame,
+					_shohamh$learnmath_frontend$Views_Page$Other,
+					A2(_shohamh$learnmath_frontend$Page_Errored$view, session, _p4._0));
+			case 'Home':
+				return A2(
+					_elm_lang$html$Html$map,
+					_shohamh$learnmath_frontend$Main$HomeMsg,
+					A2(
+						frame,
+						_shohamh$learnmath_frontend$Views_Page$Home,
+						A2(_shohamh$learnmath_frontend$Page_Home$view, session, _p4._0)));
+			case 'Login':
+				return A2(
+					_elm_lang$html$Html$map,
+					_shohamh$learnmath_frontend$Main$LoginMsg,
+					A2(
+						frame,
+						_shohamh$learnmath_frontend$Views_Page$Other,
+						A2(_shohamh$learnmath_frontend$Page_Login$view, session, _p4._0)));
+			case 'Register':
+				return A2(
+					_elm_lang$html$Html$map,
+					_shohamh$learnmath_frontend$Main$RegisterMsg,
+					A2(
+						frame,
+						_shohamh$learnmath_frontend$Views_Page$Other,
+						A2(_shohamh$learnmath_frontend$Page_Register$view, session, _p4._0)));
+			default:
+				return A2(
+					_elm_lang$html$Html$map,
+					_shohamh$learnmath_frontend$Main$QuestionMsg,
+					A2(
+						frame,
+						_shohamh$learnmath_frontend$Views_Page$Other,
+						A2(_shohamh$learnmath_frontend$Page_Question$view, session, _p4._0)));
+		}
+	});
+var _shohamh$learnmath_frontend$Main$view = function (model) {
+	var _p5 = model.pageState;
+	if (_p5.ctor === 'Loaded') {
+		return A3(_shohamh$learnmath_frontend$Main$viewPage, model.session, false, _p5._0);
+	} else {
+		return A3(_shohamh$learnmath_frontend$Main$viewPage, model.session, true, _p5._0);
+	}
+};
+var _shohamh$learnmath_frontend$Main$SelectTab = function (a) {
+	return {ctor: 'SelectTab', _0: a};
+};
+var _shohamh$learnmath_frontend$Main$TransitioningFrom = function (a) {
+	return {ctor: 'TransitioningFrom', _0: a};
+};
+var _shohamh$learnmath_frontend$Main$Loaded = function (a) {
+	return {ctor: 'Loaded', _0: a};
+};
+var _shohamh$learnmath_frontend$Main$pageErrored = F3(
+	function (model, activePage, errorMessage) {
+		var error = A2(_shohamh$learnmath_frontend$Page_Errored$pageLoadError, activePage, errorMessage);
+		return A2(
+			_shohamh$learnmath_frontend$Util_ops['=>'],
+			_elm_lang$core$Native_Utils.update(
+				model,
 				{
-					mdl: A2(_debois$elm_mdl$Material_Layout$setTabsWidth, 1384, _user$project$Main$model.mdl)
+					pageState: _shohamh$learnmath_frontend$Main$Loaded(
+						_shohamh$learnmath_frontend$Main$Errored(error))
 				}),
-			_1: _debois$elm_mdl$Material_Layout$sub0(_user$project$Main$Mdl)
-		},
-		view: _user$project$Main$view,
-		subscriptions: _user$project$Main$subs,
-		update: _user$project$Main$update
-	})();
+			_elm_lang$core$Platform_Cmd$none);
+	});
+var _shohamh$learnmath_frontend$Main$setRoute = F2(
+	function (maybeRoute, model) {
+		var errored = _shohamh$learnmath_frontend$Main$pageErrored(model);
+		var transition = F2(
+			function (toMsg, task) {
+				return A2(
+					_shohamh$learnmath_frontend$Util_ops['=>'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{
+							pageState: _shohamh$learnmath_frontend$Main$TransitioningFrom(
+								_shohamh$learnmath_frontend$Main$getPage(model.pageState))
+						}),
+					A2(_elm_lang$core$Task$attempt, toMsg, task));
+			});
+		var _p6 = maybeRoute;
+		if (_p6.ctor === 'Nothing') {
+			return A2(
+				_shohamh$learnmath_frontend$Util_ops['=>'],
+				_elm_lang$core$Native_Utils.update(
+					model,
+					{
+						pageState: _shohamh$learnmath_frontend$Main$Loaded(_shohamh$learnmath_frontend$Main$NotFound)
+					}),
+				_elm_lang$core$Platform_Cmd$none);
+		} else {
+			switch (_p6._0.ctor) {
+				case 'Home':
+					return A2(
+						transition,
+						_shohamh$learnmath_frontend$Main$HomeLoaded,
+						_shohamh$learnmath_frontend$Page_Home$init(model.session));
+				case 'Question':
+					return A2(
+						_shohamh$learnmath_frontend$Util_ops['=>'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								pageState: _shohamh$learnmath_frontend$Main$Loaded(
+									_shohamh$learnmath_frontend$Main$Question(_shohamh$learnmath_frontend$Page_Question$model))
+							}),
+						_elm_lang$core$Platform_Cmd$none);
+				case 'Login':
+					return A2(
+						_shohamh$learnmath_frontend$Util_ops['=>'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								pageState: _shohamh$learnmath_frontend$Main$Loaded(
+									_shohamh$learnmath_frontend$Main$Login(_shohamh$learnmath_frontend$Page_Login$model))
+							}),
+						_elm_lang$core$Platform_Cmd$none);
+				case 'Logout':
+					var session = model.session;
+					return A2(
+						_shohamh$learnmath_frontend$Util_ops['=>'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								session: _elm_lang$core$Native_Utils.update(
+									session,
+									{user: _elm_lang$core$Maybe$Nothing})
+							}),
+						_elm_lang$core$Platform_Cmd$batch(
+							{
+								ctor: '::',
+								_0: _shohamh$learnmath_frontend$Ports$storeSession(_elm_lang$core$Maybe$Nothing),
+								_1: {
+									ctor: '::',
+									_0: _shohamh$learnmath_frontend$Route$modifyUrl(_shohamh$learnmath_frontend$Route$Home),
+									_1: {ctor: '[]'}
+								}
+							}));
+				default:
+					return A2(
+						_shohamh$learnmath_frontend$Util_ops['=>'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								pageState: _shohamh$learnmath_frontend$Main$Loaded(
+									_shohamh$learnmath_frontend$Main$Register(_shohamh$learnmath_frontend$Page_Register$model))
+							}),
+						_elm_lang$core$Platform_Cmd$none);
+			}
+		}
+	});
+var _shohamh$learnmath_frontend$Main$init = F2(
+	function (val, location) {
+		var _p7 = A2(
+			_shohamh$learnmath_frontend$Main$setRoute,
+			_shohamh$learnmath_frontend$Route$fromLocation(location),
+			{
+				pageState: _shohamh$learnmath_frontend$Main$Loaded(_shohamh$learnmath_frontend$Main$initialPage),
+				session: {
+					user: _shohamh$learnmath_frontend$Main$decodeUserFromJson(val)
+				},
+				mdl: A2(_debois$elm_mdl$Material_Layout$setTabsWidth, 1384, _debois$elm_mdl$Material$model)
+			});
+		var model_ = _p7._0;
+		var cmd_ = _p7._1;
+		return {
+			ctor: '_Tuple2',
+			_0: model_,
+			_1: _elm_lang$core$Platform_Cmd$batch(
+				{
+					ctor: '::',
+					_0: cmd_,
+					_1: {
+						ctor: '::',
+						_0: _debois$elm_mdl$Material_Layout$sub0(_shohamh$learnmath_frontend$Main$Mdl),
+						_1: {ctor: '[]'}
+					}
+				})
+		};
+	});
+var _shohamh$learnmath_frontend$Main$updatePage = F3(
+	function (page, msg, model) {
+		var errored = _shohamh$learnmath_frontend$Main$pageErrored(model);
+		var toPage = F5(
+			function (toModel, toMsg, subUpdate, subMsg, subModel) {
+				var _p8 = A2(subUpdate, subMsg, subModel);
+				var newModel = _p8._0;
+				var newCmd = _p8._1;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							pageState: _shohamh$learnmath_frontend$Main$Loaded(
+								toModel(newModel))
+						}),
+					_1: A2(_elm_lang$core$Platform_Cmd$map, toMsg, newCmd)
+				};
+			});
+		var session = model.session;
+		var _p9 = {ctor: '_Tuple2', _0: msg, _1: page};
+		_v5_9:
+		do {
+			_v5_8:
+			do {
+				switch (_p9._0.ctor) {
+					case 'SetRoute':
+						return A2(_shohamh$learnmath_frontend$Main$setRoute, _p9._0._0, model);
+					case 'HomeLoaded':
+						if (_p9._0._0.ctor === 'Ok') {
+							return A2(
+								_shohamh$learnmath_frontend$Util_ops['=>'],
+								_elm_lang$core$Native_Utils.update(
+									model,
+									{
+										pageState: _shohamh$learnmath_frontend$Main$Loaded(
+											_shohamh$learnmath_frontend$Main$Home(_p9._0._0._0))
+									}),
+								_elm_lang$core$Platform_Cmd$none);
+						} else {
+							return A2(
+								_shohamh$learnmath_frontend$Util_ops['=>'],
+								_elm_lang$core$Native_Utils.update(
+									model,
+									{
+										pageState: _shohamh$learnmath_frontend$Main$Loaded(
+											_shohamh$learnmath_frontend$Main$Errored(_p9._0._0._0))
+									}),
+								_elm_lang$core$Platform_Cmd$none);
+						}
+					case 'SetUser':
+						var _p10 = _p9._0._0;
+						var session = model.session;
+						var cmd = ((!_elm_lang$core$Native_Utils.eq(session.user, _elm_lang$core$Maybe$Nothing)) && _elm_lang$core$Native_Utils.eq(_p10, _elm_lang$core$Maybe$Nothing)) ? _shohamh$learnmath_frontend$Route$modifyUrl(_shohamh$learnmath_frontend$Route$Home) : _elm_lang$core$Platform_Cmd$none;
+						return A2(
+							_shohamh$learnmath_frontend$Util_ops['=>'],
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{
+									session: _elm_lang$core$Native_Utils.update(
+										session,
+										{user: _p10})
+								}),
+							cmd);
+					case 'LoginMsg':
+						switch (_p9._1.ctor) {
+							case 'Login':
+								var _p11 = A2(_shohamh$learnmath_frontend$Page_Login$update, _p9._0._0, _p9._1._0);
+								var pageModel = _p11._0._0;
+								var cmd = _p11._0._1;
+								var msgFromPage = _p11._1;
+								var newModel = function () {
+									var _p12 = msgFromPage;
+									if (_p12.ctor === 'NoOp') {
+										return model;
+									} else {
+										var session = model.session;
+										return _elm_lang$core$Native_Utils.update(
+											model,
+											{
+												session: {
+													user: _elm_lang$core$Maybe$Just(_p12._0)
+												}
+											});
+									}
+								}();
+								return A2(
+									_shohamh$learnmath_frontend$Util_ops['=>'],
+									_elm_lang$core$Native_Utils.update(
+										newModel,
+										{
+											pageState: _shohamh$learnmath_frontend$Main$Loaded(
+												_shohamh$learnmath_frontend$Main$Login(pageModel))
+										}),
+									A2(_elm_lang$core$Platform_Cmd$map, _shohamh$learnmath_frontend$Main$LoginMsg, cmd));
+							case 'NotFound':
+								break _v5_8;
+							default:
+								break _v5_9;
+						}
+					case 'RegisterMsg':
+						switch (_p9._1.ctor) {
+							case 'Register':
+								var _p13 = A2(_shohamh$learnmath_frontend$Page_Register$update, _p9._0._0, _p9._1._0);
+								var pageModel = _p13._0._0;
+								var cmd = _p13._0._1;
+								var msgFromPage = _p13._1;
+								var newModel = function () {
+									var _p14 = msgFromPage;
+									if (_p14.ctor === 'NoOp') {
+										return model;
+									} else {
+										var session = model.session;
+										return _elm_lang$core$Native_Utils.update(
+											model,
+											{
+												session: {
+													user: _elm_lang$core$Maybe$Just(_p14._0)
+												}
+											});
+									}
+								}();
+								return A2(
+									_shohamh$learnmath_frontend$Util_ops['=>'],
+									_elm_lang$core$Native_Utils.update(
+										newModel,
+										{
+											pageState: _shohamh$learnmath_frontend$Main$Loaded(
+												_shohamh$learnmath_frontend$Main$Register(pageModel))
+										}),
+									A2(_elm_lang$core$Platform_Cmd$map, _shohamh$learnmath_frontend$Main$RegisterMsg, cmd));
+							case 'NotFound':
+								break _v5_8;
+							default:
+								break _v5_9;
+						}
+					case 'HomeMsg':
+						switch (_p9._1.ctor) {
+							case 'Home':
+								return A5(
+									toPage,
+									_shohamh$learnmath_frontend$Main$Home,
+									_shohamh$learnmath_frontend$Main$HomeMsg,
+									_shohamh$learnmath_frontend$Page_Home$update(session),
+									_p9._0._0,
+									_p9._1._0);
+							case 'NotFound':
+								break _v5_8;
+							default:
+								break _v5_9;
+						}
+					case 'Mdl':
+						return A3(_debois$elm_mdl$Material$update, _shohamh$learnmath_frontend$Main$Mdl, _p9._0._0, model);
+					default:
+						if (_p9._1.ctor === 'NotFound') {
+							break _v5_8;
+						} else {
+							break _v5_9;
+						}
+				}
+			} while(false);
+			return A2(_shohamh$learnmath_frontend$Util_ops['=>'], model, _elm_lang$core$Platform_Cmd$none);
+		} while(false);
+		return A2(_shohamh$learnmath_frontend$Util_ops['=>'], model, _elm_lang$core$Platform_Cmd$none);
+	});
+var _shohamh$learnmath_frontend$Main$update = F2(
+	function (msg, model) {
+		return A3(
+			_shohamh$learnmath_frontend$Main$updatePage,
+			_shohamh$learnmath_frontend$Main$getPage(model.pageState),
+			msg,
+			model);
+	});
+var _shohamh$learnmath_frontend$Main$main = A2(
+	_elm_lang$navigation$Navigation$programWithFlags,
+	function (_p15) {
+		return _shohamh$learnmath_frontend$Main$SetRoute(
+			_shohamh$learnmath_frontend$Route$fromLocation(_p15));
+	},
+	{init: _shohamh$learnmath_frontend$Main$init, view: _shohamh$learnmath_frontend$Main$view, subscriptions: _shohamh$learnmath_frontend$Main$subs, update: _shohamh$learnmath_frontend$Main$update})(_elm_lang$core$Json_Decode$value);
 
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};
-if (typeof _user$project$Main$main !== 'undefined') {
-    _user$project$Main$main(Elm['Main'], 'Main', {"types":{"unions":{"Dict.LeafColor":{"args":[],"tags":{"LBBlack":[],"LBlack":[]}},"Forms.Login.Msg":{"args":[],"tags":{"UpdateUsername":["String"],"Submit":[],"SubmitResult":["Result.Result Http.Error Forms.Login.ResponseData"],"Mdl":["Material.Msg Forms.Login.Msg"],"UpdatePassword":["String"]}},"Forms.Question.Msg":{"args":[],"tags":{"UpdateUsername":["String"],"Submit":[],"SubmitResult":["Result.Result Http.Error Forms.Question.ResponseData"],"Mdl":["Material.Msg Forms.Question.Msg"],"MyscriptReceive":["String"],"UpdatePassword":["String"]}},"Material.Component.Msg":{"args":["button","textfield","menu","layout","toggles","tooltip","tabs","dispatch"],"tags":{"TooltipMsg":["Material.Component.Index","tooltip"],"TogglesMsg":["Material.Component.Index","toggles"],"LayoutMsg":["layout"],"ButtonMsg":["Material.Component.Index","button"],"MenuMsg":["Material.Component.Index","menu"],"TabsMsg":["Material.Component.Index","tabs"],"Dispatch":["dispatch"],"TextfieldMsg":["Material.Component.Index","textfield"]}},"Forms.Register.Msg":{"args":[],"tags":{"UpdateUsername":["String"],"UpdateEmail":["String"],"Submit":[],"SubmitResult":["Result.Result Http.Error Forms.Register.ResponseData"],"Mdl":["Material.Msg Forms.Register.Msg"],"UpdatePasswordAgain":["String"],"UpdatePassword":["String"]}},"Material.Ripple.Msg":{"args":[],"tags":{"Down":["Material.Ripple.DOMState"],"Up":[],"Tick":[]}},"Dict.Dict":{"args":["k","v"],"tags":{"RBNode_elm_builtin":["Dict.NColor","k","v","Dict.Dict k v","Dict.Dict k v"],"RBEmpty_elm_builtin":["Dict.LeafColor"]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Main.Msg":{"args":[],"tags":{"RegisterFormHandler":["Forms.Register.Msg"],"SelectTab":["Int"],"LoginFormHandler":["Forms.Login.Msg"],"Mdl":["Material.Msg Main.Msg"],"QuestionFormHandler":["Forms.Question.Msg"]}},"Material.Tooltip.Msg":{"args":[],"tags":{"Enter":["Material.Tooltip.DOMState"],"Leave":[]}},"Dict.NColor":{"args":[],"tags":{"BBlack":[],"Red":[],"NBlack":[],"Black":[]}},"Json.Decode.Decoder":{"args":["a"],"tags":{"Decoder":[]}},"Material.Textfield.Msg":{"args":[],"tags":{"Focus":[],"Input":["String"],"Blur":[]}},"Material.Layout.Msg":{"args":[],"tags":{"Resize":["Int"],"ToggleDrawer":[],"TransitionEnd":[],"ScrollPane":["Bool","Float"],"Ripple":["Int","Material.Ripple.Msg"],"ScrollTab":["Material.Layout.TabScrollState"],"TransitionHeader":["{ toCompact : Bool, fixedHeader : Bool }"],"NOP":[]}},"Material.Toggles.Msg":{"args":[],"tags":{"Ripple":["Material.Ripple.Msg"],"SetFocus":["Bool"]}},"VirtualDom.Property":{"args":["msg"],"tags":{"Property":[]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String"],"NetworkError":[],"Timeout":[],"BadStatus":["Http.Response String"],"BadPayload":["String","Http.Response String"]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}},"Material.Tabs.Msg":{"args":[],"tags":{"Ripple":["Int","Material.Ripple.Msg"]}},"Material.Menu.Msg":{"args":["m"],"tags":{"Tick":[],"Close":[],"Open":["Material.Menu.Geometry.Geometry"],"Key":["List (Material.Options.Internal.Summary (Material.Menu.ItemConfig m) m)","Int"],"Ripple":["Int","Material.Ripple.Msg"],"Select":["Int","Maybe.Maybe m"],"Click":["Mouse.Position"]}},"Material.Dispatch.Config":{"args":["msg"],"tags":{"Config":["{ decoders : List ( String , ( Json.Decode.Decoder msg, Maybe.Maybe Html.Events.Options ) ) , lift : Maybe.Maybe (Json.Decode.Decoder (List msg) -> Json.Decode.Decoder msg) }"]}}},"aliases":{"Material.Button.Msg":{"args":[],"type":"Material.Ripple.Msg"},"Material.Layout.TabScrollState":{"args":[],"type":"{ canScrollLeft : Bool , canScrollRight : Bool , width : Maybe.Maybe Int }"},"Material.Tooltip.DOMState":{"args":[],"type":"{ rect : DOM.Rectangle, offsetWidth : Float, offsetHeight : Float }"},"Forms.Register.ResponseData":{"args":[],"type":"{ success : Bool, errorMessages : List String }"},"Html.Attribute":{"args":["msg"],"type":"VirtualDom.Property msg"},"Material.Menu.ItemConfig":{"args":["m"],"type":"{ enabled : Bool, divider : Bool, onSelect : Maybe.Maybe m }"},"Material.Component.Index":{"args":[],"type":"List Int"},"Html.Events.Options":{"args":[],"type":"{ stopPropagation : Bool, preventDefault : Bool }"},"Forms.Login.ResponseData":{"args":[],"type":"{ success : Bool, error_messages : List String }"},"Http.Response":{"args":["body"],"type":"{ url : String , status : { code : Int, message : String } , headers : Dict.Dict String String , body : body }"},"Material.Ripple.DOMState":{"args":[],"type":"{ rect : DOM.Rectangle , clientX : Maybe.Maybe Float , clientY : Maybe.Maybe Float , touchX : Maybe.Maybe Float , touchY : Maybe.Maybe Float , type_ : String }"},"Mouse.Position":{"args":[],"type":"{ x : Int, y : Int }"},"Material.Options.Internal.Summary":{"args":["c","m"],"type":"{ classes : List String , css : List ( String, String ) , attrs : List (Html.Attribute m) , internal : List (Html.Attribute m) , dispatch : Material.Dispatch.Config m , config : c }"},"Material.Msg":{"args":["m"],"type":"Material.Component.Msg Material.Button.Msg Material.Textfield.Msg (Material.Menu.Msg m) Material.Layout.Msg Material.Toggles.Msg Material.Tooltip.Msg Material.Tabs.Msg (List m)"},"Material.Menu.Geometry.Element":{"args":[],"type":"{ offsetTop : Float , offsetLeft : Float , offsetHeight : Float , bounds : DOM.Rectangle }"},"Forms.Question.ResponseData":{"args":[],"type":"{ success : Bool, error_messages : List String }"},"Material.Menu.Geometry.Geometry":{"args":[],"type":"{ button : Material.Menu.Geometry.Element , menu : Material.Menu.Geometry.Element , container : Material.Menu.Geometry.Element , offsetTops : List Float , offsetHeights : List Float }"},"DOM.Rectangle":{"args":[],"type":"{ top : Float, left : Float, width : Float, height : Float }"}},"message":"Main.Msg"},"versions":{"elm":"0.18.0"}});
+if (typeof _shohamh$learnmath_frontend$Main$main !== 'undefined') {
+    _shohamh$learnmath_frontend$Main$main(Elm['Main'], 'Main', {"types":{"unions":{"Dict.LeafColor":{"args":[],"tags":{"LBBlack":[],"LBlack":[]}},"Data.User.Username":{"args":[],"tags":{"Username":["String"]}},"Material.Component.Msg":{"args":["button","textfield","menu","layout","toggles","tooltip","tabs","dispatch"],"tags":{"TooltipMsg":["Material.Component.Index","tooltip"],"TogglesMsg":["Material.Component.Index","toggles"],"LayoutMsg":["layout"],"ButtonMsg":["Material.Component.Index","button"],"MenuMsg":["Material.Component.Index","menu"],"TabsMsg":["Material.Component.Index","tabs"],"Dispatch":["dispatch"],"TextfieldMsg":["Material.Component.Index","textfield"]}},"Material.Ripple.Msg":{"args":[],"tags":{"Down":["Material.Ripple.DOMState"],"Up":[],"Tick":[]}},"Data.AuthToken.AuthToken":{"args":[],"tags":{"AuthToken":["String"]}},"Dict.Dict":{"args":["k","v"],"tags":{"RBNode_elm_builtin":["Dict.NColor","k","v","Dict.Dict k v","Dict.Dict k v"],"RBEmpty_elm_builtin":["Dict.LeafColor"]}},"Route.Route":{"args":[],"tags":{"Home":[],"Logout":[],"Register":[],"Login":[],"Question":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Main.Msg":{"args":[],"tags":{"QuestionMsg":["Page.Question.Msg"],"SelectTab":["Int"],"LoginMsg":["Page.Login.Msg"],"HomeLoaded":["Result.Result Page.Errored.PageLoadError Page.Home.Model"],"SetUser":["Maybe.Maybe Data.User.User"],"SetRoute":["Maybe.Maybe Route.Route"],"HomeMsg":["Page.Home.Msg"],"Mdl":["Material.Msg Main.Msg"],"RegisterMsg":["Page.Register.Msg"]}},"Page.Question.Msg":{"args":[],"tags":{"UpdateUsername":["String"],"Submit":[],"SubmitResult":["Result.Result Http.Error Page.Question.ResponseData"],"Mdl":["Material.Msg Page.Question.Msg"],"MyscriptReceive":["String"],"UpdatePassword":["String"]}},"Page.Errored.PageLoadError":{"args":[],"tags":{"PageLoadError":["Page.Errored.Model"]}},"Material.Tooltip.Msg":{"args":[],"tags":{"Enter":["Material.Tooltip.DOMState"],"Leave":[]}},"Dict.NColor":{"args":[],"tags":{"BBlack":[],"Red":[],"NBlack":[],"Black":[]}},"Json.Decode.Decoder":{"args":["a"],"tags":{"Decoder":[]}},"Views.Page.ActivePage":{"args":[],"tags":{"Other":[],"Home":[],"Register":[],"Login":[],"Question":[]}},"Page.Home.Msg":{"args":[],"tags":{"NoOp":[]}},"Material.Textfield.Msg":{"args":[],"tags":{"Focus":[],"Input":["String"],"Blur":[]}},"Material.Layout.Msg":{"args":[],"tags":{"Resize":["Int"],"ToggleDrawer":[],"TransitionEnd":[],"ScrollPane":["Bool","Float"],"Ripple":["Int","Material.Ripple.Msg"],"ScrollTab":["Material.Layout.TabScrollState"],"TransitionHeader":["{ toCompact : Bool, fixedHeader : Bool }"],"NOP":[]}},"Material.Toggles.Msg":{"args":[],"tags":{"Ripple":["Material.Ripple.Msg"],"SetFocus":["Bool"]}},"Page.Register.Msg":{"args":[],"tags":{"UpdateUsername":["String"],"UpdateEmail":["String"],"Submit":[],"SubmitResult":["Result.Result Http.Error Page.Register.ResponseData"],"Mdl":["Material.Msg Page.Register.Msg"],"UpdatePasswordAgain":["String"],"UpdatePassword":["String"]}},"VirtualDom.Property":{"args":["msg"],"tags":{"Property":[]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String"],"NetworkError":[],"Timeout":[],"BadStatus":["Http.Response String"],"BadPayload":["String","Http.Response String"]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}},"Material.Tabs.Msg":{"args":[],"tags":{"Ripple":["Int","Material.Ripple.Msg"]}},"Material.Menu.Msg":{"args":["m"],"tags":{"Tick":[],"Close":[],"Open":["Material.Menu.Geometry.Geometry"],"Key":["List (Material.Options.Internal.Summary (Material.Menu.ItemConfig m) m)","Int"],"Ripple":["Int","Material.Ripple.Msg"],"Select":["Int","Maybe.Maybe m"],"Click":["Mouse.Position"]}},"Material.Dispatch.Config":{"args":["msg"],"tags":{"Config":["{ decoders : List ( String , ( Json.Decode.Decoder msg, Maybe.Maybe Html.Events.Options ) ) , lift : Maybe.Maybe (Json.Decode.Decoder (List msg) -> Json.Decode.Decoder msg) }"]}},"Page.Login.Msg":{"args":[],"tags":{"UpdateUsername":["String"],"Submit":[],"SubmitResult":["Result.Result Http.Error Page.Login.ResponseData"],"Mdl":["Material.Msg Page.Login.Msg"],"UpdatePassword":["String"]}}},"aliases":{"Material.Button.Msg":{"args":[],"type":"Material.Ripple.Msg"},"Material.Layout.TabScrollState":{"args":[],"type":"{ canScrollLeft : Bool , canScrollRight : Bool , width : Maybe.Maybe Int }"},"Material.Tooltip.DOMState":{"args":[],"type":"{ rect : DOM.Rectangle, offsetWidth : Float, offsetHeight : Float }"},"Html.Attribute":{"args":["msg"],"type":"VirtualDom.Property msg"},"Material.Menu.ItemConfig":{"args":["m"],"type":"{ enabled : Bool, divider : Bool, onSelect : Maybe.Maybe m }"},"Material.Component.Index":{"args":[],"type":"List Int"},"Html.Events.Options":{"args":[],"type":"{ stopPropagation : Bool, preventDefault : Bool }"},"Http.Response":{"args":["body"],"type":"{ url : String , status : { code : Int, message : String } , headers : Dict.Dict String String , body : body }"},"Page.Errored.Model":{"args":[],"type":"{ activePage : Views.Page.ActivePage, errorMessage : String }"},"Material.Ripple.DOMState":{"args":[],"type":"{ rect : DOM.Rectangle , clientX : Maybe.Maybe Float , clientY : Maybe.Maybe Float , touchX : Maybe.Maybe Float , touchY : Maybe.Maybe Float , type_ : String }"},"Page.Home.Model":{"args":[],"type":"{ a : Int }"},"Mouse.Position":{"args":[],"type":"{ x : Int, y : Int }"},"Material.Options.Internal.Summary":{"args":["c","m"],"type":"{ classes : List String , css : List ( String, String ) , attrs : List (Html.Attribute m) , internal : List (Html.Attribute m) , dispatch : Material.Dispatch.Config m , config : c }"},"Material.Msg":{"args":["m"],"type":"Material.Component.Msg Material.Button.Msg Material.Textfield.Msg (Material.Menu.Msg m) Material.Layout.Msg Material.Toggles.Msg Material.Tooltip.Msg Material.Tabs.Msg (List m)"},"Material.Menu.Geometry.Element":{"args":[],"type":"{ offsetTop : Float , offsetLeft : Float , offsetHeight : Float , bounds : DOM.Rectangle }"},"Data.User.User":{"args":[],"type":"{ email : String , token : Data.AuthToken.AuthToken , username : Data.User.Username }"},"Page.Login.ResponseData":{"args":[],"type":"{ success : Bool, error_messages : List String }"},"Material.Menu.Geometry.Geometry":{"args":[],"type":"{ button : Material.Menu.Geometry.Element , menu : Material.Menu.Geometry.Element , container : Material.Menu.Geometry.Element , offsetTops : List Float , offsetHeights : List Float }"},"Page.Question.ResponseData":{"args":[],"type":"{ success : Bool, error_messages : List String }"},"Page.Register.ResponseData":{"args":[],"type":"{ success : Bool, errorMessages : List String }"},"DOM.Rectangle":{"args":[],"type":"{ top : Float, left : Float, width : Float, height : Float }"}},"message":"Main.Msg"},"versions":{"elm":"0.18.0"}});
 }
 
 if (typeof define === "function" && define['amd'])

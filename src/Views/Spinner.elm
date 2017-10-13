@@ -11,4 +11,4 @@ spinner =
         [ div [ class "sk-child sk-bounce1" ] []
         , div [ class "sk-child sk-bounce2" ] []
         , div [ class "sk-child sk-bounce3" ] []
-]
+        ]

@@ -1,5 +1,7 @@
-module Page.Register exposing (..)
+module Page.Register exposing (ExternalMsg(..), Model, Msg, model, update, view)
 
+import Data.Session as Session exposing (Session)
+import Data.User as User exposing (User)
 import Html exposing (..)
 import Http
 import Json.Decode as JD exposing (..)
@@ -10,6 +12,8 @@ import Material
 import Material.Button as Button exposing (..)
 import Material.Options as Options exposing (css, onClick, onInput, when)
 import Material.Textfield as Textfield
+import Ports
+import Util exposing ((=>))
 
 
 type alias Model =
@@ -58,35 +62,40 @@ type Msg
     | Mdl (Material.Msg Msg)
 
 
+type ExternalMsg
+    = NoOp
+    | SetUser User
+
+
 requestModel : Model -> RequestData
 requestModel model =
     RequestData model.username model.password model.email
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Model -> ( ( Model, Cmd Msg ), ExternalMsg )
 update msg model =
     case msg of
         Mdl msg_ ->
-            Material.update Mdl msg_ model
+            Material.update Mdl msg_ model => NoOp
 
         UpdateUsername str ->
-            { model | username = str } ! []
+            { model | username = str } => Cmd.none => NoOp
 
         UpdatePassword str ->
-            { model | password = str } ! []
+            { model | password = str } => Cmd.none => NoOp
 
         UpdatePasswordAgain str ->
-            { model | passwordAgain = str } ! []
+            { model | passwordAgain = str } => Cmd.none => NoOp
 
         UpdateEmail str ->
-            { model | email = str } ! []
+            { model | email = str } => Cmd.none => NoOp
 
         Submit ->
             let
                 requestData =
                     requestModel model
             in
-            model ! [ send requestData ]
+            model => send requestData => NoOp
 
         SubmitResult (Ok responseData) ->
             { model
@@ -99,7 +108,8 @@ update msg model =
                             "Registration failed."
                 , errorMessages = responseData.errorMessages
             }
-                ! []
+                => Cmd.none
+                => NoOp
 
         SubmitResult (Err httpError) ->
             let
@@ -126,7 +136,8 @@ update msg model =
                         [ errorMessage
                         ]
             }
-                ! []
+                => Cmd.none
+                => NoOp
 
 
 send : RequestData -> Cmd Msg
@@ -169,8 +180,8 @@ viewErrorMessages errorMessages =
     div [] (List.intersperse (br [] []) (List.map text errorMessages))
 
 
-viewForm : Model -> Html Msg
-viewForm model =
+view : Session -> Model -> Html Msg
+view session model =
     div []
         [ Textfield.render Mdl
             [ 0 ]

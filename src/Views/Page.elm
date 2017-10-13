@@ -1,8 +1,8 @@
 module Views.Page exposing (ActivePage(..), bodyId, frame)
+
 -- The frame around a typical page - that is, the header and footer.
 
-
-import Data.User as User exposing (User)
+import Data.User as User exposing (User, Username)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Lazy exposing (lazy2)
@@ -21,9 +21,11 @@ type ActivePage
     | Home
     | Login
     | Register
-    | Settings
-    | Profile Username
-    | NewArticle
+    | Question
+
+
+
+--| Profile Username
 
 
 {-| Take a page's Html and frame it with a header and footer.
@@ -38,7 +40,7 @@ frame isLoading user page content =
         [ viewHeader page user isLoading
         , content
         , viewFooter
-]
+        ]
 
 
 viewHeader : ActivePage -> Maybe User -> Bool -> Html msg
@@ -64,15 +66,19 @@ viewSignIn page user =
             ]
 
         Just user ->
-            [ navbarLink (page == NewArticle) Route.NewArticle [ i [ class "ion-compose" ] [], text " New Post" ]
-            , navbarLink (page == Settings) Route.Settings [ i [ class "ion-gear-a" ] [], text " Settings" ]
-            , navbarLink
-                (page == Profile user.username)
-                (Route.Profile user.username)
-                [ img [ class "user-pic", UserPhoto.src user.image ] []
-                , User.usernameToHtml user.username
-                ]
-            , navbarLink False Route.Logout [ text "Sign out" ]
+            [ {- navbarLink
+
+                  (page == Profile user.username)
+                    (Route.Profile user.username)
+                    [ {- img [ class "user-pic", {- UserPhoto.src -} "https://i.imgur.com/RBeajsL.jpg" user.image ] []
+                         ,
+                      -}
+                      User.usernameToHtml user.username
+                    ]
+
+                 ,
+              -}
+              navbarLink False Route.Logout [ text "Sign out" ]
             ]
 
 
