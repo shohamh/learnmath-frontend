@@ -1,5 +1,6 @@
 module Page.Register exposing (ExternalMsg(..), Model, Msg, model, update, view)
 
+import Config
 import Data.Session as Session exposing (Session)
 import Data.User as User exposing (User)
 import Html exposing (..)
@@ -144,7 +145,7 @@ send : RequestData -> Cmd Msg
 send requestData =
     let
         url =
-            "http://learnmath.pythonanywhere.com/register"
+            Config.server ++ "/register"
 
         body =
             Http.jsonBody <| requestEncoder requestData

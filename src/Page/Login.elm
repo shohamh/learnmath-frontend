@@ -1,8 +1,9 @@
 module Page.Login exposing (ExternalMsg(..), Model, Msg, model, update, view)
 
+import Config
 import Data.AuthToken as AuthToken exposing (AuthToken)
 import Data.Session as Session exposing (Session)
-import Data.User as User exposing (User)
+import Data.User as User exposing (User, Username(..))
 import Html exposing (..)
 import Http
 import Json.Decode as JD exposing (..)
@@ -77,7 +78,7 @@ requestModel model =
 
 responseDataToUser : ResponseData -> Model -> User
 responseDataToUser responseData model =
-    User ("email@email.com" responseData.authToken (User.Username model.username))
+    User "email@email.com" responseData.authToken (Username model.username)
 
 
 update : Msg -> Model -> ( ( Model, Cmd Msg ), ExternalMsg )
@@ -137,7 +138,7 @@ send : RequestData -> Cmd Msg
 send requestData =
     let
         url =
-            "http://learnmath.pythonanywhere.com/login"
+            Config.server ++ "/login"
 
         body =
             Http.jsonBody <| requestEncoder requestData
@@ -162,10 +163,6 @@ responseDecoder =
         |> required "success" JD.bool
         |> required "session_key" AuthToken.decoder
         |> required "error_messages" (JD.list JD.string)
-
-
-type alias Mdl =
-    Material.Model
 
 
 viewErrorMessages : List String -> Html Msg

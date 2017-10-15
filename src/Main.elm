@@ -343,7 +343,7 @@ viewPage session isLoading page =
             Home.view session subModel |> frame Page.Home |> Html.map HomeMsg
 
         Login subModel ->
-            Login.view session subModel |> frame Page.Other |> Html.map LoginMsg
+            Login.view session subModel |> frame Page.Other Login.Msg.Mdl |> Html.map LoginMsg
 
         Register subModel ->
             Register.view session subModel |> frame Page.Other |> Html.map RegisterMsg

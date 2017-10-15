@@ -28,6 +28,7 @@ model =
 
 type Msg
     = SelectTab Int
+    | Mdl (Material.Msg Msg)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -36,12 +37,18 @@ update msg model =
         SelectTab tabIndex ->
             { model | selectedTab = tabIndex } ! []
 
+        Mdl msg_ ->
+            Material.update Mdl msg_ model
 
-{-| Determines which navbar link (if any) will be rendered as active.
-Note that we don't enumerate every page here, because the navbar doesn't
-have links for every page. Anything that's not part of the navbar falls
-under Other.
+
+
+{- | Determines which navbar link (if any) will be rendered as active.
+   Note that we don't enumerate every page here, because the navbar doesn't
+   have links for every page. Anything that's not part of the navbar falls
+   under Other.
 -}
+
+
 type ActivePage
     = Other
     | Home
@@ -50,8 +57,12 @@ type ActivePage
     | Question
 
 
-tabTitles : List String
-tabTitles =
+
+--| Profile Username
+
+
+tabList : List String
+tabList =
     [ "Home"
     , "Login"
     , "Register"
@@ -59,12 +70,9 @@ tabTitles =
     ]
 
 
-
---| Profile Username
-
-
-type alias Mdl =
-    Material.Model
+tabTitles : List (Html msg)
+tabTitles =
+    List.map (\x -> text x) tabList
 
 
 {-| Take a page's Html and frame it with a header and footer.
@@ -73,15 +81,15 @@ The caller provides the current user, so we can display in either
 isLoading is for determining whether we should show a loading spinner
 in the header. (This comes up during slow page transitions.)
 -}
-frame : Bool -> Maybe User -> ActivePage -> Html msg -> Html msg
-frame isLoading user page content =
-    Layout.render Mdl
+frame : Bool -> Maybe User -> ActivePage -> Html msg -> b -> Html msg
+frame isLoading user page content mdlMessage =
+    Layout.render mdlMessage
         model.mdl
         [ Layout.fixedHeader
         , Layout.onSelectTab SelectTab
         , Layout.selectedTab model.selectedTab
         ]
-        { header = viewHeader page user isLoading
+        { header = [ viewHeader page user isLoading ]
         , drawer = [ text "drawer text" ]
         , tabs = ( tabTitles, [] )
         , main = [ content ]
