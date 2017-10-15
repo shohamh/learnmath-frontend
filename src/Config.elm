@@ -6,10 +6,21 @@ protocol =
     "http"
 
 
+serverAddress : String
+serverAddress =
+    "learnmath-backend-shoham424210.codeanyapp.com"
+
+
+
+--"learnmath.pythonanywhere.com"
+--"localhost"
+
+
+serverPort : String
+serverPort =
+    "8000"
+
+
 server : String
 server =
-    protocol ++ ":// " ++ "learnmath.pythonanywhere.com"
-
-
-
---"localhost:5000"
+    protocol ++ ":// " ++ serverAddress ++ ":" ++ serverPort

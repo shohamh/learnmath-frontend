@@ -72,7 +72,7 @@ tabList =
 
 tabTitles : List (Html msg)
 tabTitles =
-    List.map (\x -> text x) tabList
+    List.map text tabList
 
 
 {-| Take a page's Html and frame it with a header and footer.
@@ -81,9 +81,9 @@ The caller provides the current user, so we can display in either
 isLoading is for determining whether we should show a loading spinner
 in the header. (This comes up during slow page transitions.)
 -}
-frame : Bool -> Maybe User -> ActivePage -> Html msg -> b -> Html msg
-frame isLoading user page content mdlMessage =
-    Layout.render mdlMessage
+frame : Bool -> Maybe User -> ActivePage -> Html msg -> (Material.Msg msg -> msg) -> (Int -> msg) -> Html msg
+frame isLoading user page content mdlMsg selectTabMsg =
+    Layout.render mdlMsg
         model.mdl
         [ Layout.fixedHeader
         , Layout.onSelectTab SelectTab
