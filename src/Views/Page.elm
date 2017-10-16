@@ -1,4 +1,4 @@
-module Views.Page exposing (ActivePage(..), bodyId, frame)
+module Views.Page exposing (ActivePage(..), Msg(..), bodyId, frame)
 
 -- The frame around a typical page - that is, the header and footer.
 
@@ -8,6 +8,7 @@ import Html.Attributes exposing (..)
 import Html.Lazy exposing (lazy2)
 import Material
 import Material.Layout as Layout
+import Page.Login
 import Route exposing (Route)
 import Util exposing ((=>))
 import Views.Spinner exposing (spinner)
@@ -16,6 +17,7 @@ import Views.Spinner exposing (spinner)
 type alias Model =
     { mdl : Material.Model
     , selectedTab : Int
+    , loginModel : Page.Login.Model
     }
 
 
@@ -26,8 +28,9 @@ model =
     }
 
 
-type Msg
+type Msg loginMsg
     = SelectTab Int
+    | LiftMsg loginMsg
     | Mdl (Material.Msg Msg)
 
 
@@ -39,6 +42,13 @@ update msg model =
 
         Mdl msg_ ->
             Material.update Mdl msg_ model
+
+        LiftMsg msg_ ->
+            let
+                ( newLoginModel, newLoginCmd ) =
+                    Page.Login.update msg_ model.loginModel
+            in
+            { model | loginModel = newLoginModel } ! [ newLoginCmd ]
 
 
 
@@ -81,9 +91,9 @@ The caller provides the current user, so we can display in either
 isLoading is for determining whether we should show a loading spinner
 in the header. (This comes up during slow page transitions.)
 -}
-frame : Bool -> Maybe User -> ActivePage -> Html msg -> (Material.Msg msg -> msg) -> (Int -> msg) -> Html msg
-frame isLoading user page content mdlMsg selectTabMsg =
-    Layout.render mdlMsg
+frame : Bool -> Maybe User -> ActivePage -> Html Msg -> Html Msg
+frame isLoading user page content =
+    Layout.render Mdl
         model.mdl
         [ Layout.fixedHeader
         , Layout.onSelectTab SelectTab
@@ -92,7 +102,7 @@ frame isLoading user page content mdlMsg selectTabMsg =
         { header = [ viewHeader page user isLoading ]
         , drawer = [ text "drawer text" ]
         , tabs = ( tabTitles, [] )
-        , main = [ content ]
+        , main = [ Html.map LiftMsg content ]
         }
 
 

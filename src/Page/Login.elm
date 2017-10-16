@@ -1,4 +1,4 @@
-module Page.Login exposing (ExternalMsg(..), Model, Msg(..), model, update, view)
+module Page.Login exposing (ExternalMsg(..), Model, Msg, model, update, view)
 
 import Config
 import Data.AuthToken as AuthToken exposing (AuthToken)
