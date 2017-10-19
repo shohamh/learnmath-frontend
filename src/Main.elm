@@ -5,8 +5,6 @@ import Data.User as User exposing (User)
 import Html exposing (..)
 import Html.Attributes exposing (attribute)
 import Json.Decode as Decode exposing (Value)
-import Material
-import Material.Layout as Layout
 import Navigation exposing (Location)
 import Page.Errored as Errored exposing (PageLoadError)
 import Page.Home as Home
@@ -39,10 +37,6 @@ type Page
 type alias Model =
     { pageState : PageState
     , session : Session
-    , mdl :
-        Material.Model
-
-    -- Boilerplate: model store for any and all Mdl components you use.
     }
 
 
@@ -53,10 +47,9 @@ init val location =
             setRoute (Route.fromLocation location)
                 { pageState = Loaded initialPage
                 , session = { user = decodeUserFromJson val }
-                , mdl = {- Layout.setTabsWidth 1384 -} Material.model
                 }
     in
-    ( model_, Cmd.batch [ cmd_, Layout.sub0 Mdl ] )
+    ( model_, cmd_ )
 
 
 decodeUserFromJson : Value -> Maybe User
@@ -87,7 +80,6 @@ type Msg
       --| ProfileLoaded Username (Result PageLoadError Profile.Model)
     | SetRoute (Maybe Route)
     | HomeLoaded (Result PageLoadError Home.Model)
-    | Mdl (Material.Msg Msg)
 
 
 setRoute : Maybe Route -> Model -> ( Model, Cmd Msg )
@@ -241,10 +233,6 @@ updatePage page msg model =
         {- ( ProfileMsg subMsg, Profile username subModel ) ->
            toPage (Profile username) ProfileMsg (Profile.update model.session) subMsg subModel
         -}
-        -- Boilerplate: Mdl action handler.
-        ( Mdl msg_, _ ) ->
-            Material.update Mdl msg_ model
-
         ( _, NotFound ) ->
             -- Disregard incoming messages when we're on the
             -- NotFound page.
@@ -257,13 +245,6 @@ updatePage page msg model =
 
 
 -- VIEW
-
-
-type alias Mdl =
-    Material.Model
-
-
-
 --| Profile Profile.Model
 
 
@@ -428,7 +409,7 @@ sessionChange =
 
 subs : Model -> Sub Msg
 subs model =
-    Sub.batch [ pageSubscriptions (getPage model.pageState), Sub.map SetUser sessionChange, Layout.subs Mdl model.mdl ]
+    Sub.batch [ pageSubscriptions (getPage model.pageState), Sub.map SetUser sessionChange ]
 
 
 main : Program Value Model Msg

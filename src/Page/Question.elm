@@ -2,92 +2,38 @@ module Page.Question exposing (..)
 
 import Data.Session as Session exposing (Session)
 import Html exposing (..)
-import Html.Attributes exposing (attribute)
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 import Http
 import Json.Decode as JD exposing (..)
 import Json.Decode.Pipeline exposing (decode, required)
 import Json.Encode as JE exposing (..)
-import Material
-import Material.Button as Button exposing (..)
-import Material.Options as Options exposing (css, onClick, onInput, when)
-import Material.Textfield as Textfield
+import Route
+import Views.Form as Form
+import Views.Page as Page
 import WebSocket
 
 
 type alias Model =
-    { username : String
-    , password : String
-    , successMessage : String
+    { successMessage : String
     , errorMessages : List String
-    , mdl : Material.Model
     }
 
 
 model : Model
 model =
-    { username = ""
-    , password = ""
-    , successMessage = ""
+    { successMessage = ""
     , errorMessages = []
-    , mdl = Material.model
-    }
-
-
-type alias RequestData =
-    { username : String
-    , password : String
-    }
-
-
-type alias ResponseData =
-    { success : Bool
-    , error_messages : List String
     }
 
 
 type Msg
-    = UpdateUsername String
-    | UpdatePassword String
-    | Submit
-    | SubmitResult (Result Http.Error ResponseData)
-    | MyscriptReceive String
-    | Mdl (Material.Msg Msg)
-
-
-requestModel : Model -> RequestData
-requestModel model =
-    RequestData model.username model.password
+    = MyscriptReceive String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Mdl msg_ ->
-            Material.update Mdl msg_ model
-
-        UpdateUsername str ->
-            { model | username = str } ! []
-
-        UpdatePassword str ->
-            { model | password = str } ! []
-
-        Submit ->
-            let
-                requestData =
-                    requestModel model
-            in
-            model
-                ! [ Debug.log "hi"
-                        send
-                        requestData
-                  ]
-
-        SubmitResult (Ok successMessage) ->
-            model ! []
-
-        SubmitResult (Err errorMessage) ->
-            model ! []
-
         MyscriptReceive str ->
             model ! [ Debug.log str WebSocket.send "ws://echo.websocket.org" ("Hello" ++ str) ]
 
@@ -105,69 +51,19 @@ subs model =
 --WebSocket.listen "wss://cloud.myscript.com" MyscriptReceive
 
 
-send : RequestData -> Cmd Msg
-send requestData =
-    let
-        url =
-            "http://learnmath.pythonanywhere.com/login"
-
-        body =
-            Http.jsonBody <| requestEncoder requestData
-
-        request =
-            Http.post url body responseDecoder
-    in
-    Http.send SubmitResult request
-
-
-requestEncoder : RequestData -> JE.Value
-requestEncoder requestData =
-    JE.object
-        [ ( "username", JE.string requestData.username )
-        , ( "password", JE.string requestData.password )
-        ]
-
-
-responseDecoder : Decoder ResponseData
-responseDecoder =
-    decode ResponseData
-        |> required "success" JD.bool
-        |> required "error_messages" (JD.list JD.string)
-
-
-type alias Mdl =
-    Material.Model
-
-
 view : Session -> Model -> Html Msg
 view session model =
-    div []
-        [ Textfield.render Mdl
-            [ 0 ]
-            model.mdl
-            [ Textfield.label "Username"
-            , Textfield.floatingLabel
-            , Textfield.text_
-            , Options.onInput UpdateUsername
+    div [ class "question-page" ]
+        [ div [ class "container page" ]
+            [ div [ class "row" ]
+                [ div [ class "col-md-6 offset-md-3 col-xs-12" ]
+                    [ h1 [ class "text-xs-center" ] [ text "Sign in" ]
+                    , p [ class "text-xs-center" ]
+                        [ a [ Route.href Route.Register ]
+                            [ text "Need an account?" ]
+                        ]
+                    , Html.node "myscript-math-web" [ attribute "applicationkey" "22bd37fa-2ee4-4bfd-98d9-137a39b81720", attribute "hmackey" "b79d64ad-89ba-4eed-a302-dee159005446" ] []
+                    ]
+                ]
             ]
-            []
-        , Textfield.render Mdl
-            [ 1 ]
-            model.mdl
-            [ Textfield.label "Password"
-            , Textfield.floatingLabel
-            , Textfield.password
-            , Options.onInput UpdatePassword
-            ]
-            []
-        , Button.render Mdl
-            [ 2 ]
-            model.mdl
-            [ Button.raised
-            , Button.colored
-            , Button.ripple
-            , Options.onClick Submit
-            ]
-            [ text "Login" ]
-        , Html.node "myscript-math-web" [ attribute "applicationkey" "22bd37fa-2ee4-4bfd-98d9-137a39b81720", attribute "hmackey" "b79d64ad-89ba-4eed-a302-dee159005446" ] []
         ]

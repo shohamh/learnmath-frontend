@@ -1,4 +1,4 @@
-module Views.Page exposing (ActivePage(..), Msg(..), bodyId, frame)
+module Views.Page exposing (ActivePage(..), bodyId, frame)
 
 -- The frame around a typical page - that is, the header and footer.
 
@@ -6,50 +6,9 @@ import Data.User as User exposing (User, Username)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Lazy exposing (lazy2)
-import Material
-import Material.Layout as Layout
-import Page.Login
 import Route exposing (Route)
 import Util exposing ((=>))
 import Views.Spinner exposing (spinner)
-
-
-type alias Model =
-    { mdl : Material.Model
-    , selectedTab : Int
-    , loginModel : Page.Login.Model
-    }
-
-
-model : Model
-model =
-    { mdl = Material.model
-    , selectedTab = 0
-    }
-
-
-type Msg loginMsg
-    = SelectTab Int
-    | LiftMsg loginMsg
-    | Mdl (Material.Msg Msg)
-
-
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    case msg of
-        SelectTab tabIndex ->
-            { model | selectedTab = tabIndex } ! []
-
-        Mdl msg_ ->
-            Material.update Mdl msg_ model
-
-        LiftMsg msg_ ->
-            let
-                ( newLoginModel, newLoginCmd ) =
-                    Page.Login.update msg_ model.loginModel
-            in
-            { model | loginModel = newLoginModel } ! [ newLoginCmd ]
-
 
 
 {- | Determines which navbar link (if any) will be rendered as active.
@@ -91,28 +50,13 @@ The caller provides the current user, so we can display in either
 isLoading is for determining whether we should show a loading spinner
 in the header. (This comes up during slow page transitions.)
 -}
-frame : Bool -> Maybe User -> ActivePage -> Html Msg -> Html Msg
+frame : Bool -> Maybe User -> ActivePage -> Html msg -> Html msg
 frame isLoading user page content =
-    Layout.render Mdl
-        model.mdl
-        [ Layout.fixedHeader
-        , Layout.onSelectTab SelectTab
-        , Layout.selectedTab model.selectedTab
+    div [ class "page-frame" ]
+        [ viewHeader page user isLoading
+        , content
+        , viewFooter
         ]
-        { header = [ viewHeader page user isLoading ]
-        , drawer = [ text "drawer text" ]
-        , tabs = ( tabTitles, [] )
-        , main = [ Html.map LiftMsg content ]
-        }
-
-
-
-{- div [ class "page-frame" ]
-   [ viewHeader page user isLoading
-   , content
-   , viewFooter
-   ]
--}
 
 
 viewHeader : ActivePage -> Maybe User -> Bool -> Html msg

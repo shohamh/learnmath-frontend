@@ -1,26 +1,27 @@
-module Page.Login exposing (ExternalMsg(..), Model, Msg, model, update, view)
+module Page.Login exposing (ExternalMsg(..), Model, Msg(..), model, update, view)
 
 import Config
 import Data.AuthToken as AuthToken exposing (AuthToken)
 import Data.Session as Session exposing (Session)
 import Data.User as User exposing (User, Username(..))
+import Debug
 import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 import Http
 import Json.Decode as JD exposing (..)
-import Json.Decode.Pipeline exposing (decode, required)
+import Json.Decode.Pipeline as JDP
 import Json.Encode as JE exposing (..)
-import Material
-import Material.Button as Button exposing (..)
-import Material.Options as Options exposing (css, onClick, onInput, when)
-import Material.Textfield as Textfield
 import Ports
 import Route
 import Util exposing ((=>))
+import Views.Form as Form
 
 
 storeSession : User -> Cmd Msg
 storeSession user =
-    User.encode user
+    User.encode
+        user
         |> JE.encode 0
         |> Just
         |> Ports.storeSession
@@ -31,7 +32,6 @@ type alias Model =
     , password : String
     , successMessage : String
     , errorMessages : List String
-    , mdl : Material.Model
     }
 
 
@@ -41,7 +41,6 @@ model =
     , password = ""
     , successMessage = ""
     , errorMessages = []
-    , mdl = Material.model
     }
 
 
@@ -59,11 +58,10 @@ type alias ResponseData =
 
 
 type Msg
-    = UpdateUsername String
-    | UpdatePassword String
+    = SetUsername String
+    | SetPassword String
     | Submit
     | SubmitResult (Result Http.Error ResponseData)
-    | Mdl (Material.Msg Msg)
 
 
 type ExternalMsg
@@ -76,21 +74,18 @@ requestModel model =
     RequestData model.username model.password
 
 
-responseDataToUser : ResponseData -> Model -> User
-responseDataToUser responseData model =
+dataToUser : Model -> ResponseData -> User
+dataToUser model responseData =
     User "email@email.com" responseData.authToken (Username model.username)
 
 
 update : Msg -> Model -> ( ( Model, Cmd Msg ), ExternalMsg )
 update msg model =
     case msg of
-        Mdl msg_ ->
-            Material.update Mdl msg_ model => NoOp
-
-        UpdateUsername str ->
+        SetUsername str ->
             { model | username = str } => Cmd.none => NoOp
 
-        UpdatePassword str ->
+        SetPassword str ->
             { model | password = str } => Cmd.none => NoOp
 
         Submit ->
@@ -101,9 +96,13 @@ update msg model =
             model => send requestData => NoOp
 
         SubmitResult (Ok responseData) ->
+            let
+                user =
+                    dataToUser model responseData
+            in
             model
-                => Cmd.batch [ storeSession (responseDataToUser responseData model), Route.modifyUrl Route.Home ]
-                => NoOp
+                => Cmd.batch [ storeSession user, Route.modifyUrl Route.Home ]
+                => SetUser user
 
         SubmitResult (Err httpError) ->
             let
@@ -159,10 +158,10 @@ requestEncoder requestData =
 
 responseDecoder : Decoder ResponseData
 responseDecoder =
-    decode ResponseData
-        |> required "success" JD.bool
-        |> required "session_key" AuthToken.decoder
-        |> required "error_messages" (JD.list JD.string)
+    JDP.decode ResponseData
+        |> JDP.required "success" JD.bool
+        |> JDP.required "session_key" AuthToken.decoder
+        |> JDP.required "error_messages" (JD.list JD.string)
 
 
 viewErrorMessages : List String -> Html Msg
@@ -172,34 +171,40 @@ viewErrorMessages errorMessages =
 
 view : Session -> Model -> Html Msg
 view session model =
-    div []
-        [ Textfield.render Mdl
-            [ 0 ]
-            model.mdl
-            [ Textfield.label "Username"
-            , Textfield.floatingLabel
-            , Textfield.text_
-            , Options.onInput UpdateUsername
+    div [ class "auth-page" ]
+        [ div [ class "container page" ]
+            [ div [ class "row" ]
+                [ div [ class "col-md-6 offset-md-3 col-xs-12" ]
+                    [ h1 [ class "text-xs-center" ] [ text "Sign in" ]
+                    , p [ class "text-xs-center" ]
+                        [ a [ Route.href Route.Register ]
+                            [ text "Need an account?" ]
+                        ]
+
+                    --, Form.viewErrors model.errorMessages
+                    , viewErrorMessages model.errorMessages
+                    , viewForm
+                    ]
+                ]
+            ]
+        ]
+
+
+viewForm : Html Msg
+viewForm =
+    Html.form [ onSubmit Submit ]
+        [ Form.input
+            [ class "form-control-lg"
+            , placeholder "Username"
+            , onInput SetUsername
             ]
             []
-        , Textfield.render Mdl
-            [ 1 ]
-            model.mdl
-            [ Textfield.label "Password"
-            , Textfield.floatingLabel
-            , Textfield.password
-            , Options.onInput UpdatePassword
+        , Form.password
+            [ class "form-control-lg"
+            , placeholder "Password"
+            , onInput SetPassword
             ]
             []
-        , Button.render Mdl
-            [ 2 ]
-            model.mdl
-            [ Button.raised
-            , Button.colored
-            , Button.ripple
-            , Options.onClick Submit
-            ]
-            [ text "Login" ]
-        , viewErrorMessages model.errorMessages
-        , text model.successMessage
+        , button [ class "btn btn-lg btn-primary pull-xs-right" ]
+            [ text "Sign in" ]
         ]

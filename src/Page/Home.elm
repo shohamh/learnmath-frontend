@@ -1,10 +1,11 @@
 module Page.Home exposing (Model, Msg, init, update, view)
 
 import Data.Session as Session exposing (Session)
+import Data.User as User
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, classList, href, id, placeholder)
-import Html.Events exposing (onClick)
 import Page.Errored as Errored exposing (PageLoadError, pageLoadError)
+import Route
 import Task exposing (Task)
 import Views.Page as Page
 
@@ -24,7 +25,18 @@ view session model =
             [ div [ class "row" ]
                 [ div [ class "col-md-3" ]
                     [ div [ class "sidebar" ]
-                        [ text "hi"
+                        [ case session.user of
+                            Just user ->
+                                text <| "Hi " ++ User.usernameToString user.username
+
+                            Nothing ->
+                                div []
+                                    [ text "Hi random person! Would be great if you "
+                                    , a [ Route.href Route.Login ] [ text "logged in!" ]
+                                    , br [] []
+                                    , text "Don't have an account? "
+                                    , a [ Route.href Route.Register ] [ text "Sign up!" ]
+                                    ]
                         ]
                     ]
                 ]
