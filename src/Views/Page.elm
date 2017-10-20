@@ -30,20 +30,6 @@ type ActivePage
 --| Profile Username
 
 
-tabList : List String
-tabList =
-    [ "Home"
-    , "Login"
-    , "Register"
-    , "Question"
-    ]
-
-
-tabTitles : List (Html msg)
-tabTitles =
-    List.map text tabList
-
-
 {-| Take a page's Html and frame it with a header and footer.
 The caller provides the current user, so we can display in either
 "signed in" (rendering username) or "signed out" mode.
@@ -64,7 +50,7 @@ viewHeader page user isLoading =
     nav [ class "navbar navbar-light" ]
         [ div [ class "container" ]
             [ a [ class "navbar-brand", Route.href Route.Home ]
-                [ text "conduit" ]
+                [ text "LearnMath" ]
             , ul [ class "nav navbar-nav pull-xs-right" ] <|
                 lazy2 Util.viewIf isLoading spinner
                     :: navbarLink (page == Home) Route.Home [ text "Home" ]
@@ -94,7 +80,8 @@ viewSignIn page user =
 
                  ,
               -}
-              navbarLink False Route.Logout [ text "Sign out" ]
+              navbarLink (page == Question) Route.Question [ text "Question" ]
+            , navbarLink False Route.Logout [ text "Sign out" ]
             ]
 
 
@@ -102,11 +89,9 @@ viewFooter : Html msg
 viewFooter =
     footer []
         [ div [ class "container" ]
-            [ a [ class "logo-font", href "/" ] [ text "conduit" ]
+            [ a [ class "logo-font", href "/" ] [ text "LearnMath" ]
             , span [ class "attribution" ]
-                [ text "An interactive learning project from "
-                , a [ href "https://thinkster.io" ] [ text "Thinkster" ]
-                , text ". Code & design licensed under MIT."
+                [ text "A Netanya Academic College 2017 final year project."
                 ]
             ]
         ]

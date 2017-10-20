@@ -200,9 +200,10 @@ updatePage page msg model =
                         Login.SetUser user ->
                             let
                                 session =
-                                    model.session
+                                    Debug.log "model.session"
+                                        model.session
                             in
-                            { model | session = { user = Just user } }
+                            { model | session = { user = Just (Debug.log "after login - model.session.user" user) } }
             in
             { newModel | pageState = Loaded (Login pageModel) }
                 => Cmd.map LoginMsg cmd
@@ -222,7 +223,7 @@ updatePage page msg model =
                                 session =
                                     model.session
                             in
-                            { model | session = { user = Just user } }
+                            { model | session = { user = Just (Debug.log "after register - model.session.user" user) } }
             in
             { newModel | pageState = Loaded (Register pageModel) }
                 => Cmd.map RegisterMsg cmd

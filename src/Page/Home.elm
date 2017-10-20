@@ -23,7 +23,7 @@ view session model =
     div [ class "home-page" ]
         [ div [ class "container page" ]
             [ div [ class "row" ]
-                [ div [ class "col-md-3" ]
+                [ div [ class "col-md-9" ]
                     [ div [ class "sidebar" ]
                         [ case session.user of
                             Just user ->

@@ -4,7 +4,6 @@ import Config
 import Data.AuthToken as AuthToken exposing (AuthToken)
 import Data.Session as Session exposing (Session)
 import Data.User as User exposing (User, Username(..))
-import Debug
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -96,13 +95,21 @@ update msg model =
             model => send requestData => NoOp
 
         SubmitResult (Ok responseData) ->
-            let
-                user =
-                    dataToUser model responseData
-            in
-            model
-                => Cmd.batch [ storeSession user, Route.modifyUrl Route.Home ]
-                => SetUser user
+            if responseData.success then
+                let
+                    user =
+                        dataToUser model responseData
+                in
+                model
+                    => Cmd.batch [ storeSession user, Route.modifyUrl Route.Home ]
+                    => SetUser user
+            else
+                { model
+                    | errorMessages =
+                        List.append model.errorMessages responseData.error_messages
+                }
+                    => Cmd.none
+                    => NoOp
 
         SubmitResult (Err httpError) ->
             let

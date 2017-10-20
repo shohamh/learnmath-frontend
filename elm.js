@@ -15030,7 +15030,7 @@ var _shohamh$learnmath_frontend$Views_Page$viewFooter = A2(
 					},
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html$text('conduit'),
+						_0: _elm_lang$html$Html$text('LearnMath'),
 						_1: {ctor: '[]'}
 					}),
 				_1: {
@@ -15044,51 +15044,14 @@ var _shohamh$learnmath_frontend$Views_Page$viewFooter = A2(
 						},
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html$text('An interactive learning project from '),
-							_1: {
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$a,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$href('https://thinkster.io'),
-										_1: {ctor: '[]'}
-									},
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html$text('Thinkster'),
-										_1: {ctor: '[]'}
-									}),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html$text('. Code & design licensed under MIT.'),
-									_1: {ctor: '[]'}
-								}
-							}
+							_0: _elm_lang$html$Html$text('A Netanya Academic College 2017 final year project.'),
+							_1: {ctor: '[]'}
 						}),
 					_1: {ctor: '[]'}
 				}
 			}),
 		_1: {ctor: '[]'}
 	});
-var _shohamh$learnmath_frontend$Views_Page$tabList = {
-	ctor: '::',
-	_0: 'Home',
-	_1: {
-		ctor: '::',
-		_0: 'Login',
-		_1: {
-			ctor: '::',
-			_0: 'Register',
-			_1: {
-				ctor: '::',
-				_0: 'Question',
-				_1: {ctor: '[]'}
-			}
-		}
-	}
-};
-var _shohamh$learnmath_frontend$Views_Page$tabTitles = A2(_elm_lang$core$List$map, _elm_lang$html$Html$text, _shohamh$learnmath_frontend$Views_Page$tabList);
 var _shohamh$learnmath_frontend$Views_Page$Question = {ctor: 'Question'};
 var _shohamh$learnmath_frontend$Views_Page$Register = {ctor: 'Register'};
 var _shohamh$learnmath_frontend$Views_Page$Login = {ctor: 'Login'};
@@ -15126,14 +15089,26 @@ var _shohamh$learnmath_frontend$Views_Page$viewSignIn = F2(
 				ctor: '::',
 				_0: A3(
 					_shohamh$learnmath_frontend$Views_Page$navbarLink,
-					false,
-					_shohamh$learnmath_frontend$Route$Logout,
+					_elm_lang$core$Native_Utils.eq(page, _shohamh$learnmath_frontend$Views_Page$Question),
+					_shohamh$learnmath_frontend$Route$Question,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html$text('Sign out'),
+						_0: _elm_lang$html$Html$text('Question'),
 						_1: {ctor: '[]'}
 					}),
-				_1: {ctor: '[]'}
+				_1: {
+					ctor: '::',
+					_0: A3(
+						_shohamh$learnmath_frontend$Views_Page$navbarLink,
+						false,
+						_shohamh$learnmath_frontend$Route$Logout,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('Sign out'),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
 			};
 		}
 	});
@@ -15171,7 +15146,7 @@ var _shohamh$learnmath_frontend$Views_Page$viewHeader = F3(
 							},
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html$text('conduit'),
+								_0: _elm_lang$html$Html$text('LearnMath'),
 								_1: {ctor: '[]'}
 							}),
 						_1: {
@@ -15338,7 +15313,7 @@ var _shohamh$learnmath_frontend$Page_Home$view = F2(
 									_elm_lang$html$Html$div,
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('col-md-3'),
+										_0: _elm_lang$html$Html_Attributes$class('col-md-9'),
 										_1: {ctor: '[]'}
 									},
 									{
@@ -15810,29 +15785,44 @@ var _shohamh$learnmath_frontend$Page_Login$update = F2(
 					_shohamh$learnmath_frontend$Page_Login$NoOp);
 			default:
 				if (_p0._0.ctor === 'Ok') {
-					var user = A2(_shohamh$learnmath_frontend$Page_Login$dataToUser, model, _p0._0._0);
-					return A2(
-						_shohamh$learnmath_frontend$Util_ops['=>'],
-						A2(
+					var _p1 = _p0._0._0;
+					if (_p1.success) {
+						var user = A2(_shohamh$learnmath_frontend$Page_Login$dataToUser, model, _p1);
+						return A2(
 							_shohamh$learnmath_frontend$Util_ops['=>'],
-							model,
-							_elm_lang$core$Platform_Cmd$batch(
-								{
-									ctor: '::',
-									_0: _shohamh$learnmath_frontend$Page_Login$storeSession(user),
-									_1: {
+							A2(
+								_shohamh$learnmath_frontend$Util_ops['=>'],
+								model,
+								_elm_lang$core$Platform_Cmd$batch(
+									{
 										ctor: '::',
-										_0: _shohamh$learnmath_frontend$Route$modifyUrl(_shohamh$learnmath_frontend$Route$Home),
-										_1: {ctor: '[]'}
-									}
-								})),
-						_shohamh$learnmath_frontend$Page_Login$SetUser(user));
+										_0: _shohamh$learnmath_frontend$Page_Login$storeSession(user),
+										_1: {
+											ctor: '::',
+											_0: _shohamh$learnmath_frontend$Route$modifyUrl(_shohamh$learnmath_frontend$Route$Home),
+											_1: {ctor: '[]'}
+										}
+									})),
+							_shohamh$learnmath_frontend$Page_Login$SetUser(user));
+					} else {
+						return A2(
+							_shohamh$learnmath_frontend$Util_ops['=>'],
+							A2(
+								_shohamh$learnmath_frontend$Util_ops['=>'],
+								_elm_lang$core$Native_Utils.update(
+									model,
+									{
+										errorMessages: A2(_elm_lang$core$List$append, model.errorMessages, _p1.error_messages)
+									}),
+								_elm_lang$core$Platform_Cmd$none),
+							_shohamh$learnmath_frontend$Page_Login$NoOp);
+					}
 				} else {
 					var errorMessage = function () {
-						var _p1 = _p0._0._0;
-						switch (_p1.ctor) {
+						var _p2 = _p0._0._0;
+						switch (_p2.ctor) {
 							case 'BadUrl':
-								return A2(_elm_lang$core$Basics_ops['++'], 'Bad url: ', _p1._0);
+								return A2(_elm_lang$core$Basics_ops['++'], 'Bad url: ', _p2._0);
 							case 'Timeout':
 								return 'Request timed out.';
 							case 'NetworkError':
@@ -15841,9 +15831,9 @@ var _shohamh$learnmath_frontend$Page_Login$update = F2(
 								return A2(
 									_elm_lang$core$Basics_ops['++'],
 									'Bad status code returned: ',
-									_elm_lang$core$Basics$toString(_p1._0.status.code));
+									_elm_lang$core$Basics$toString(_p2._0.status.code));
 							default:
-								return A2(_elm_lang$core$Basics_ops['++'], 'JSON decoding of response failed: ', _p1._0);
+								return A2(_elm_lang$core$Basics_ops['++'], 'JSON decoding of response failed: ', _p2._0);
 						}
 					}();
 					return A2(
@@ -15971,61 +15961,20 @@ var _shohamh$learnmath_frontend$Page_Question$view = F2(
 									},
 									{
 										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$h1,
+										_0: A3(
+											_elm_lang$html$Html$node,
+											'myscript-math-web',
 											{
 												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$class('text-xs-center'),
-												_1: {ctor: '[]'}
+												_0: A2(_elm_lang$html$Html_Attributes$attribute, 'applicationkey', '22bd37fa-2ee4-4bfd-98d9-137a39b81720'),
+												_1: {
+													ctor: '::',
+													_0: A2(_elm_lang$html$Html_Attributes$attribute, 'hmackey', 'b79d64ad-89ba-4eed-a302-dee159005446'),
+													_1: {ctor: '[]'}
+												}
 											},
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html$text('Sign in'),
-												_1: {ctor: '[]'}
-											}),
-										_1: {
-											ctor: '::',
-											_0: A2(
-												_elm_lang$html$Html$p,
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$class('text-xs-center'),
-													_1: {ctor: '[]'}
-												},
-												{
-													ctor: '::',
-													_0: A2(
-														_elm_lang$html$Html$a,
-														{
-															ctor: '::',
-															_0: _shohamh$learnmath_frontend$Route$href(_shohamh$learnmath_frontend$Route$Register),
-															_1: {ctor: '[]'}
-														},
-														{
-															ctor: '::',
-															_0: _elm_lang$html$Html$text('Need an account?'),
-															_1: {ctor: '[]'}
-														}),
-													_1: {ctor: '[]'}
-												}),
-											_1: {
-												ctor: '::',
-												_0: A3(
-													_elm_lang$html$Html$node,
-													'myscript-math-web',
-													{
-														ctor: '::',
-														_0: A2(_elm_lang$html$Html_Attributes$attribute, 'applicationkey', '22bd37fa-2ee4-4bfd-98d9-137a39b81720'),
-														_1: {
-															ctor: '::',
-															_0: A2(_elm_lang$html$Html_Attributes$attribute, 'hmackey', 'b79d64ad-89ba-4eed-a302-dee159005446'),
-															_1: {ctor: '[]'}
-														}
-													},
-													{ctor: '[]'}),
-												_1: {ctor: '[]'}
-											}
-										}
+											{ctor: '[]'}),
+										_1: {ctor: '[]'}
 									}),
 								_1: {ctor: '[]'}
 							}),
@@ -16859,12 +16808,13 @@ var _shohamh$learnmath_frontend$Main$updatePage = F3(
 									if (_p12.ctor === 'NoOp') {
 										return model;
 									} else {
-										var session = model.session;
+										var session = A2(_elm_lang$core$Debug$log, 'model.session', model.session);
 										return _elm_lang$core$Native_Utils.update(
 											model,
 											{
 												session: {
-													user: _elm_lang$core$Maybe$Just(_p12._0)
+													user: _elm_lang$core$Maybe$Just(
+														A2(_elm_lang$core$Debug$log, 'after login - model.session.user', _p12._0))
 												}
 											});
 									}
@@ -16900,7 +16850,8 @@ var _shohamh$learnmath_frontend$Main$updatePage = F3(
 											model,
 											{
 												session: {
-													user: _elm_lang$core$Maybe$Just(_p14._0)
+													user: _elm_lang$core$Maybe$Just(
+														A2(_elm_lang$core$Debug$log, 'after register - model.session.user', _p14._0))
 												}
 											});
 									}
