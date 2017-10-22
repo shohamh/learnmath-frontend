@@ -17,6 +17,7 @@ import WebSocket
 type alias Model =
     { successMessage : String
     , errorMessages : List String
+    , lastResponse : String
     }
 
 
@@ -24,11 +25,13 @@ model : Model
 model =
     { successMessage = ""
     , errorMessages = []
+    , lastResponse = ""
     }
 
 
 type Msg
     = MyscriptReceive String
+    | MyScriptExported String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -36,6 +39,9 @@ update msg model =
     case msg of
         MyscriptReceive str ->
             model ! [ Debug.log str WebSocket.send "ws://echo.websocket.org" ("Hello" ++ str) ]
+
+        MyScriptExported str ->
+            { model | lastResponse = Debug.log "lastResponse" str } ! []
 
 
 subs : Model -> Sub Msg
@@ -57,8 +63,13 @@ view session model =
         [ div [ class "container page" ]
             [ div [ class "row" ]
                 [ div [ class "col-md-6 offset-md-3 col-xs-12" ]
-                    [ Html.node "myscript-math-web" [ attribute "applicationkey" "22bd37fa-2ee4-4bfd-98d9-137a39b81720", attribute "hmackey" "b79d64ad-89ba-4eed-a302-dee159005446" ] []
+                    [ Html.node "myscript-math-web" [ onExported MyScriptExported, attribute "applicationkey" "22bd37fa-2ee4-4bfd-98d9-137a39b81720", attribute "hmackey" "b79d64ad-89ba-4eed-a302-dee159005446" ] []
                     ]
                 ]
             ]
         ]
+
+
+onExported : (String -> msg) -> Attribute msg
+onExported message =
+    on "exported" (JD.map message targetValue)

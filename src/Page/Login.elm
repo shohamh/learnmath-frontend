@@ -122,7 +122,7 @@ update msg model =
                             "Request timed out."
 
                         Http.NetworkError ->
-                            "Network error (no connectivity on your side)."
+                            "Network error (no connectivity)."
 
                         Http.BadStatus response ->
                             "Bad status code returned: " ++ Basics.toString response.status.code
