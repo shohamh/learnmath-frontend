@@ -13,7 +13,7 @@ import Json.Decode.Pipeline as JDP
 import Json.Encode as JE exposing (..)
 import Ports
 import Route
-import Util exposing ((=>))
+import Util exposing ((=>), httpPost)
 import Views.Form as Form
 
 
@@ -88,11 +88,7 @@ update msg model =
             { model | password = str } => Cmd.none => NoOp
 
         Submit ->
-            let
-                requestData =
-                    requestModel model
-            in
-            model => send requestData => NoOp
+            model => httpPost "login" (requestModel model) requestEncoder responseDecoder SubmitResult => NoOp
 
         SubmitResult (Ok responseData) ->
             if responseData.success then
@@ -140,21 +136,6 @@ update msg model =
                 => NoOp
 
 
-send : RequestData -> Cmd Msg
-send requestData =
-    let
-        url =
-            Config.server ++ "/login"
-
-        body =
-            Http.jsonBody <| requestEncoder requestData
-
-        request =
-            Http.post url body responseDecoder
-    in
-    Http.send SubmitResult request
-
-
 requestEncoder : RequestData -> JE.Value
 requestEncoder requestData =
     JE.object
@@ -187,10 +168,10 @@ view session model =
                         [ a [ Route.href Route.Register ]
                             [ text "Need an account?" ]
                         ]
+                    , viewForm
 
                     --, Form.viewErrors model.errorMessages
                     , viewErrorMessages model.errorMessages
-                    , viewForm
                     ]
                 ]
             ]

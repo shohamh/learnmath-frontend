@@ -14690,6 +14690,17 @@ var _shohamh$learnmath_frontend$Data_AuthToken$AuthToken = function (a) {
 };
 var _shohamh$learnmath_frontend$Data_AuthToken$decoder = A2(_elm_lang$core$Json_Decode$map, _shohamh$learnmath_frontend$Data_AuthToken$AuthToken, _elm_lang$core$Json_Decode$string);
 
+var _shohamh$learnmath_frontend$Util$httpPost = F5(
+	function (endpoint, payload, payloadEncoder, responseDecoder, responseMsg) {
+		var body = _elm_lang$http$Http$jsonBody(
+			payloadEncoder(payload));
+		var url = A2(
+			_elm_lang$core$Basics_ops['++'],
+			_shohamh$learnmath_frontend$Config$server,
+			A2(_elm_lang$core$Basics_ops['++'], '/', endpoint));
+		var request = A3(_elm_lang$http$Http$post, url, body, responseDecoder);
+		return A2(_elm_lang$http$Http$send, responseMsg, request);
+	});
 var _shohamh$learnmath_frontend$Util$appendErrors = F2(
 	function (model, errors) {
 		return _elm_lang$core$Native_Utils.update(
@@ -15578,13 +15589,6 @@ var _shohamh$learnmath_frontend$Page_Login$responseDecoder = A3(
 var _shohamh$learnmath_frontend$Page_Login$SubmitResult = function (a) {
 	return {ctor: 'SubmitResult', _0: a};
 };
-var _shohamh$learnmath_frontend$Page_Login$send = function (requestData) {
-	var body = _elm_lang$http$Http$jsonBody(
-		_shohamh$learnmath_frontend$Page_Login$requestEncoder(requestData));
-	var url = A2(_elm_lang$core$Basics_ops['++'], _shohamh$learnmath_frontend$Config$server, '/login');
-	var request = A3(_elm_lang$http$Http$post, url, body, _shohamh$learnmath_frontend$Page_Login$responseDecoder);
-	return A2(_elm_lang$http$Http$send, _shohamh$learnmath_frontend$Page_Login$SubmitResult, request);
-};
 var _shohamh$learnmath_frontend$Page_Login$Submit = {ctor: 'Submit'};
 var _shohamh$learnmath_frontend$Page_Login$SetPassword = function (a) {
 	return {ctor: 'SetPassword', _0: a};
@@ -15730,10 +15734,10 @@ var _shohamh$learnmath_frontend$Page_Login$view = F2(
 												}),
 											_1: {
 												ctor: '::',
-												_0: _shohamh$learnmath_frontend$Page_Login$viewErrorMessages(model.errorMessages),
+												_0: _shohamh$learnmath_frontend$Page_Login$viewForm,
 												_1: {
 													ctor: '::',
-													_0: _shohamh$learnmath_frontend$Page_Login$viewForm,
+													_0: _shohamh$learnmath_frontend$Page_Login$viewErrorMessages(model.errorMessages),
 													_1: {ctor: '[]'}
 												}
 											}
@@ -15775,13 +15779,18 @@ var _shohamh$learnmath_frontend$Page_Login$update = F2(
 						_elm_lang$core$Platform_Cmd$none),
 					_shohamh$learnmath_frontend$Page_Login$NoOp);
 			case 'Submit':
-				var requestData = _shohamh$learnmath_frontend$Page_Login$requestModel(model);
 				return A2(
 					_shohamh$learnmath_frontend$Util_ops['=>'],
 					A2(
 						_shohamh$learnmath_frontend$Util_ops['=>'],
 						model,
-						_shohamh$learnmath_frontend$Page_Login$send(requestData)),
+						A5(
+							_shohamh$learnmath_frontend$Util$httpPost,
+							'login',
+							_shohamh$learnmath_frontend$Page_Login$requestModel(model),
+							_shohamh$learnmath_frontend$Page_Login$requestEncoder,
+							_shohamh$learnmath_frontend$Page_Login$responseDecoder,
+							_shohamh$learnmath_frontend$Page_Login$SubmitResult)),
 					_shohamh$learnmath_frontend$Page_Login$NoOp);
 			default:
 				if (_p0._0.ctor === 'Ok') {
@@ -15950,8 +15959,8 @@ var _shohamh$learnmath_frontend$Page_Question$onExport = function (message) {
 var _shohamh$learnmath_frontend$Page_Question$subs = function (model) {
 	return _elm_lang$core$Platform_Sub$none;
 };
-var _shohamh$learnmath_frontend$Page_Question$update = F2(
-	function (msg, model) {
+var _shohamh$learnmath_frontend$Page_Question$update = F3(
+	function (session, msg, model) {
 		var _p0 = msg;
 		return A2(
 			_elm_lang$core$Platform_Cmd_ops['!'],
@@ -16139,17 +16148,10 @@ var _shohamh$learnmath_frontend$Page_Register$responseDecoder = A3(
 		'success',
 		_elm_lang$core$Json_Decode$bool,
 		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_shohamh$learnmath_frontend$Page_Register$ResponseData)));
-var _shohamh$learnmath_frontend$Page_Register$SubmitResult = function (a) {
-	return {ctor: 'SubmitResult', _0: a};
+var _shohamh$learnmath_frontend$Page_Register$RegisterResult = function (a) {
+	return {ctor: 'RegisterResult', _0: a};
 };
-var _shohamh$learnmath_frontend$Page_Register$send = function (requestData) {
-	var body = _elm_lang$http$Http$jsonBody(
-		_shohamh$learnmath_frontend$Page_Register$requestEncoder(requestData));
-	var url = A2(_elm_lang$core$Basics_ops['++'], _shohamh$learnmath_frontend$Config$server, '/register');
-	var request = A3(_elm_lang$http$Http$post, url, body, _shohamh$learnmath_frontend$Page_Register$responseDecoder);
-	return A2(_elm_lang$http$Http$send, _shohamh$learnmath_frontend$Page_Register$SubmitResult, request);
-};
-var _shohamh$learnmath_frontend$Page_Register$Submit = {ctor: 'Submit'};
+var _shohamh$learnmath_frontend$Page_Register$Register = {ctor: 'Register'};
 var _shohamh$learnmath_frontend$Page_Register$SetEmail = function (a) {
 	return {ctor: 'SetEmail', _0: a};
 };
@@ -16166,7 +16168,7 @@ var _shohamh$learnmath_frontend$Page_Register$viewForm = A2(
 	_elm_lang$html$Html$form,
 	{
 		ctor: '::',
-		_0: _elm_lang$html$Html_Events$onSubmit(_shohamh$learnmath_frontend$Page_Register$Submit),
+		_0: _elm_lang$html$Html_Events$onSubmit(_shohamh$learnmath_frontend$Page_Register$Register),
 		_1: {ctor: '[]'}
 	},
 	{
@@ -16338,11 +16340,31 @@ var _shohamh$learnmath_frontend$Page_Register$view = F2(
 												}),
 											_1: {
 												ctor: '::',
-												_0: _shohamh$learnmath_frontend$Page_Register$viewErrorMessages(model.errorMessages),
+												_0: _shohamh$learnmath_frontend$Page_Register$viewForm,
 												_1: {
 													ctor: '::',
-													_0: _shohamh$learnmath_frontend$Page_Register$viewForm,
-													_1: {ctor: '[]'}
+													_0: A2(
+														_elm_lang$html$Html$div,
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html_Attributes$style(
+																{
+																	ctor: '::',
+																	_0: {ctor: '_Tuple2', _0: 'font-size', _1: '20px'},
+																	_1: {ctor: '[]'}
+																}),
+															_1: {ctor: '[]'}
+														},
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html$text(model.successMessage),
+															_1: {ctor: '[]'}
+														}),
+													_1: {
+														ctor: '::',
+														_0: _shohamh$learnmath_frontend$Page_Register$viewErrorMessages(model.errorMessages),
+														_1: {ctor: '[]'}
+													}
 												}
 											}
 										}
@@ -16402,14 +16424,19 @@ var _shohamh$learnmath_frontend$Page_Register$update = F2(
 							{email: _p0._0}),
 						_elm_lang$core$Platform_Cmd$none),
 					_shohamh$learnmath_frontend$Page_Register$NoOp);
-			case 'Submit':
-				var requestData = _shohamh$learnmath_frontend$Page_Register$requestModel(model);
+			case 'Register':
 				return A2(
 					_shohamh$learnmath_frontend$Util_ops['=>'],
 					A2(
 						_shohamh$learnmath_frontend$Util_ops['=>'],
 						model,
-						_shohamh$learnmath_frontend$Page_Register$send(requestData)),
+						A5(
+							_shohamh$learnmath_frontend$Util$httpPost,
+							'register',
+							_shohamh$learnmath_frontend$Page_Register$requestModel(model),
+							_shohamh$learnmath_frontend$Page_Register$requestEncoder,
+							_shohamh$learnmath_frontend$Page_Register$responseDecoder,
+							_shohamh$learnmath_frontend$Page_Register$RegisterResult)),
 					_shohamh$learnmath_frontend$Page_Register$NoOp);
 			default:
 				if (_p0._0.ctor === 'Ok') {
@@ -16799,9 +16826,9 @@ var _shohamh$learnmath_frontend$Main$updatePage = F3(
 			});
 		var session = model.session;
 		var _p9 = {ctor: '_Tuple2', _0: msg, _1: page};
-		_v5_8:
+		_v5_9:
 		do {
-			_v5_7:
+			_v5_8:
 			do {
 				switch (_p9._0.ctor) {
 					case 'SetRoute':
@@ -16875,9 +16902,9 @@ var _shohamh$learnmath_frontend$Main$updatePage = F3(
 										}),
 									A2(_elm_lang$core$Platform_Cmd$map, _shohamh$learnmath_frontend$Main$LoginMsg, cmd));
 							case 'NotFound':
-								break _v5_7;
-							default:
 								break _v5_8;
+							default:
+								break _v5_9;
 						}
 					case 'RegisterMsg':
 						switch (_p9._1.ctor) {
@@ -16912,9 +16939,9 @@ var _shohamh$learnmath_frontend$Main$updatePage = F3(
 										}),
 									A2(_elm_lang$core$Platform_Cmd$map, _shohamh$learnmath_frontend$Main$RegisterMsg, cmd));
 							case 'NotFound':
-								break _v5_7;
-							default:
 								break _v5_8;
+							default:
+								break _v5_9;
 						}
 					case 'HomeMsg':
 						switch (_p9._1.ctor) {
@@ -16927,15 +16954,30 @@ var _shohamh$learnmath_frontend$Main$updatePage = F3(
 									_p9._0._0,
 									_p9._1._0);
 							case 'NotFound':
-								break _v5_7;
-							default:
 								break _v5_8;
+							default:
+								break _v5_9;
+						}
+					case 'QuestionMsg':
+						switch (_p9._1.ctor) {
+							case 'Question':
+								return A5(
+									toPage,
+									_shohamh$learnmath_frontend$Main$Question,
+									_shohamh$learnmath_frontend$Main$QuestionMsg,
+									_shohamh$learnmath_frontend$Page_Question$update(session),
+									_p9._0._0,
+									_p9._1._0);
+							case 'NotFound':
+								break _v5_8;
+							default:
+								break _v5_9;
 						}
 					default:
 						if (_p9._1.ctor === 'NotFound') {
-							break _v5_7;
-						} else {
 							break _v5_8;
+						} else {
+							break _v5_9;
 						}
 				}
 			} while(false);
@@ -16962,7 +17004,7 @@ var _shohamh$learnmath_frontend$Main$main = A2(
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};
 if (typeof _shohamh$learnmath_frontend$Main$main !== 'undefined') {
-    _shohamh$learnmath_frontend$Main$main(Elm['Main'], 'Main', {"types":{"unions":{"Dict.LeafColor":{"args":[],"tags":{"LBBlack":[],"LBlack":[]}},"Data.User.Username":{"args":[],"tags":{"Username":["String"]}},"Data.AuthToken.AuthToken":{"args":[],"tags":{"AuthToken":["String"]}},"Dict.Dict":{"args":["k","v"],"tags":{"RBNode_elm_builtin":["Dict.NColor","k","v","Dict.Dict k v","Dict.Dict k v"],"RBEmpty_elm_builtin":["Dict.LeafColor"]}},"Route.Route":{"args":[],"tags":{"Home":[],"Logout":[],"Register":[],"Login":[],"Question":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Main.Msg":{"args":[],"tags":{"QuestionMsg":["Page.Question.Msg"],"SelectTab":["Int"],"LoginMsg":["Page.Login.Msg"],"HomeLoaded":["Result.Result Page.Errored.PageLoadError Page.Home.Model"],"SetUser":["Maybe.Maybe Data.User.User"],"SetRoute":["Maybe.Maybe Route.Route"],"HomeMsg":["Page.Home.Msg"],"RegisterMsg":["Page.Register.Msg"]}},"Page.Question.Msg":{"args":[],"tags":{"MyScriptExport":["String"]}},"Page.Errored.PageLoadError":{"args":[],"tags":{"PageLoadError":["Page.Errored.Model"]}},"Dict.NColor":{"args":[],"tags":{"BBlack":[],"Red":[],"NBlack":[],"Black":[]}},"Views.Page.ActivePage":{"args":[],"tags":{"Other":[],"Home":[],"Register":[],"Login":[],"Question":[]}},"Page.Home.Msg":{"args":[],"tags":{"NoOp":[]}},"Page.Register.Msg":{"args":[],"tags":{"SetPasswordAgain":["String"],"SetUsername":["String"],"Submit":[],"SubmitResult":["Result.Result Http.Error Page.Register.ResponseData"],"SetPassword":["String"],"SetEmail":["String"]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String"],"NetworkError":[],"Timeout":[],"BadStatus":["Http.Response String"],"BadPayload":["String","Http.Response String"]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}},"Page.Login.Msg":{"args":[],"tags":{"SetUsername":["String"],"Submit":[],"SubmitResult":["Result.Result Http.Error Page.Login.ResponseData"],"SetPassword":["String"]}}},"aliases":{"Http.Response":{"args":["body"],"type":"{ url : String , status : { code : Int, message : String } , headers : Dict.Dict String String , body : body }"},"Page.Errored.Model":{"args":[],"type":"{ activePage : Views.Page.ActivePage, errorMessage : String }"},"Page.Home.Model":{"args":[],"type":"{ a : Int }"},"Data.User.User":{"args":[],"type":"{ email : String , token : Data.AuthToken.AuthToken , username : Data.User.Username }"},"Page.Login.ResponseData":{"args":[],"type":"{ success : Bool , authToken : Data.AuthToken.AuthToken , error_messages : List String }"},"Page.Register.ResponseData":{"args":[],"type":"{ success : Bool, errorMessages : List String }"}},"message":"Main.Msg"},"versions":{"elm":"0.18.0"}});
+    _shohamh$learnmath_frontend$Main$main(Elm['Main'], 'Main', {"types":{"unions":{"Dict.LeafColor":{"args":[],"tags":{"LBBlack":[],"LBlack":[]}},"Data.User.Username":{"args":[],"tags":{"Username":["String"]}},"Data.AuthToken.AuthToken":{"args":[],"tags":{"AuthToken":["String"]}},"Dict.Dict":{"args":["k","v"],"tags":{"RBNode_elm_builtin":["Dict.NColor","k","v","Dict.Dict k v","Dict.Dict k v"],"RBEmpty_elm_builtin":["Dict.LeafColor"]}},"Route.Route":{"args":[],"tags":{"Home":[],"Logout":[],"Register":[],"Login":[],"Question":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Main.Msg":{"args":[],"tags":{"QuestionMsg":["Page.Question.Msg"],"SelectTab":["Int"],"LoginMsg":["Page.Login.Msg"],"HomeLoaded":["Result.Result Page.Errored.PageLoadError Page.Home.Model"],"SetUser":["Maybe.Maybe Data.User.User"],"SetRoute":["Maybe.Maybe Route.Route"],"HomeMsg":["Page.Home.Msg"],"RegisterMsg":["Page.Register.Msg"]}},"Page.Question.Msg":{"args":[],"tags":{"MyScriptExport":["String"]}},"Page.Errored.PageLoadError":{"args":[],"tags":{"PageLoadError":["Page.Errored.Model"]}},"Dict.NColor":{"args":[],"tags":{"BBlack":[],"Red":[],"NBlack":[],"Black":[]}},"Views.Page.ActivePage":{"args":[],"tags":{"Other":[],"Home":[],"Register":[],"Login":[],"Question":[]}},"Page.Home.Msg":{"args":[],"tags":{"NoOp":[]}},"Page.Register.Msg":{"args":[],"tags":{"SetPasswordAgain":["String"],"RegisterResult":["Result.Result Http.Error Page.Register.ResponseData"],"Register":[],"SetUsername":["String"],"SetPassword":["String"],"SetEmail":["String"]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String"],"NetworkError":[],"Timeout":[],"BadStatus":["Http.Response String"],"BadPayload":["String","Http.Response String"]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}},"Page.Login.Msg":{"args":[],"tags":{"SetUsername":["String"],"Submit":[],"SubmitResult":["Result.Result Http.Error Page.Login.ResponseData"],"SetPassword":["String"]}}},"aliases":{"Http.Response":{"args":["body"],"type":"{ url : String , status : { code : Int, message : String } , headers : Dict.Dict String String , body : body }"},"Page.Errored.Model":{"args":[],"type":"{ activePage : Views.Page.ActivePage, errorMessage : String }"},"Page.Home.Model":{"args":[],"type":"{ a : Int }"},"Data.User.User":{"args":[],"type":"{ email : String , token : Data.AuthToken.AuthToken , username : Data.User.Username }"},"Page.Login.ResponseData":{"args":[],"type":"{ success : Bool , authToken : Data.AuthToken.AuthToken , error_messages : List String }"},"Page.Register.ResponseData":{"args":[],"type":"{ success : Bool, errorMessages : List String }"}},"message":"Main.Msg"},"versions":{"elm":"0.18.0"}});
 }
 
 if (typeof define === "function" && define['amd'])

@@ -13,7 +13,7 @@ import Json.Encode as JE exposing (..)
 import List
 import Ports
 import Route
-import Util exposing ((=>))
+import Util exposing ((=>), httpPost)
 import Views.Form as Form
 import Views.Page as Page
 
@@ -57,8 +57,8 @@ type Msg
     | SetPassword String
     | SetPasswordAgain String
     | SetEmail String
-    | Submit
-    | SubmitResult (Result Http.Error ResponseData)
+    | Register
+    | RegisterResult (Result Http.Error ResponseData)
 
 
 type ExternalMsg
@@ -86,14 +86,10 @@ update msg model =
         SetEmail str ->
             { model | email = str } => Cmd.none => NoOp
 
-        Submit ->
-            let
-                requestData =
-                    requestModel model
-            in
-            model => send requestData => NoOp
+        Register ->
+            model => httpPost "register" (requestModel model) requestEncoder responseDecoder RegisterResult => NoOp
 
-        SubmitResult (Ok responseData) ->
+        RegisterResult (Ok responseData) ->
             { model
                 | successMessage =
                     case responseData.success of
@@ -107,7 +103,7 @@ update msg model =
                 => Cmd.none
                 => NoOp
 
-        SubmitResult (Err httpError) ->
+        RegisterResult (Err httpError) ->
             let
                 errorMessage =
                     case httpError of
@@ -134,21 +130,6 @@ update msg model =
             }
                 => Cmd.none
                 => NoOp
-
-
-send : RequestData -> Cmd Msg
-send requestData =
-    let
-        url =
-            Config.server ++ "/register"
-
-        body =
-            Http.jsonBody <| requestEncoder requestData
-
-        request =
-            Http.post url body responseDecoder
-    in
-    Http.send SubmitResult request
 
 
 requestEncoder : RequestData -> JE.Value
@@ -183,10 +164,16 @@ view session model =
                         [ a [ Route.href Route.Login ]
                             [ text "Have an account?" ]
                         ]
+                    , viewForm
+                    , div
+                        [ style
+                            [ ( "font-size", "20px" )
+                            ]
+                        ]
+                        [ text model.successMessage ]
                     , viewErrorMessages model.errorMessages
 
                     -- , Form.viewErrors model.errorMessages
-                    , viewForm
                     ]
                 ]
             ]
@@ -195,7 +182,7 @@ view session model =
 
 viewForm : Html Msg
 viewForm =
-    Html.form [ onSubmit Submit ]
+    Html.form [ onSubmit Register ]
         [ Form.input
             [ class "form-control-lg"
             , placeholder "Username"

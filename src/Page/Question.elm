@@ -33,8 +33,8 @@ type Msg
     = MyScriptExport String
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+update : Session -> Msg -> Model -> ( Model, Cmd Msg )
+update session msg model =
     case msg of
         MyScriptExport str ->
             { model | lastExport = Debug.log "latestExport" str } ! []

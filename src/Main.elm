@@ -231,6 +231,9 @@ updatePage page msg model =
         ( HomeMsg subMsg, Home subModel ) ->
             toPage Home HomeMsg (Home.update session) subMsg subModel
 
+        ( QuestionMsg subMsg, Question subModel ) ->
+            toPage Question QuestionMsg (Question.update session) subMsg subModel
+
         {- ( ProfileMsg subMsg, Profile username subModel ) ->
            toPage (Profile username) ProfileMsg (Profile.update model.session) subMsg subModel
         -}

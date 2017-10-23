@@ -1,8 +1,11 @@
-module Util exposing ((=>), appendErrors, onClickStopPropagation, pair, viewIf)
+module Util exposing ((=>), appendErrors, httpPost, onClickStopPropagation, pair, viewIf)
 
+import Config
 import Html exposing (Attribute, Html)
 import Html.Events exposing (defaultOptions, onWithOptions)
+import Http
 import Json.Decode as Decode
+import Json.Encode
 
 
 (=>) : a -> b -> ( a, b )
@@ -46,3 +49,18 @@ onClickStopPropagation msg =
 appendErrors : { model | errors : List error } -> List error -> { model | errors : List error }
 appendErrors model errors =
     { model | errors = model.errors ++ errors }
+
+
+httpPost : String -> payload -> (payload -> Json.Encode.Value) -> Decode.Decoder response -> (Result Http.Error response -> msg) -> Cmd msg
+httpPost endpoint payload payloadEncoder responseDecoder responseMsg =
+    let
+        url =
+            Config.server ++ "/" ++ endpoint
+
+        body =
+            Http.jsonBody <| payloadEncoder payload
+
+        request =
+            Http.post url body responseDecoder
+    in
+    Http.send responseMsg request
