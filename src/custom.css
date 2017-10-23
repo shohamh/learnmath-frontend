@@ -2,3 +2,7 @@
 .elm-overlay {
     z-index: 999;
 }
+
+myscript-math-web {
+    height: 100%;
+}

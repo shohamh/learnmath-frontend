@@ -17,7 +17,7 @@ import WebSocket
 type alias Model =
     { successMessage : String
     , errorMessages : List String
-    , lastResponse : String
+    , lastExport : String
     }
 
 
@@ -25,36 +25,24 @@ model : Model
 model =
     { successMessage = ""
     , errorMessages = []
-    , lastResponse = ""
+    , lastExport = ""
     }
 
 
 type Msg
-    = MyscriptReceive String
-    | MyScriptExported String
+    = MyScriptExport String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        MyscriptReceive str ->
-            model ! [ Debug.log str WebSocket.send "ws://echo.websocket.org" ("Hello" ++ str) ]
-
-        MyScriptExported str ->
-            { model | lastResponse = Debug.log "lastResponse" str } ! []
+        MyScriptExport str ->
+            { model | lastExport = Debug.log "latestExport" str } ! []
 
 
 subs : Model -> Sub Msg
 subs model =
-    Sub.batch
-        [ WebSocket.listen "wss://cloud.myscript.com/api/v3.0/recognition/ws/math" MyscriptReceive
-
-        --, WebSocket.listen "wss://cloud.myscript.com" MyscriptReceive
-        ]
-
-
-
---WebSocket.listen "wss://cloud.myscript.com" MyscriptReceive
+    Sub.none
 
 
 view : Session -> Model -> Html Msg
@@ -63,13 +51,28 @@ view session model =
         [ div [ class "container page" ]
             [ div [ class "row" ]
                 [ div [ class "col-md-6 offset-md-3 col-xs-12" ]
-                    [ Html.node "myscript-math-web" [ onExported MyScriptExported, attribute "applicationkey" "22bd37fa-2ee4-4bfd-98d9-137a39b81720", attribute "hmackey" "b79d64ad-89ba-4eed-a302-dee159005446" ] []
+                    [ let
+                        mimetypes =
+                            [ "application/x-latex", "application/mathml+xml" ]
+
+                        mimetypesEncoded =
+                            JE.encode 0 (JE.list (List.map JE.string mimetypes))
+                      in
+                      Html.node "myscript-math-web"
+                        [ attribute "mimetypes" mimetypesEncoded
+                        , attribute "scheme" "http"
+                        , attribute "host" "cloud.myscript.com"
+                        , onExport MyScriptExport
+                        , attribute "applicationkey" "22bd37fa-2ee4-4bfd-98d9-137a39b81720"
+                        , attribute "hmackey" "b79d64ad-89ba-4eed-a302-dee159005446"
+                        ]
+                        []
                     ]
                 ]
             ]
         ]
 
 
-onExported : (String -> msg) -> Attribute msg
-onExported message =
-    on "exported" (JD.map message targetValue)
+onExport : (String -> msg) -> Attribute msg
+onExport message =
+    on "exports-changed" (JD.map message (JD.at [ "detail", "value", "application/mathml+xml" ] JD.string))

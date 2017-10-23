@@ -1,5 +1,5 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -7,14 +7,15 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="HandheldFriendly" content="true" />
 
-    <script src="../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../webcomponentsjs/webcomponents-loader.js"></script>
     <link rel="import" href="../iron-component-page/iron-component-page.html">
-
-    <style>
-        paper-header-panel#headerPanel select {
-            display: none;
-        }
-    </style>
+    <customStyle>
+        <style>
+            iron-component-page {
+                --iron-component-page-header-color: #1A9FFF;
+            }
+        </style>
+    </customStyle>
 </head>
 <body touch-action="none" unresolved>
 

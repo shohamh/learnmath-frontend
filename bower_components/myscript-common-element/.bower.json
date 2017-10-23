@@ -1,10 +1,15 @@
 {
   "name": "myscript-common-element",
-  "description": "HTML5 Element easing integration of MyScript handwriting recognition in your web-page",
-  "keywords": [
-    "myscript"
-  ],
   "main": "myscript-common-element.html",
+  "description": "myscript-common-element is the common layer of myscript-math-web and myscript-text-web.",
+  "keywords": [
+    "myscript",
+    "javascript",
+    "developer",
+    "handwriting",
+    "recognition",
+    "cloud"
+  ],
   "license": "Apache-2",
   "homepage": "https://github.com/MyScript/myscript-common-element/",
   "repository": {
@@ -12,35 +17,43 @@
     "url": "git://github.com/MyScript/myscript-common-element.git"
   },
   "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "tests",
-    "test",
-    "docs"
+    "*",
+    "!*.svg",
+    "!LICENSE",
+    "!myscript-common-element.html",
+    "!myscript-languages-element.html",
+    "!myscript-stylesheet.html",
+    "!myscriptjs-import.html",
+    "!pepjs-import.html",
+    "!index.html",
+    "!analysis.json",
+    "!bower.json",
+    "!examples/**/*"
   ],
   "dependencies": {
-    "polymer": "Polymer/polymer#1.4.x",
-    "iron-resizable-behavior": "PolymerElements/iron-resizable-behavior#1.0.x",
-    "iron-icons": "PolymerElements/iron-icons#1.1.x",
-    "paper-fab": "PolymerElements/paper-fab#1.2.x",
-    "paper-toast": "PolymerElements/paper-toast#1.2.x",
-    "myscript": "myscript#1.2.3"
+    "myscript": "^4.0.0",
+    "polymer": "^2.0.1",
+    "iron-resizable-behavior": "^2.0.1",
+    "paper-fab": "^2.0.0",
+    "paper-toast": "^2.0.0",
+    "paper-button": "^2.0.0",
+    "pepjs": "^0.4.3"
   },
   "devDependencies": {
-    "iron-component-page": "PolymerElements/iron-component-page#1.1.x"
+    "webcomponentsjs": "^1.0.1",
+    "iron-component-page": "^3.0.0",
+    "paper-swatch-picker": "^2.0.1",
+    "paper-toggle-button": "^2.0.0",
+    "paper-slider": "^2.0.2"
   },
-  "resolutions": {
-    "polymer": "1.4.x"
-  },
-  "version": "1.2.3",
-  "_release": "1.2.3",
+  "version": "4.0.1",
+  "_release": "4.0.1",
   "_resolution": {
     "type": "version",
-    "tag": "v1.2.3",
-    "commit": "162c4940fed4136284c0f2577254ff68bcd303dc"
+    "tag": "v4.0.1",
+    "commit": "17944870cd4e17f335de75060f95272edadaa8b0"
   },
   "_source": "https://github.com/MyScript/myscript-common-element.git",
-  "_target": "^1.2.3",
+  "_target": "^4.0.0",
   "_originalSource": "myscript-common-element"
 }

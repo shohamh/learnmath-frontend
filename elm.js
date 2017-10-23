@@ -15923,52 +15923,56 @@ var _shohamh$learnmath_frontend$Page_NotFound$view = function (session) {
 		});
 };
 
-var _shohamh$learnmath_frontend$Page_Question$onExported = function (message) {
+var _shohamh$learnmath_frontend$Page_Question$onExport = function (message) {
 	return A2(
 		_elm_lang$html$Html_Events$on,
-		'exported',
-		A2(_elm_lang$core$Json_Decode$map, message, _elm_lang$html$Html_Events$targetValue));
+		'exports-changed',
+		A2(
+			_elm_lang$core$Json_Decode$map,
+			message,
+			A2(
+				_elm_lang$core$Json_Decode$at,
+				{
+					ctor: '::',
+					_0: 'detail',
+					_1: {
+						ctor: '::',
+						_0: 'value',
+						_1: {
+							ctor: '::',
+							_0: 'application/mathml+xml',
+							_1: {ctor: '[]'}
+						}
+					}
+				},
+				_elm_lang$core$Json_Decode$string)));
+};
+var _shohamh$learnmath_frontend$Page_Question$subs = function (model) {
+	return _elm_lang$core$Platform_Sub$none;
 };
 var _shohamh$learnmath_frontend$Page_Question$update = F2(
 	function (msg, model) {
 		var _p0 = msg;
-		if (_p0.ctor === 'MyscriptReceive') {
-			var _p1 = _p0._0;
-			return A2(
-				_elm_lang$core$Platform_Cmd_ops['!'],
+		return A2(
+			_elm_lang$core$Platform_Cmd_ops['!'],
+			_elm_lang$core$Native_Utils.update(
 				model,
 				{
-					ctor: '::',
-					_0: A4(
-						_elm_lang$core$Debug$log,
-						_p1,
-						_elm_lang$websocket$WebSocket$send,
-						'ws://echo.websocket.org',
-						A2(_elm_lang$core$Basics_ops['++'], 'Hello', _p1)),
-					_1: {ctor: '[]'}
-				});
-		} else {
-			return A2(
-				_elm_lang$core$Platform_Cmd_ops['!'],
-				_elm_lang$core$Native_Utils.update(
-					model,
-					{
-						lastResponse: A2(_elm_lang$core$Debug$log, 'lastResponse', _p0._0)
-					}),
-				{ctor: '[]'});
-		}
+					lastExport: A2(_elm_lang$core$Debug$log, 'latestExport', _p0._0)
+				}),
+			{ctor: '[]'});
 	});
 var _shohamh$learnmath_frontend$Page_Question$model = {
 	successMessage: '',
 	errorMessages: {ctor: '[]'},
-	lastResponse: ''
+	lastExport: ''
 };
 var _shohamh$learnmath_frontend$Page_Question$Model = F3(
 	function (a, b, c) {
-		return {successMessage: a, errorMessages: b, lastResponse: c};
+		return {successMessage: a, errorMessages: b, lastExport: c};
 	});
-var _shohamh$learnmath_frontend$Page_Question$MyScriptExported = function (a) {
-	return {ctor: 'MyScriptExported', _0: a};
+var _shohamh$learnmath_frontend$Page_Question$MyScriptExport = function (a) {
+	return {ctor: 'MyScriptExport', _0: a};
 };
 var _shohamh$learnmath_frontend$Page_Question$view = F2(
 	function (session, model) {
@@ -16008,23 +16012,51 @@ var _shohamh$learnmath_frontend$Page_Question$view = F2(
 									},
 									{
 										ctor: '::',
-										_0: A3(
-											_elm_lang$html$Html$node,
-											'myscript-math-web',
-											{
+										_0: function () {
+											var mimetypes = {
 												ctor: '::',
-												_0: _shohamh$learnmath_frontend$Page_Question$onExported(_shohamh$learnmath_frontend$Page_Question$MyScriptExported),
+												_0: 'application/x-latex',
 												_1: {
 													ctor: '::',
-													_0: A2(_elm_lang$html$Html_Attributes$attribute, 'applicationkey', '22bd37fa-2ee4-4bfd-98d9-137a39b81720'),
+													_0: 'application/mathml+xml',
+													_1: {ctor: '[]'}
+												}
+											};
+											var mimetypesEncoded = A2(
+												_elm_lang$core$Json_Encode$encode,
+												0,
+												_elm_lang$core$Json_Encode$list(
+													A2(_elm_lang$core$List$map, _elm_lang$core$Json_Encode$string, mimetypes)));
+											return A3(
+												_elm_lang$html$Html$node,
+												'myscript-math-web',
+												{
+													ctor: '::',
+													_0: A2(_elm_lang$html$Html_Attributes$attribute, 'mimetypes', mimetypesEncoded),
 													_1: {
 														ctor: '::',
-														_0: A2(_elm_lang$html$Html_Attributes$attribute, 'hmackey', 'b79d64ad-89ba-4eed-a302-dee159005446'),
-														_1: {ctor: '[]'}
+														_0: A2(_elm_lang$html$Html_Attributes$attribute, 'scheme', 'http'),
+														_1: {
+															ctor: '::',
+															_0: A2(_elm_lang$html$Html_Attributes$attribute, 'host', 'cloud.myscript.com'),
+															_1: {
+																ctor: '::',
+																_0: _shohamh$learnmath_frontend$Page_Question$onExport(_shohamh$learnmath_frontend$Page_Question$MyScriptExport),
+																_1: {
+																	ctor: '::',
+																	_0: A2(_elm_lang$html$Html_Attributes$attribute, 'applicationkey', '22bd37fa-2ee4-4bfd-98d9-137a39b81720'),
+																	_1: {
+																		ctor: '::',
+																		_0: A2(_elm_lang$html$Html_Attributes$attribute, 'hmackey', 'b79d64ad-89ba-4eed-a302-dee159005446'),
+																		_1: {ctor: '[]'}
+																	}
+																}
+															}
+														}
 													}
-												}
-											},
-											{ctor: '[]'}),
+												},
+												{ctor: '[]'});
+										}(),
 										_1: {ctor: '[]'}
 									}),
 								_1: {ctor: '[]'}
@@ -16034,17 +16066,6 @@ var _shohamh$learnmath_frontend$Page_Question$view = F2(
 				_1: {ctor: '[]'}
 			});
 	});
-var _shohamh$learnmath_frontend$Page_Question$MyscriptReceive = function (a) {
-	return {ctor: 'MyscriptReceive', _0: a};
-};
-var _shohamh$learnmath_frontend$Page_Question$subs = function (model) {
-	return _elm_lang$core$Platform_Sub$batch(
-		{
-			ctor: '::',
-			_0: A2(_elm_lang$websocket$WebSocket$listen, 'wss://cloud.myscript.com/api/v3.0/recognition/ws/math', _shohamh$learnmath_frontend$Page_Question$MyscriptReceive),
-			_1: {ctor: '[]'}
-		});
-};
 
 var _shohamh$learnmath_frontend$Page_Register$viewErrorMessages = function (errorMessages) {
 	return A2(
@@ -16941,7 +16962,7 @@ var _shohamh$learnmath_frontend$Main$main = A2(
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};
 if (typeof _shohamh$learnmath_frontend$Main$main !== 'undefined') {
-    _shohamh$learnmath_frontend$Main$main(Elm['Main'], 'Main', {"types":{"unions":{"Dict.LeafColor":{"args":[],"tags":{"LBBlack":[],"LBlack":[]}},"Data.User.Username":{"args":[],"tags":{"Username":["String"]}},"Data.AuthToken.AuthToken":{"args":[],"tags":{"AuthToken":["String"]}},"Dict.Dict":{"args":["k","v"],"tags":{"RBNode_elm_builtin":["Dict.NColor","k","v","Dict.Dict k v","Dict.Dict k v"],"RBEmpty_elm_builtin":["Dict.LeafColor"]}},"Route.Route":{"args":[],"tags":{"Home":[],"Logout":[],"Register":[],"Login":[],"Question":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Main.Msg":{"args":[],"tags":{"QuestionMsg":["Page.Question.Msg"],"SelectTab":["Int"],"LoginMsg":["Page.Login.Msg"],"HomeLoaded":["Result.Result Page.Errored.PageLoadError Page.Home.Model"],"SetUser":["Maybe.Maybe Data.User.User"],"SetRoute":["Maybe.Maybe Route.Route"],"HomeMsg":["Page.Home.Msg"],"RegisterMsg":["Page.Register.Msg"]}},"Page.Question.Msg":{"args":[],"tags":{"MyScriptExported":["String"],"MyscriptReceive":["String"]}},"Page.Errored.PageLoadError":{"args":[],"tags":{"PageLoadError":["Page.Errored.Model"]}},"Dict.NColor":{"args":[],"tags":{"BBlack":[],"Red":[],"NBlack":[],"Black":[]}},"Views.Page.ActivePage":{"args":[],"tags":{"Other":[],"Home":[],"Register":[],"Login":[],"Question":[]}},"Page.Home.Msg":{"args":[],"tags":{"NoOp":[]}},"Page.Register.Msg":{"args":[],"tags":{"SetPasswordAgain":["String"],"SetUsername":["String"],"Submit":[],"SubmitResult":["Result.Result Http.Error Page.Register.ResponseData"],"SetPassword":["String"],"SetEmail":["String"]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String"],"NetworkError":[],"Timeout":[],"BadStatus":["Http.Response String"],"BadPayload":["String","Http.Response String"]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}},"Page.Login.Msg":{"args":[],"tags":{"SetUsername":["String"],"Submit":[],"SubmitResult":["Result.Result Http.Error Page.Login.ResponseData"],"SetPassword":["String"]}}},"aliases":{"Http.Response":{"args":["body"],"type":"{ url : String , status : { code : Int, message : String } , headers : Dict.Dict String String , body : body }"},"Page.Errored.Model":{"args":[],"type":"{ activePage : Views.Page.ActivePage, errorMessage : String }"},"Page.Home.Model":{"args":[],"type":"{ a : Int }"},"Data.User.User":{"args":[],"type":"{ email : String , token : Data.AuthToken.AuthToken , username : Data.User.Username }"},"Page.Login.ResponseData":{"args":[],"type":"{ success : Bool , authToken : Data.AuthToken.AuthToken , error_messages : List String }"},"Page.Register.ResponseData":{"args":[],"type":"{ success : Bool, errorMessages : List String }"}},"message":"Main.Msg"},"versions":{"elm":"0.18.0"}});
+    _shohamh$learnmath_frontend$Main$main(Elm['Main'], 'Main', {"types":{"unions":{"Dict.LeafColor":{"args":[],"tags":{"LBBlack":[],"LBlack":[]}},"Data.User.Username":{"args":[],"tags":{"Username":["String"]}},"Data.AuthToken.AuthToken":{"args":[],"tags":{"AuthToken":["String"]}},"Dict.Dict":{"args":["k","v"],"tags":{"RBNode_elm_builtin":["Dict.NColor","k","v","Dict.Dict k v","Dict.Dict k v"],"RBEmpty_elm_builtin":["Dict.LeafColor"]}},"Route.Route":{"args":[],"tags":{"Home":[],"Logout":[],"Register":[],"Login":[],"Question":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Main.Msg":{"args":[],"tags":{"QuestionMsg":["Page.Question.Msg"],"SelectTab":["Int"],"LoginMsg":["Page.Login.Msg"],"HomeLoaded":["Result.Result Page.Errored.PageLoadError Page.Home.Model"],"SetUser":["Maybe.Maybe Data.User.User"],"SetRoute":["Maybe.Maybe Route.Route"],"HomeMsg":["Page.Home.Msg"],"RegisterMsg":["Page.Register.Msg"]}},"Page.Question.Msg":{"args":[],"tags":{"MyScriptExport":["String"]}},"Page.Errored.PageLoadError":{"args":[],"tags":{"PageLoadError":["Page.Errored.Model"]}},"Dict.NColor":{"args":[],"tags":{"BBlack":[],"Red":[],"NBlack":[],"Black":[]}},"Views.Page.ActivePage":{"args":[],"tags":{"Other":[],"Home":[],"Register":[],"Login":[],"Question":[]}},"Page.Home.Msg":{"args":[],"tags":{"NoOp":[]}},"Page.Register.Msg":{"args":[],"tags":{"SetPasswordAgain":["String"],"SetUsername":["String"],"Submit":[],"SubmitResult":["Result.Result Http.Error Page.Register.ResponseData"],"SetPassword":["String"],"SetEmail":["String"]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String"],"NetworkError":[],"Timeout":[],"BadStatus":["Http.Response String"],"BadPayload":["String","Http.Response String"]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}},"Page.Login.Msg":{"args":[],"tags":{"SetUsername":["String"],"Submit":[],"SubmitResult":["Result.Result Http.Error Page.Login.ResponseData"],"SetPassword":["String"]}}},"aliases":{"Http.Response":{"args":["body"],"type":"{ url : String , status : { code : Int, message : String } , headers : Dict.Dict String String , body : body }"},"Page.Errored.Model":{"args":[],"type":"{ activePage : Views.Page.ActivePage, errorMessage : String }"},"Page.Home.Model":{"args":[],"type":"{ a : Int }"},"Data.User.User":{"args":[],"type":"{ email : String , token : Data.AuthToken.AuthToken , username : Data.User.Username }"},"Page.Login.ResponseData":{"args":[],"type":"{ success : Bool , authToken : Data.AuthToken.AuthToken , error_messages : List String }"},"Page.Register.ResponseData":{"args":[],"type":"{ success : Bool, errorMessages : List String }"}},"message":"Main.Msg"},"versions":{"elm":"0.18.0"}});
 }
 
 if (typeof define === "function" && define['amd'])
