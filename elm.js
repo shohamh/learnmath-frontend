@@ -14121,7 +14121,7 @@ var _lukewestby$elm_http_builder$HttpBuilder$RequestBuilder = F9(
 
 var _shohamh$learnmath_frontend$Config$serverPort = '8080';
 var _shohamh$learnmath_frontend$Config$serverAddress = '213.57.236.76';
-var _shohamh$learnmath_frontend$Config$protocol = 'https';
+var _shohamh$learnmath_frontend$Config$protocol = 'http';
 var _shohamh$learnmath_frontend$Config$server = A2(
 	_elm_lang$core$Basics_ops['++'],
 	_shohamh$learnmath_frontend$Config$protocol,
