@@ -3,7 +3,7 @@ module Config exposing (server)
 
 protocol : String
 protocol =
-    "https"
+    "http"
 
 
 serverAddress : String
