@@ -129,7 +129,7 @@ view session model =
                       in
                       Html.node "myscript-math-web"
                         [ attribute "mimetypes" mimetypesEncoded
-                        , attribute "scheme" "http"
+                        , attribute "scheme" "https"
                         , attribute "host" "cloud.myscript.com"
                         , onExport MyScriptExport
                         , attribute "applicationkey" "22bd37fa-2ee4-4bfd-98d9-137a39b81720"

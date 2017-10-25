@@ -15615,7 +15615,7 @@ var _shohamh$learnmath_frontend$Page_Question$view = F2(
 													_0: A2(_elm_lang$html$Html_Attributes$attribute, 'mimetypes', mimetypesEncoded),
 													_1: {
 														ctor: '::',
-														_0: A2(_elm_lang$html$Html_Attributes$attribute, 'scheme', 'http'),
+														_0: A2(_elm_lang$html$Html_Attributes$attribute, 'scheme', 'https'),
 														_1: {
 															ctor: '::',
 															_0: A2(_elm_lang$html$Html_Attributes$attribute, 'host', 'cloud.myscript.com'),
