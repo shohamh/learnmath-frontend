@@ -1,6 +1,7 @@
 module Page.AddQuestion exposing (..)
 
 import Data.Session as Session exposing (Session)
+import Data.User as User
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -40,7 +41,7 @@ update session msg model =
                 ! []
 
         AddQuestion ->
-            Debug.log "addq model" model ! [ addQuestion session model ]
+            model ! [ addQuestion session model ]
 
         AddQuestionResult (Err httpError) ->
             let
@@ -95,7 +96,7 @@ type alias ResponseData =
 
 addQuestion : Session -> Model -> Cmd Msg
 addQuestion session model =
-    httpPost "add_question" (questionFromModel model) questionEncoder responseDecoder AddQuestionResult
+    httpPost "add_question" ( session, model ) addQuestionRequestEncoder responseDecoder AddQuestionResult
 
 
 questionFromModel : Model -> Question
@@ -107,6 +108,21 @@ questionEncoder : Question -> JE.Value
 questionEncoder question =
     JE.object
         [ ( "mathml", JE.string question.mathml )
+        ]
+
+
+addQuestionRequestEncoder : ( Session, Model ) -> JE.Value
+addQuestionRequestEncoder ( session, model ) =
+    JE.object
+        [ ( "question", questionEncoder (questionFromModel model) )
+        , ( "user"
+          , case session.user of
+                Just user ->
+                    User.encode user
+
+                Nothing ->
+                    JE.null
+          )
         ]
 
 

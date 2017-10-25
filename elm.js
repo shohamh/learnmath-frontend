@@ -14408,6 +14408,35 @@ var _shohamh$learnmath_frontend$Page_AddQuestion$Question = function (a) {
 var _shohamh$learnmath_frontend$Page_AddQuestion$questionFromModel = function (model) {
 	return _shohamh$learnmath_frontend$Page_AddQuestion$Question(model.lastExport);
 };
+var _shohamh$learnmath_frontend$Page_AddQuestion$addQuestionRequestEncoder = function (_p0) {
+	var _p1 = _p0;
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'question',
+				_1: _shohamh$learnmath_frontend$Page_AddQuestion$questionEncoder(
+					_shohamh$learnmath_frontend$Page_AddQuestion$questionFromModel(_p1._1))
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'user',
+					_1: function () {
+						var _p2 = _p1._0.user;
+						if (_p2.ctor === 'Just') {
+							return _shohamh$learnmath_frontend$Data_User$encode(_p2._0);
+						} else {
+							return _elm_lang$core$Json_Encode$null;
+						}
+					}()
+				},
+				_1: {ctor: '[]'}
+			}
+		});
+};
 var _shohamh$learnmath_frontend$Page_AddQuestion$Solution = function (a) {
 	return {mathml: a};
 };
@@ -14432,40 +14461,40 @@ var _shohamh$learnmath_frontend$Page_AddQuestion$addQuestion = F2(
 		return A5(
 			_shohamh$learnmath_frontend$Util$httpPost,
 			'add_question',
-			_shohamh$learnmath_frontend$Page_AddQuestion$questionFromModel(model),
-			_shohamh$learnmath_frontend$Page_AddQuestion$questionEncoder,
+			{ctor: '_Tuple2', _0: session, _1: model},
+			_shohamh$learnmath_frontend$Page_AddQuestion$addQuestionRequestEncoder,
 			_shohamh$learnmath_frontend$Page_AddQuestion$responseDecoder,
 			_shohamh$learnmath_frontend$Page_AddQuestion$AddQuestionResult);
 	});
 var _shohamh$learnmath_frontend$Page_AddQuestion$update = F3(
 	function (session, msg, model) {
-		var _p0 = msg;
-		switch (_p0.ctor) {
+		var _p3 = msg;
+		switch (_p3.ctor) {
 			case 'MyScriptExport':
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							lastExport: A2(_elm_lang$core$Debug$log, 'latestExport', _p0._0)
+							lastExport: A2(_elm_lang$core$Debug$log, 'latestExport', _p3._0)
 						}),
 					{ctor: '[]'});
 			case 'AddQuestion':
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
-					A2(_elm_lang$core$Debug$log, 'addq model', model),
+					model,
 					{
 						ctor: '::',
 						_0: A2(_shohamh$learnmath_frontend$Page_AddQuestion$addQuestion, session, model),
 						_1: {ctor: '[]'}
 					});
 			default:
-				if (_p0._0.ctor === 'Err') {
+				if (_p3._0.ctor === 'Err') {
 					var errorMessage = function () {
-						var _p1 = _p0._0._0;
-						switch (_p1.ctor) {
+						var _p4 = _p3._0._0;
+						switch (_p4.ctor) {
 							case 'BadUrl':
-								return A2(_elm_lang$core$Basics_ops['++'], 'Bad url: ', _p1._0);
+								return A2(_elm_lang$core$Basics_ops['++'], 'Bad url: ', _p4._0);
 							case 'Timeout':
 								return 'Request timed out.';
 							case 'NetworkError':
@@ -14474,9 +14503,9 @@ var _shohamh$learnmath_frontend$Page_AddQuestion$update = F3(
 								return A2(
 									_elm_lang$core$Basics_ops['++'],
 									'Bad status code returned: ',
-									_elm_lang$core$Basics$toString(_p1._0.status.code));
+									_elm_lang$core$Basics$toString(_p4._0.status.code));
 							default:
-								return A2(_elm_lang$core$Basics_ops['++'], 'JSON decoding of response failed: ', _p1._0);
+								return A2(_elm_lang$core$Basics_ops['++'], 'JSON decoding of response failed: ', _p4._0);
 						}
 					}();
 					return A2(
