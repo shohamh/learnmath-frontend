@@ -2,7 +2,7 @@ module Views.Page exposing (ActivePage(..), bodyId, frame)
 
 -- The frame around a typical page - that is, the header and footer.
 
-import Data.User as User exposing (User, Username)
+import Data.User as User exposing (Role(..), User, Username)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Lazy exposing (lazy2)
@@ -24,6 +24,7 @@ type ActivePage
     | Login
     | Register
     | Question
+    | AddQuestion
 
 
 
@@ -60,29 +61,24 @@ viewHeader page user isLoading =
 
 
 viewSignIn : ActivePage -> Maybe User -> List (Html msg)
-viewSignIn page user =
-    case user of
+viewSignIn page maybeUser =
+    case maybeUser of
         Nothing ->
             [ navbarLink (page == Login) Route.Login [ text "Sign in" ]
             , navbarLink (page == Register) Route.Register [ text "Sign up" ]
             ]
 
         Just user ->
-            [ {- navbarLink
-
-                  (page == Profile user.username)
-                    (Route.Profile user.username)
-                    [ {- img [ class "user-pic", {- UserPhoto.src -} "https://i.imgur.com/RBeajsL.jpg" user.image ] []
-                         ,
-                      -}
-                      User.usernameToHtml user.username
+            case user.role of
+                Student ->
+                    [ navbarLink (page == Question) Route.Question [ text "Question" ]
+                    , navbarLink False Route.Logout [ text "Sign out" ]
                     ]
 
-                 ,
-              -}
-              navbarLink (page == Question) Route.Question [ text "Question" ]
-            , navbarLink False Route.Logout [ text "Sign out" ]
-            ]
+                Teacher ->
+                    [ navbarLink (page == AddQuestion) Route.AddQuestion [ text "Add Question" ]
+                    , navbarLink False Route.Logout [ text "Sign out" ]
+                    ]
 
 
 viewFooter : Html msg

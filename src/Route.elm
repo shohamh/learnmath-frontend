@@ -16,6 +16,7 @@ type Route
     | Logout
     | Register
     | Question
+    | AddQuestion
 
 
 
@@ -30,6 +31,7 @@ route =
         , Url.map Logout (s "logout")
         , Url.map Register (s "register")
         , Url.map Question (s "question")
+        , Url.map AddQuestion (s "add_question")
 
         --       , Url.map Profile (s "profile" </> User.usernameParser)
         ]
@@ -58,6 +60,9 @@ routeToString page =
 
                 Question ->
                     [ "question" ]
+
+                AddQuestion ->
+                    [ "add_question" ]
 
         {- Profile username ->
            [ "profile", User.usernameToString username ]

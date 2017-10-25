@@ -51,7 +51,7 @@ type alias RequestData =
 
 type alias ResponseData =
     { success : Bool
-    , authToken : AuthToken
+    , user : User
     , error_messages : List String
     }
 
@@ -73,11 +73,6 @@ requestModel model =
     RequestData model.username model.password
 
 
-dataToUser : Model -> ResponseData -> User
-dataToUser model responseData =
-    User "email@email.com" responseData.authToken (Username model.username)
-
-
 update : Msg -> Model -> ( ( Model, Cmd Msg ), ExternalMsg )
 update msg model =
     case msg of
@@ -94,7 +89,7 @@ update msg model =
             if responseData.success then
                 let
                     user =
-                        dataToUser model responseData
+                        responseData.user
                 in
                 model
                     => Cmd.batch [ storeSession user, Route.modifyUrl Route.Home ]
@@ -148,7 +143,7 @@ responseDecoder : Decoder ResponseData
 responseDecoder =
     JDP.decode ResponseData
         |> JDP.required "success" JD.bool
-        |> JDP.required "session_key" AuthToken.decoder
+        |> JDP.required "user" User.decoder
         |> JDP.required "error_messages" (JD.list JD.string)
 
 

@@ -6,6 +6,7 @@ import Html exposing (..)
 import Html.Attributes exposing (attribute)
 import Json.Decode as Decode exposing (Value)
 import Navigation exposing (Location)
+import Page.AddQuestion as AddQuestion
 import Page.Errored as Errored exposing (PageLoadError)
 import Page.Home as Home
 import Page.Login as Login
@@ -27,6 +28,7 @@ type Page
     | Login Login.Model
     | Register Register.Model
     | Question Question.Model
+    | AddQuestion AddQuestion.Model
 
 
 
@@ -70,11 +72,11 @@ initialPage =
 
 
 type Msg
-    = SelectTab Int
-    | HomeMsg Home.Msg
+    = HomeMsg Home.Msg
     | LoginMsg Login.Msg
     | RegisterMsg Register.Msg
     | QuestionMsg Question.Msg
+    | AddQuestionMsg AddQuestion.Msg
     | SetUser (Maybe User)
       --| ProfileMsg Profile.Msg
       --| ProfileLoaded Username (Result PageLoadError Profile.Model)
@@ -101,6 +103,9 @@ setRoute maybeRoute model =
 
         Just Route.Question ->
             { model | pageState = Loaded (Question Question.model) } => Cmd.map QuestionMsg (Question.getQuestion model.session Question.model)
+
+        Just Route.AddQuestion ->
+            { model | pageState = Loaded (AddQuestion AddQuestion.model) } => Cmd.none
 
         Just Route.Login ->
             { model | pageState = Loaded (Login Login.model) } => Cmd.none
@@ -234,6 +239,9 @@ updatePage page msg model =
         ( QuestionMsg subMsg, Question subModel ) ->
             toPage Question QuestionMsg (Question.update session) subMsg subModel
 
+        ( AddQuestionMsg subMsg, AddQuestion subModel ) ->
+            toPage AddQuestion AddQuestionMsg (AddQuestion.update session) subMsg subModel
+
         {- ( ProfileMsg subMsg, Profile username subModel ) ->
            toPage (Profile username) ProfileMsg (Profile.update model.session) subMsg subModel
         -}
@@ -336,6 +344,9 @@ viewPage session isLoading page =
         Question subModel ->
             Question.view session subModel |> frame Page.Other |> Html.map QuestionMsg
 
+        AddQuestion subModel ->
+            AddQuestion.view session subModel |> frame Page.Other |> Html.map AddQuestionMsg
+
 
 
 {-
@@ -404,6 +415,9 @@ pageSubscriptions page =
         -}
         Question subModel ->
             Sub.map QuestionMsg (Question.subs subModel)
+
+        AddQuestion subModel ->
+            Sub.none
 
 
 sessionChange : Sub (Maybe User)

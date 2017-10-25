@@ -1,4 +1,4 @@
-module Data.User exposing (Role(..), User, Username(..), decoder, encode, roleDecoder, roleEncoder, usernameDecoder, usernameParser, usernameToHtml, usernameToString)
+module Data.User exposing (Role(..), User, Username(..), decoder, encode, roleDecoder, roleEncoder, roleToString, usernameDecoder, usernameParser, usernameToHtml, usernameToString)
 
 import Data.AuthToken as AuthToken exposing (AuthToken)
 import Html exposing (Html)
@@ -12,6 +12,7 @@ type alias User =
     { email : String
     , token : AuthToken
     , username : Username
+    , role : Role
     }
 
 
@@ -53,6 +54,7 @@ decoder =
         |> required "email" Decode.string
         |> required "token" AuthToken.decoder
         |> required "username" usernameDecoder
+        |> required "role" roleDecoder
 
 
 encode : User -> Value
@@ -61,6 +63,7 @@ encode user =
         [ ( "email", Encode.string user.email )
         , ( "token", AuthToken.encode user.token )
         , ( "username", encodeUsername user.username )
+        , ( "role", roleEncoder user.role )
         ]
 
 
@@ -91,3 +94,13 @@ encodeUsername (Username username) =
 usernameToHtml : Username -> Html msg
 usernameToHtml (Username username) =
     Html.text username
+
+
+roleToString : Role -> String
+roleToString role =
+    case role of
+        Student ->
+            "Student"
+
+        Teacher ->
+            "Teacher"
