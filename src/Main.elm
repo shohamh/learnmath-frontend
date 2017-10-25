@@ -100,7 +100,7 @@ setRoute maybeRoute model =
             transition HomeLoaded (Home.init model.session)
 
         Just Route.Question ->
-            { model | pageState = Loaded (Question Question.model) } => Cmd.none
+            { model | pageState = Loaded (Question Question.model) } => Cmd.map QuestionMsg (Question.getQuestion model.session Question.model)
 
         Just Route.Login ->
             { model | pageState = Loaded (Login Login.model) } => Cmd.none

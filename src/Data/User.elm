@@ -1,4 +1,4 @@
-module Data.User exposing (User, Username(..), decoder, encode, usernameDecoder, usernameParser, usernameToHtml, usernameToString)
+module Data.User exposing (Role(..), User, Username(..), decoder, encode, roleDecoder, roleEncoder, usernameDecoder, usernameParser, usernameToHtml, usernameToString)
 
 import Data.AuthToken as AuthToken exposing (AuthToken)
 import Html exposing (Html)
@@ -6,7 +6,6 @@ import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline as Pipeline exposing (decode, required)
 import Json.Encode as Encode exposing (Value)
 import UrlParser
-import Util exposing ((=>))
 
 
 type alias User =
@@ -14,6 +13,38 @@ type alias User =
     , token : AuthToken
     , username : Username
     }
+
+
+type Role
+    = Student
+    | Teacher
+
+
+roleDecoder : Decoder Role
+roleDecoder =
+    Decode.string
+        |> Decode.andThen
+            (\str ->
+                case str of
+                    "Student" ->
+                        Decode.succeed Student
+
+                    "Teacher" ->
+                        Decode.succeed Teacher
+
+                    somethingElse ->
+                        Decode.fail <| "Unknown role: " ++ somethingElse
+            )
+
+
+roleEncoder : Role -> Value
+roleEncoder role =
+    case role of
+        Student ->
+            Encode.string "Student"
+
+        Teacher ->
+            Encode.string "Teacher"
 
 
 decoder : Decoder User

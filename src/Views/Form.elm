@@ -1,7 +1,8 @@
-module Views.Form exposing (input, password, textarea, viewErrors)
+module Views.Form exposing (input, password, radio, textarea, viewErrors)
 
 import Html exposing (Attribute, Html, fieldset, li, text, ul)
 import Html.Attributes exposing (class, type_)
+import Html.Events
 
 
 password : List (Attribute msg) -> List (Html msg) -> Html msg
@@ -12,6 +13,31 @@ password attrs =
 input : List (Attribute msg) -> List (Html msg) -> Html msg
 input attrs =
     control Html.input ([ type_ "text" ] ++ attrs)
+
+
+radio : String -> List String -> (v -> msg) -> List v -> List (Attribute msg) -> List (Html msg) -> Html msg
+radio name values msg msgValues attrs children =
+    fieldset [ class "form-group" ] <|
+        List.map2
+            (\strValue ->
+                \msgValue ->
+                    Html.label []
+                        [ Html.input
+                            (class
+                                "form-control"
+                                :: class "radio"
+                                :: Html.Attributes.name name
+                                :: type_ "radio"
+                                :: Html.Attributes.value strValue
+                                :: Html.Events.onClick (msg msgValue)
+                                :: attrs
+                            )
+                            children
+                        , text strValue
+                        ]
+            )
+            values
+            msgValues
 
 
 textarea : List (Attribute msg) -> List (Html msg) -> Html msg

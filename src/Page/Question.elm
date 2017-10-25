@@ -8,6 +8,7 @@ import Http
 import Json.Decode as JD exposing (..)
 import Json.Decode.Pipeline as JDP exposing (decode, required)
 import Json.Encode as JE exposing (..)
+import Ports
 import Util exposing ((=>), httpPost)
 
 
@@ -30,7 +31,8 @@ model =
 
 type Msg
     = MyScriptExport String
-    | SolutionUpdateResult (Result Http.Error ResponseData)
+    | GetQuestionResult (Result Http.Error ResponseData)
+    | SendSolutionResult (Result Http.Error ResponseData)
 
 
 update : Session -> Msg -> Model -> ( Model, Cmd Msg )
@@ -38,10 +40,9 @@ update session msg model =
     case msg of
         MyScriptExport str ->
             { model | lastExport = Debug.log "latestExport" str }
-                ! [ httpPost "question" (requestModel model) requestEncoder responseDecoder SolutionUpdateResult
-                  ]
+                ! []
 
-        SolutionUpdateResult (Err httpError) ->
+        SendSolutionResult (Err httpError) ->
             let
                 errorMessage =
                     case httpError of
@@ -68,11 +69,50 @@ update session msg model =
             }
                 => Cmd.none
 
-        SolutionUpdateResult (Ok resp) ->
+        SendSolutionResult (Ok resp) ->
             { model | question = resp.problem } => Cmd.none
 
+        GetQuestionResult (Err httpError) ->
+            let
+                errorMessage =
+                    case httpError of
+                        Http.BadUrl str ->
+                            "Bad url: " ++ str
 
-type alias RequestData =
+                        Http.Timeout ->
+                            "Request timed out."
+
+                        Http.NetworkError ->
+                            "Network error (no connectivity)."
+
+                        Http.BadStatus response ->
+                            "Bad status code returned: " ++ Basics.toString response.status.code
+
+                        Http.BadPayload debug_str response ->
+                            "JSON decoding of response failed: " ++ debug_str
+            in
+            { model
+                | errorMessages =
+                    List.append model.errorMessages
+                        [ errorMessage
+                        ]
+            }
+                => Cmd.none
+
+        GetQuestionResult (Ok resp) ->
+            let
+                newModel =
+                    { model | question = resp.problem }
+            in
+            newModel => Ports.importQuestion (Just (Debug.log "question from server" newModel.question))
+
+
+type alias Question =
+    { mathml : String
+    }
+
+
+type alias Solution =
     { mathml : String
     }
 
@@ -84,15 +124,37 @@ type alias ResponseData =
     }
 
 
-requestModel : Model -> RequestData
-requestModel model =
-    RequestData model.lastExport
+getQuestion : Session -> Model -> Cmd Msg
+getQuestion session model =
+    httpPost "question" (questionFromModel model) questionEncoder responseDecoder GetQuestionResult
 
 
-requestEncoder : RequestData -> JE.Value
-requestEncoder requestData =
+sendSolution : Session -> Model -> Cmd Msg
+sendSolution session model =
+    httpPost "solution" (solutionFromModel model) solutionEncoder responseDecoder SendSolutionResult
+
+
+questionFromModel : Model -> Question
+questionFromModel model =
+    Question model.question
+
+
+solutionFromModel : Model -> Solution
+solutionFromModel model =
+    Solution model.lastExport
+
+
+solutionEncoder : Solution -> JE.Value
+solutionEncoder solution =
     JE.object
-        [ ( "mathml", JE.string requestData.mathml )
+        [ ( "mathml", JE.string solution.mathml )
+        ]
+
+
+questionEncoder : Question -> JE.Value
+questionEncoder question =
+    JE.object
+        [ ( "mathml", JE.string question.mathml )
         ]
 
 

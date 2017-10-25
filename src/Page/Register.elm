@@ -2,7 +2,7 @@ module Page.Register exposing (ExternalMsg(..), Model, Msg, model, update, view)
 
 import Config
 import Data.Session as Session exposing (Session)
-import Data.User as User exposing (User)
+import Data.User as User exposing (Role(..), User)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -23,6 +23,7 @@ type alias Model =
     , password : String
     , passwordAgain : String
     , email : String
+    , role : User.Role
     , successMessage : String
     , errorMessages : List String
     }
@@ -34,6 +35,7 @@ model =
     , password = ""
     , passwordAgain = ""
     , email = ""
+    , role = Student
     , successMessage = ""
     , errorMessages = []
     }
@@ -43,6 +45,7 @@ type alias RequestData =
     { username : String
     , password : String
     , email : String
+    , role : Role
     }
 
 
@@ -57,6 +60,7 @@ type Msg
     | SetPassword String
     | SetPasswordAgain String
     | SetEmail String
+    | SetUserRole User.Role
     | Register
     | RegisterResult (Result Http.Error ResponseData)
 
@@ -68,7 +72,7 @@ type ExternalMsg
 
 requestModel : Model -> RequestData
 requestModel model =
-    RequestData model.username model.password model.email
+    RequestData model.username model.password model.email model.role
 
 
 update : Msg -> Model -> ( ( Model, Cmd Msg ), ExternalMsg )
@@ -85,6 +89,9 @@ update msg model =
 
         SetEmail str ->
             { model | email = str } => Cmd.none => NoOp
+
+        SetUserRole role ->
+            { model | role = role } => Cmd.none => NoOp
 
         Register ->
             model => httpPost "register" (requestModel model) requestEncoder responseDecoder RegisterResult => NoOp
@@ -138,6 +145,7 @@ requestEncoder requestData =
         [ ( "username", JE.string requestData.username )
         , ( "password", JE.string requestData.password )
         , ( "email", JE.string requestData.email )
+        , ( "role", User.roleEncoder requestData.role )
         ]
 
 
@@ -207,6 +215,10 @@ viewForm =
             , onInput SetPassword
             ]
             []
+        , span []
+            [ text "Role:"
+            , Form.radio "Role" [ "Student", "Teacher" ] SetUserRole [ Student, Teacher ] [] []
+            ]
         , button [ class "btn btn-lg btn-primary pull-xs-right" ]
             [ text "Sign up" ]
         ]
