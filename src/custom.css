@@ -2,6 +2,16 @@
 .elm-overlay {
     z-index: 999;
 }
+html,body {
+    height: 100%;
+}
+#main {
+    display: flex;
+    flex-direction: column;
+}
+#main div {
+    flex: 1;
+}
 
 myscript-math-web {
     height: 100%;

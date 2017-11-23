@@ -10,6 +10,7 @@ import Json.Decode.Pipeline as JDP exposing (decode, required)
 import Json.Encode as JE exposing (..)
 import Ports
 import Util exposing ((=>), httpPost)
+import Views.Form as Form
 
 
 type alias Model =
@@ -17,6 +18,7 @@ type alias Model =
     , errorMessages : List String
     , lastExport : String
     , question : String
+    , isCorrect : Maybe Bool
     }
 
 
@@ -26,13 +28,15 @@ model =
     , errorMessages = []
     , lastExport = ""
     , question = ""
+    , isCorrect = Nothing
     }
 
 
 type Msg
     = MyScriptExport String
-    | GetQuestionResult (Result Http.Error ResponseData)
-    | SendSolutionResult (Result Http.Error ResponseData)
+    | CheckSolution
+    | LoadQuestionResult (Result Http.Error LoadQuestionResponseData)
+    | CheckSolutionResult (Result Http.Error CheckSolutionResponseData)
 
 
 update : Session -> Msg -> Model -> ( Model, Cmd Msg )
@@ -42,7 +46,10 @@ update session msg model =
             { model | lastExport = Debug.log "latestExport" str }
                 ! []
 
-        SendSolutionResult (Err httpError) ->
+        CheckSolution ->
+            model ! [ checkSolution session model ]
+
+        CheckSolutionResult (Err httpError) ->
             let
                 errorMessage =
                     case httpError of
@@ -69,10 +76,10 @@ update session msg model =
             }
                 => Cmd.none
 
-        SendSolutionResult (Ok resp) ->
-            { model | question = resp.problem } => Cmd.none
+        CheckSolutionResult (Ok resp) ->
+            { model | isCorrect = Just resp.correct } => Cmd.none
 
-        GetQuestionResult (Err httpError) ->
+        LoadQuestionResult (Err httpError) ->
             let
                 errorMessage =
                     case httpError of
@@ -99,7 +106,7 @@ update session msg model =
             }
                 => Cmd.none
 
-        GetQuestionResult (Ok resp) ->
+        LoadQuestionResult (Ok resp) ->
             let
                 newModel =
                     { model | question = resp.problem }
@@ -117,21 +124,28 @@ type alias Solution =
     }
 
 
-type alias ResponseData =
+type alias LoadQuestionResponseData =
     { success : Bool
     , error_messages : List String
     , problem : String
     }
 
 
-getQuestion : Session -> Model -> Cmd Msg
-getQuestion session model =
-    httpPost "question" (questionFromModel model) questionEncoder responseDecoder GetQuestionResult
+type alias CheckSolutionResponseData =
+    { success : Bool
+    , error_messages : List String
+    , correct : Bool
+    }
 
 
-sendSolution : Session -> Model -> Cmd Msg
-sendSolution session model =
-    httpPost "solution" (solutionFromModel model) solutionEncoder responseDecoder SendSolutionResult
+loadQuestion : Session -> Model -> Cmd Msg
+loadQuestion session model =
+    httpPost "question" (questionFromModel model) questionEncoder loadQuestionResponseDecoder LoadQuestionResult
+
+
+checkSolution : Session -> Model -> Cmd Msg
+checkSolution session model =
+    httpPost "check_solution" (solutionFromModel model) solutionEncoder checkSolutionResponseDecoder CheckSolutionResult
 
 
 questionFromModel : Model -> Question
@@ -158,12 +172,20 @@ questionEncoder question =
         ]
 
 
-responseDecoder : Decoder ResponseData
-responseDecoder =
-    JDP.decode ResponseData
+loadQuestionResponseDecoder : Decoder LoadQuestionResponseData
+loadQuestionResponseDecoder =
+    JDP.decode LoadQuestionResponseData
         |> JDP.required "success" JD.bool
         |> JDP.required "error_messages" (JD.list JD.string)
         |> JDP.required "problem" JD.string
+
+
+checkSolutionResponseDecoder : Decoder CheckSolutionResponseData
+checkSolutionResponseDecoder =
+    JDP.decode CheckSolutionResponseData
+        |> JDP.required "success" JD.bool
+        |> JDP.required "error_messages" (JD.list JD.string)
+        |> JDP.required "correct" JD.bool
 
 
 viewErrorMessages : List String -> Html Msg
@@ -181,7 +203,7 @@ view session model =
     div [ class "question-page" ]
         [ div [ class "container page" ]
             [ div [ class "row" ]
-                [ div [ class "col-md-6 offset-md-3 col-xs-12" ]
+                [ div [ class "col-md-12" ]
                     [ let
                         mimetypes =
                             [ "application/x-latex", "application/mathml+xml" ]
@@ -199,6 +221,21 @@ view session model =
                         ]
                         []
                     , viewErrorMessages model.errorMessages
+                    , case model.isCorrect of
+                        Nothing ->
+                            div [] []
+
+                        Just correct ->
+                            div []
+                                [ case correct of
+                                    True ->
+                                        text "Correct! Good job!"
+
+                                    False ->
+                                        text "Incorrect, check your work for mistakes and try again!"
+                                ]
+                    , button [ class "btn btn-lg btn-primary pull-xs-right", onClick CheckSolution ]
+                        [ text "Check Solution" ]
                     ]
                 ]
             ]

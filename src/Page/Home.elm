@@ -15,7 +15,12 @@ type Msg
 
 
 type alias Model =
-    { a : Int }
+    {}
+
+
+model : Model
+model =
+    {}
 
 
 view : Session -> Model -> Html Msg
@@ -50,7 +55,7 @@ init session =
         handleLoadError _ =
             pageLoadError Page.Home "Homepage is currently unavailable."
     in
-    Task.succeed (Model 3)
+    Task.succeed model
         |> Task.mapError handleLoadError
 
 

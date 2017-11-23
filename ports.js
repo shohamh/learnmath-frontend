@@ -16,10 +16,10 @@ app.ports.importQuestion.subscribe(function (question) {
 
     function actualImport(component, question) {
         component.importContent({
-            x: 50,
-            y: 50
+            x: 0,
+            y: 0
         }, question, "application/x-latex");
-        component.convert();
+        //component.convert();
     }
 
     if (component.hasAttribute("initialized")) {
