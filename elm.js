@@ -15902,10 +15902,30 @@ var _shohamh$learnmath_frontend$Page_Question$solutionEncoder = function (soluti
 			ctor: '::',
 			_0: {
 				ctor: '_Tuple2',
-				_0: 'mathml',
+				_0: 'solution',
 				_1: _elm_lang$core$Json_Encode$string(solution.mathml)
 			},
 			_1: {ctor: '[]'}
+		});
+};
+var _shohamh$learnmath_frontend$Page_Question$solquesEncoder = function (model) {
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'solutions',
+				_1: _elm_lang$core$Json_Encode$string(model.lastExport)
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'question',
+					_1: _elm_lang$core$Json_Encode$string(model.question)
+				},
+				_1: {ctor: '[]'}
+			}
 		});
 };
 var _shohamh$learnmath_frontend$Page_Question$model = {
@@ -15970,13 +15990,7 @@ var _shohamh$learnmath_frontend$Page_Question$CheckSolutionResult = function (a)
 };
 var _shohamh$learnmath_frontend$Page_Question$checkSolution = F2(
 	function (session, model) {
-		return A5(
-			_shohamh$learnmath_frontend$Util$httpPost,
-			'check_solution',
-			_shohamh$learnmath_frontend$Page_Question$solutionFromModel(model),
-			_shohamh$learnmath_frontend$Page_Question$solutionEncoder,
-			_shohamh$learnmath_frontend$Page_Question$checkSolutionResponseDecoder,
-			_shohamh$learnmath_frontend$Page_Question$CheckSolutionResult);
+		return A5(_shohamh$learnmath_frontend$Util$httpPost, 'check_solution', model, _shohamh$learnmath_frontend$Page_Question$solquesEncoder, _shohamh$learnmath_frontend$Page_Question$checkSolutionResponseDecoder, _shohamh$learnmath_frontend$Page_Question$CheckSolutionResult);
 	});
 var _shohamh$learnmath_frontend$Page_Question$update = F3(
 	function (session, msg, model) {

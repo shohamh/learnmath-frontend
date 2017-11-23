@@ -145,7 +145,7 @@ loadQuestion session model =
 
 checkSolution : Session -> Model -> Cmd Msg
 checkSolution session model =
-    httpPost "check_solution" (solutionFromModel model) solutionEncoder checkSolutionResponseDecoder CheckSolutionResult
+    httpPost "check_solution" model solquesEncoder checkSolutionResponseDecoder CheckSolutionResult
 
 
 questionFromModel : Model -> Question
@@ -158,10 +158,19 @@ solutionFromModel model =
     Solution model.lastExport
 
 
+
+-- temp
+
+
+solquesEncoder : Model -> JE.Value
+solquesEncoder model =
+    JE.object [ ( "solutions", JE.string model.lastExport ), ( "question", JE.string model.question ) ]
+
+
 solutionEncoder : Solution -> JE.Value
 solutionEncoder solution =
     JE.object
-        [ ( "mathml", JE.string solution.mathml )
+        [ ( "solution", JE.string solution.mathml )
         ]
 
 
