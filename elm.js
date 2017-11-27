@@ -16050,22 +16050,24 @@ var _shohamh$learnmath_frontend$Page_Question$update = F3(
 							}),
 						_elm_lang$core$Platform_Cmd$none);
 				} else {
+					var _p2 = _p0._0._0;
 					return A2(
 						_shohamh$learnmath_frontend$Util_ops['=>'],
 						_elm_lang$core$Native_Utils.update(
 							model,
 							{
-								isCorrect: _elm_lang$core$Maybe$Just(_p0._0._0.correct)
+								isCorrect: _elm_lang$core$Maybe$Just(_p2.correct),
+								errorMessages: A2(_elm_lang$core$List$append, model.errorMessages, _p2.error_messages)
 							}),
 						_elm_lang$core$Platform_Cmd$none);
 				}
 			default:
 				if (_p0._0.ctor === 'Err') {
 					var errorMessage = function () {
-						var _p2 = _p0._0._0;
-						switch (_p2.ctor) {
+						var _p3 = _p0._0._0;
+						switch (_p3.ctor) {
 							case 'BadUrl':
-								return A2(_elm_lang$core$Basics_ops['++'], 'Bad url: ', _p2._0);
+								return A2(_elm_lang$core$Basics_ops['++'], 'Bad url: ', _p3._0);
 							case 'Timeout':
 								return 'Request timed out.';
 							case 'NetworkError':
@@ -16074,9 +16076,9 @@ var _shohamh$learnmath_frontend$Page_Question$update = F3(
 								return A2(
 									_elm_lang$core$Basics_ops['++'],
 									'Bad status code returned: ',
-									_elm_lang$core$Basics$toString(_p2._0.status.code));
+									_elm_lang$core$Basics$toString(_p3._0.status.code));
 							default:
-								return A2(_elm_lang$core$Basics_ops['++'], 'JSON decoding of response failed: ', _p2._0);
+								return A2(_elm_lang$core$Basics_ops['++'], 'JSON decoding of response failed: ', _p3._0);
 						}
 					}();
 					return A2(
@@ -16213,8 +16215,8 @@ var _shohamh$learnmath_frontend$Page_Question$view = F2(
 											_1: {
 												ctor: '::',
 												_0: function () {
-													var _p3 = model.isCorrect;
-													if (_p3.ctor === 'Nothing') {
+													var _p4 = model.isCorrect;
+													if (_p4.ctor === 'Nothing') {
 														return A2(
 															_elm_lang$html$Html$div,
 															{ctor: '[]'},
@@ -16226,8 +16228,8 @@ var _shohamh$learnmath_frontend$Page_Question$view = F2(
 															{
 																ctor: '::',
 																_0: function () {
-																	var _p4 = _p3._0;
-																	if (_p4 === true) {
+																	var _p5 = _p4._0;
+																	if (_p5 === true) {
 																		return _elm_lang$html$Html$text('Correct! Good job!');
 																	} else {
 																		return _elm_lang$html$Html$text('Incorrect, check your work for mistakes and try again!');

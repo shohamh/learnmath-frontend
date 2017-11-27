@@ -77,7 +77,11 @@ update session msg model =
                 => Cmd.none
 
         CheckSolutionResult (Ok resp) ->
-            { model | isCorrect = Just resp.correct } => Cmd.none
+            { model
+                | isCorrect = Just resp.correct
+                , errorMessages = List.append model.errorMessages resp.error_messages
+            }
+                => Cmd.none
 
         LoadQuestionResult (Err httpError) ->
             let
@@ -109,7 +113,9 @@ update session msg model =
         LoadQuestionResult (Ok resp) ->
             let
                 newModel =
-                    { model | question = resp.problem }
+                    { model
+                        | question = resp.problem
+                    }
             in
             newModel => Ports.importQuestion (Just (Debug.log "question from server" newModel.question))
 
