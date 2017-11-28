@@ -15293,6 +15293,11 @@ var _shohamh$learnmath_frontend$Ports$importQuestion = _elm_lang$core$Native_Pla
 	function (v) {
 		return (v.ctor === 'Nothing') ? null : v._0;
 	});
+var _shohamh$learnmath_frontend$Ports$myscriptConvert = _elm_lang$core$Native_Platform.outgoingPort(
+	'myscriptConvert',
+	function (v) {
+		return null;
+	});
 var _shohamh$learnmath_frontend$Ports$onSessionChange = _elm_lang$core$Native_Platform.incomingPort('onSessionChange', _elm_lang$core$Json_Decode$value);
 
 var _shohamh$learnmath_frontend$Views_Form$control = F3(
@@ -15869,10 +15874,10 @@ var _shohamh$learnmath_frontend$Page_Question$onExport = function (message) {
 				},
 				_elm_lang$core$Json_Decode$string)));
 };
-var _shohamh$learnmath_frontend$Page_Question$onConverted = function (message) {
+var _shohamh$learnmath_frontend$Page_Question$onConvert = function (message) {
 	return A2(
 		_elm_lang$html$Html_Events$on,
-		'converted',
+		'convert',
 		A2(
 			_elm_lang$core$Json_Decode$map,
 			message,
@@ -15880,14 +15885,18 @@ var _shohamh$learnmath_frontend$Page_Question$onConverted = function (message) {
 				_elm_lang$core$Json_Decode$at,
 				{
 					ctor: '::',
-					_0: 'detail',
+					_0: 'target',
 					_1: {
 						ctor: '::',
-						_0: 'value',
+						_0: '__data',
 						_1: {
 							ctor: '::',
-							_0: 'application/mathml+xml',
-							_1: {ctor: '[]'}
+							_0: 'exports',
+							_1: {
+								ctor: '::',
+								_0: 'application/mathml+xml',
+								_1: {ctor: '[]'}
+							}
 						}
 					}
 				},
@@ -15956,13 +15965,15 @@ var _shohamh$learnmath_frontend$Page_Question$model = {
 	successMessage: '',
 	errorMessages: {ctor: '[]'},
 	lastExport: '',
+	exportCount: 0,
 	lastConvert: '',
+	convertCount: 0,
 	question: '',
 	isCorrect: _elm_lang$core$Maybe$Nothing
 };
-var _shohamh$learnmath_frontend$Page_Question$Model = F6(
-	function (a, b, c, d, e, f) {
-		return {successMessage: a, errorMessages: b, lastExport: c, lastConvert: d, question: e, isCorrect: f};
+var _shohamh$learnmath_frontend$Page_Question$Model = F8(
+	function (a, b, c, d, e, f, g, h) {
+		return {successMessage: a, errorMessages: b, lastExport: c, exportCount: d, lastConvert: e, convertCount: f, question: g, isCorrect: h};
 	});
 var _shohamh$learnmath_frontend$Page_Question$Question = function (a) {
 	return {mathml: a};
@@ -16027,16 +16038,23 @@ var _shohamh$learnmath_frontend$Page_Question$update = F3(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							lastExport: A2(_elm_lang$core$Debug$log, 'latestExport', _p0._0)
+							lastExport: A2(_elm_lang$core$Debug$log, 'latestExport', _p0._0),
+							exportCount: model.exportCount + 1
 						}),
-					{ctor: '[]'});
+					{
+						ctor: '::',
+						_0: (_elm_lang$core$Native_Utils.cmp(model.exportCount, 2) < 1) ? _shohamh$learnmath_frontend$Ports$myscriptConvert(
+							{ctor: '_Tuple0'}) : _elm_lang$core$Platform_Cmd$none,
+						_1: {ctor: '[]'}
+					});
 			case 'MyScriptConvert':
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							lastConvert: A2(_elm_lang$core$Debug$log, 'latestConvert', _p0._0)
+							lastConvert: A2(_elm_lang$core$Debug$log, 'latestConvert', _p0._0),
+							convertCount: model.convertCount + 1
 						}),
 					{ctor: '[]'});
 			case 'CheckSolution':
@@ -16233,7 +16251,7 @@ var _shohamh$learnmath_frontend$Page_Question$view = F2(
 																_0: _shohamh$learnmath_frontend$Page_Question$onExport(_shohamh$learnmath_frontend$Page_Question$MyScriptExport),
 																_1: {
 																	ctor: '::',
-																	_0: _shohamh$learnmath_frontend$Page_Question$onConverted(_shohamh$learnmath_frontend$Page_Question$MyScriptConvert),
+																	_0: _shohamh$learnmath_frontend$Page_Question$onConvert(_shohamh$learnmath_frontend$Page_Question$MyScriptConvert),
 																	_1: {
 																		ctor: '::',
 																		_0: A2(_elm_lang$html$Html_Attributes$attribute, 'applicationkey', '22bd37fa-2ee4-4bfd-98d9-137a39b81720'),

@@ -31,3 +31,31 @@ app.ports.importQuestion.subscribe(function (question) {
     }
 
 });
+
+app.ports.myscriptConvert.subscribe(function () {
+    var commonElements = Array.from(document.getElementsByTagName('myscript-common-element'));
+    commonElements.forEach(function (commonElement) {
+        if (!(commonElement.hasAttribute("canexport") && commonElement.hasAttribute("canconvert")))
+        {
+            var fakeStroke = {
+                "-myscript-pen-fill-color": "#FFFFFF00",
+                "-myscript-pen-fill-style": "none",
+                "-myscript-pen-width": 1,
+                "color": "#1580CD",
+                "id": "pendingStroke-0",
+                "l": [ ],
+                "p": [ ],
+                "pointerId": -1,
+                "pointerType": "pen",
+                "t": [ ],
+                "type": "stroke",
+                "width": 0,
+                "x": [],
+                "y": [ ]
+            };
+            
+            commonElement.editor.model.rawStrokes = [fakeStroke];
+        }
+        commonElement.convert();
+    });
+});

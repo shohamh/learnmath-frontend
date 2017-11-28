@@ -10,14 +10,15 @@ import Json.Decode.Pipeline as JDP exposing (decode, required)
 import Json.Encode as JE exposing (..)
 import Ports
 import Util exposing ((=>), httpPost)
-import Views.Form as Form
 
 
 type alias Model =
     { successMessage : String
     , errorMessages : List String
     , lastExport : String
+    , exportCount : Int
     , lastConvert : String
+    , convertCount : Int
     , question : String
     , isCorrect : Maybe Bool
     }
@@ -28,7 +29,9 @@ model =
     { successMessage = ""
     , errorMessages = []
     , lastExport = ""
+    , exportCount = 0
     , lastConvert = ""
+    , convertCount = 0
     , question = ""
     , isCorrect = Nothing
     }
@@ -46,11 +49,15 @@ update : Session -> Msg -> Model -> ( Model, Cmd Msg )
 update session msg model =
     case msg of
         MyScriptExport str ->
-            { model | lastExport = Debug.log "latestExport" str }
-                ! []
+            { model | lastExport = Debug.log "latestExport" str, exportCount = model.exportCount + 1 }
+                ! [ if model.exportCount <= 2 then
+                        Ports.myscriptConvert ()
+                    else
+                        Cmd.none
+                  ]
 
         MyScriptConvert str ->
-            { model | lastConvert = Debug.log "latestConvert" str }
+            { model | lastConvert = Debug.log "latestConvert" str, convertCount = model.convertCount + 1 }
                 ! []
 
         CheckSolution ->
@@ -238,7 +245,7 @@ view session model =
                         , attribute "scheme" "https"
                         , attribute "host" "cloud.myscript.com"
                         , onExport MyScriptExport
-                        , onConverted MyScriptConvert
+                        , onConvert MyScriptConvert
                         , attribute "applicationkey" "22bd37fa-2ee4-4bfd-98d9-137a39b81720"
                         , attribute "hmackey" "b79d64ad-89ba-4eed-a302-dee159005446"
                         ]
@@ -269,9 +276,9 @@ view session model =
         ]
 
 
-onConverted : (String -> msg) -> Attribute msg
-onConverted message =
-    on "converted" (JD.map message (JD.at [ "detail", "value", "application/mathml+xml" ] JD.string))
+onConvert : (String -> msg) -> Attribute msg
+onConvert message =
+    on "convert" (JD.map message (JD.at [ "target", "__data", "exports", "application/mathml+xml" ] JD.string))
 
 
 onExport : (String -> msg) -> Attribute msg
