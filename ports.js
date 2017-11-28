@@ -33,7 +33,22 @@ app.ports.importQuestion.subscribe(function (question) {
 });
 
 app.ports.myscriptConvert.subscribe(function () {
-    var commonElements = Array.from(document.getElementsByTagName('myscript-common-element'));
+    var isChrome = !!window.chrome && !!window.chrome.webstore;
+    var commonElements;
+    if (!isChrome) {
+        commonElements = Array.from(document.getElementsByTagName('myscript-common-element'));
+    } else {
+        var myscriptMathWebElements = Array.from(document.getElementsByTagName('myscript-math-web'));
+        commonElements = [];
+        myscriptMathWebElements.forEach(function(myscriptMathWeb) {
+            var myscriptMathWebChildren = Array.from(myscriptMathWeb.shadowRoot.children);
+            myscriptMathWebChildren.forEach(function(child) {
+                if (child.tagName.toLowerCase() == "myscript-common-element") {
+                    commonElements.push(child);
+                }
+            });
+        });
+    }
     console.log("myscriptConvert (auto-resize)");
     commonElements.forEach(function (commonElement) {
         if (!(commonElement.hasAttribute("canexport") && commonElement.hasAttribute("canconvert")))
