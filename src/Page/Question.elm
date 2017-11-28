@@ -17,6 +17,7 @@ type alias Model =
     { successMessage : String
     , errorMessages : List String
     , lastExport : String
+    , lastConvert : String
     , question : String
     , isCorrect : Maybe Bool
     }
@@ -27,6 +28,7 @@ model =
     { successMessage = ""
     , errorMessages = []
     , lastExport = ""
+    , lastConvert = ""
     , question = ""
     , isCorrect = Nothing
     }
@@ -34,6 +36,7 @@ model =
 
 type Msg
     = MyScriptExport String
+    | MyScriptConvert String
     | CheckSolution
     | LoadQuestionResult (Result Http.Error LoadQuestionResponseData)
     | CheckSolutionResult (Result Http.Error CheckSolutionResponseData)
@@ -44,6 +47,10 @@ update session msg model =
     case msg of
         MyScriptExport str ->
             { model | lastExport = Debug.log "latestExport" str }
+                ! []
+
+        MyScriptConvert str ->
+            { model | lastConvert = Debug.log "latestConvert" str }
                 ! []
 
         CheckSolution ->
@@ -231,11 +238,16 @@ view session model =
                         , attribute "scheme" "https"
                         , attribute "host" "cloud.myscript.com"
                         , onExport MyScriptExport
+                        , onConverted MyScriptConvert
                         , attribute "applicationkey" "22bd37fa-2ee4-4bfd-98d9-137a39b81720"
                         , attribute "hmackey" "b79d64ad-89ba-4eed-a302-dee159005446"
                         ]
                         []
-                    , viewErrorMessages model.errorMessages
+                    ]
+                ]
+            , div [ class "row" ]
+                [ div [ class "col-md-12" ]
+                    [ viewErrorMessages model.errorMessages
                     , case model.isCorrect of
                         Nothing ->
                             div [] []
@@ -255,6 +267,11 @@ view session model =
                 ]
             ]
         ]
+
+
+onConverted : (String -> msg) -> Attribute msg
+onConverted message =
+    on "converted" (JD.map message (JD.at [ "detail", "value", "application/mathml+xml" ] JD.string))
 
 
 onExport : (String -> msg) -> Attribute msg
