@@ -54,7 +54,8 @@ app.ports.myscriptConvert.subscribe(function () {
                 "x": [],
                 "y": [ ]
             };
-            
+            commonElement.canexport = "";
+            commonElement.canconvert = "function L(t,n,e){var r=et.setRecognitionContext(t,{model:n,callback:function(t,r){return ut(n,t,r,e)}});ot.sendMessage(r,b).catch(function(r){return ot.retry(L,t,n,e)})}";
             commonElement.editor.model.rawStrokes = [fakeStroke];
         }
         commonElement.convert();
