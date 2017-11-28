@@ -34,6 +34,7 @@ app.ports.importQuestion.subscribe(function (question) {
 
 app.ports.myscriptConvert.subscribe(function () {
     var commonElements = Array.from(document.getElementsByTagName('myscript-common-element'));
+    console.log("myscriptConvert (auto-resize)");
     commonElements.forEach(function (commonElement) {
         if (!(commonElement.hasAttribute("canexport") && commonElement.hasAttribute("canconvert")))
         {

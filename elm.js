@@ -16109,7 +16109,7 @@ var _shohamh$learnmath_frontend$Page_Question$update = F3(
 							model,
 							{
 								isCorrect: _elm_lang$core$Maybe$Just(_p2.correct),
-								errorMessages: A2(_elm_lang$core$List$append, model.errorMessages, _p2.error_messages)
+								errorMessages: _p2.error_messages
 							}),
 						_elm_lang$core$Platform_Cmd$none);
 				}

@@ -93,7 +93,7 @@ update session msg model =
         CheckSolutionResult (Ok resp) ->
             { model
                 | isCorrect = Just resp.correct
-                , errorMessages = List.append model.errorMessages resp.error_messages
+                , errorMessages = resp.error_messages
             }
                 => Cmd.none
 
