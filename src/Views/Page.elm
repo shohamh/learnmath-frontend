@@ -25,6 +25,8 @@ type ActivePage
     | Register
     | Question
     | AddQuestion
+    | Dashboard Username
+    | TeacherDashboard
 
 
 
@@ -71,12 +73,14 @@ viewSignIn page maybeUser =
         Just user ->
             case user.role of
                 Student ->
-                    [ navbarLink (page == Question) Route.Question [ text "Question" ]
+                    [ navbarLink (page == Dashboard user.username) (Route.Dashboard user.username) [ text "Dashboard" ]
+                    , navbarLink (page == Question) Route.Question [ text "Question" ]
                     , navbarLink False Route.Logout [ text "Sign out" ]
                     ]
 
                 Teacher ->
-                    [ navbarLink (page == AddQuestion) Route.AddQuestion [ text "Add Question" ]
+                    [ navbarLink (page == TeacherDashboard) Route.TeacherDashboard [ text "Dashboard" ]
+                    , navbarLink (page == AddQuestion) Route.AddQuestion [ text "Add Question" ]
                     , navbarLink False Route.Logout [ text "Sign out" ]
                     ]
 

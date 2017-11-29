@@ -1,5 +1,7 @@
 module Page.Login exposing (ExternalMsg(..), Model, Msg(..), model, update, view)
 
+--import Request.User exposing (storeSession)
+
 import Config
 import Data.AuthToken as AuthToken exposing (AuthToken)
 import Data.Session as Session exposing (Session)
@@ -17,7 +19,7 @@ import Util exposing ((=>), httpPost)
 import Views.Form as Form
 
 
-storeSession : User -> Cmd Msg
+storeSession : User -> Cmd msg
 storeSession user =
     User.encode
         user

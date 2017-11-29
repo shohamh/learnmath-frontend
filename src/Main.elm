@@ -7,12 +7,14 @@ import Html.Attributes exposing (attribute)
 import Json.Decode as Decode exposing (Value)
 import Navigation exposing (Location)
 import Page.AddQuestion as AddQuestion
+import Page.Dashboard as Dashboard
 import Page.Errored as Errored exposing (PageLoadError)
 import Page.Home as Home
 import Page.Login as Login
 import Page.NotFound as NotFound
 import Page.Question as Question
 import Page.Register as Register
+import Page.TeacherDashboard as TeacherDashboard
 import Ports
 import Route exposing (Route)
 import Task
@@ -29,6 +31,8 @@ type Page
     | Register Register.Model
     | Question Question.Model
     | AddQuestion AddQuestion.Model
+    | Dashboard Dashboard.Model
+    | TeacherDashboard TeacherDashboard.Model
 
 
 
@@ -77,6 +81,8 @@ type Msg
     | RegisterMsg Register.Msg
     | QuestionMsg Question.Msg
     | AddQuestionMsg AddQuestion.Msg
+    | DashboardMsg Dashboard.Msg
+    | TeacherDashboardMsg TeacherDashboard.Msg
     | SetUser (Maybe User)
       --| ProfileMsg Profile.Msg
       --| ProfileLoaded Username (Result PageLoadError Profile.Model)
@@ -123,6 +129,12 @@ setRoute maybeRoute model =
 
         Just Route.Register ->
             { model | pageState = Loaded (Register Register.model) } => Cmd.none
+
+        Just (Route.Dashboard username) ->
+            { model | pageState = Loaded (Dashboard Dashboard.model) } => Cmd.none
+
+        Just Route.TeacherDashboard ->
+            { model | pageState = Loaded (TeacherDashboard TeacherDashboard.model) } => Cmd.none
 
 
 
@@ -347,46 +359,11 @@ viewPage session isLoading page =
         AddQuestion subModel ->
             AddQuestion.view session subModel |> frame Page.Other |> Html.map AddQuestionMsg
 
+        Dashboard subModel ->
+            Dashboard.view session subModel |> frame Page.Other |> Html.map DashboardMsg
 
-
-{-
-   view : Model -> Html Msg
-   view model =
-       Layout.render Mdl
-           model.mdl
-           [ Layout.fixedHeader
-           , Layout.onSelectTab SelectTab
-           , Layout.selectedTab model.selectedTab
-           ]
-           { header =
-               [ text "LearnMath"
-               ]
-           , drawer = [ text "drawer text" ]
-           , tabs = ( tabTitles, [] )
-           , main = [ viewBody model ]
-           }
-
-
-   viewBody : Model -> Html Msg
-   viewBody model =
-       div []
-           [ {- stylesheet
-                ,
-             -}
-             case model.selectedTab of
-               0 ->
-                   Html.map RegisterPageHandler (Page.Register.viewPage model.registerPage)
-
-               1 ->
-                   Html.map LoginPageHandler (Page.Login.viewPage model.loginPage)
-
-               2 ->
-                   Html.map QuestionPageHandler (Page.Question.viewPage model.questionPage)
-
-               _ ->
-                   text "404"
-           ]
--}
+        TeacherDashboard subModel ->
+            TeacherDashboard.view session subModel |> frame Page.Other |> Html.map TeacherDashboardMsg
 
 
 pageSubscriptions : Page -> Sub Msg
@@ -417,6 +394,12 @@ pageSubscriptions page =
             Sub.map QuestionMsg (Question.subs subModel)
 
         AddQuestion subModel ->
+            Sub.none
+
+        Dashboard subModel ->
+            Sub.none
+
+        TeacherDashboard subModel ->
             Sub.none
 
 

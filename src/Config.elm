@@ -1,4 +1,4 @@
-module Config exposing (server)
+module Config exposing (apiUrl, server)
 
 
 protocol : String
@@ -26,3 +26,8 @@ serverPort =
 server : String
 server =
     protocol ++ "://" ++ serverAddress ++ ":" ++ serverPort
+
+
+apiUrl : String -> String
+apiUrl path =
+    server ++ path

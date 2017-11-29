@@ -1,4 +1,4 @@
-module Data.User exposing (Role(..), User, Username(..), decoder, encode, roleDecoder, roleEncoder, roleToString, usernameDecoder, usernameParser, usernameToHtml, usernameToString)
+module Data.User exposing (Role(..), User, Username(..), decoder, encode, encodeUsername, roleDecoder, roleEncoder, roleToString, usernameDecoder, usernameParser, usernameToHtml, usernameToString)
 
 import Data.AuthToken as AuthToken exposing (AuthToken)
 import Html exposing (Html)
