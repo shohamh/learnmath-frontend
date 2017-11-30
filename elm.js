@@ -5837,608 +5837,6 @@ var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required = F3(
 			decoder);
 	});
 
-var _elm_lang$core$Task$onError = _elm_lang$core$Native_Scheduler.onError;
-var _elm_lang$core$Task$andThen = _elm_lang$core$Native_Scheduler.andThen;
-var _elm_lang$core$Task$spawnCmd = F2(
-	function (router, _p0) {
-		var _p1 = _p0;
-		return _elm_lang$core$Native_Scheduler.spawn(
-			A2(
-				_elm_lang$core$Task$andThen,
-				_elm_lang$core$Platform$sendToApp(router),
-				_p1._0));
-	});
-var _elm_lang$core$Task$fail = _elm_lang$core$Native_Scheduler.fail;
-var _elm_lang$core$Task$mapError = F2(
-	function (convert, task) {
-		return A2(
-			_elm_lang$core$Task$onError,
-			function (_p2) {
-				return _elm_lang$core$Task$fail(
-					convert(_p2));
-			},
-			task);
-	});
-var _elm_lang$core$Task$succeed = _elm_lang$core$Native_Scheduler.succeed;
-var _elm_lang$core$Task$map = F2(
-	function (func, taskA) {
-		return A2(
-			_elm_lang$core$Task$andThen,
-			function (a) {
-				return _elm_lang$core$Task$succeed(
-					func(a));
-			},
-			taskA);
-	});
-var _elm_lang$core$Task$map2 = F3(
-	function (func, taskA, taskB) {
-		return A2(
-			_elm_lang$core$Task$andThen,
-			function (a) {
-				return A2(
-					_elm_lang$core$Task$andThen,
-					function (b) {
-						return _elm_lang$core$Task$succeed(
-							A2(func, a, b));
-					},
-					taskB);
-			},
-			taskA);
-	});
-var _elm_lang$core$Task$map3 = F4(
-	function (func, taskA, taskB, taskC) {
-		return A2(
-			_elm_lang$core$Task$andThen,
-			function (a) {
-				return A2(
-					_elm_lang$core$Task$andThen,
-					function (b) {
-						return A2(
-							_elm_lang$core$Task$andThen,
-							function (c) {
-								return _elm_lang$core$Task$succeed(
-									A3(func, a, b, c));
-							},
-							taskC);
-					},
-					taskB);
-			},
-			taskA);
-	});
-var _elm_lang$core$Task$map4 = F5(
-	function (func, taskA, taskB, taskC, taskD) {
-		return A2(
-			_elm_lang$core$Task$andThen,
-			function (a) {
-				return A2(
-					_elm_lang$core$Task$andThen,
-					function (b) {
-						return A2(
-							_elm_lang$core$Task$andThen,
-							function (c) {
-								return A2(
-									_elm_lang$core$Task$andThen,
-									function (d) {
-										return _elm_lang$core$Task$succeed(
-											A4(func, a, b, c, d));
-									},
-									taskD);
-							},
-							taskC);
-					},
-					taskB);
-			},
-			taskA);
-	});
-var _elm_lang$core$Task$map5 = F6(
-	function (func, taskA, taskB, taskC, taskD, taskE) {
-		return A2(
-			_elm_lang$core$Task$andThen,
-			function (a) {
-				return A2(
-					_elm_lang$core$Task$andThen,
-					function (b) {
-						return A2(
-							_elm_lang$core$Task$andThen,
-							function (c) {
-								return A2(
-									_elm_lang$core$Task$andThen,
-									function (d) {
-										return A2(
-											_elm_lang$core$Task$andThen,
-											function (e) {
-												return _elm_lang$core$Task$succeed(
-													A5(func, a, b, c, d, e));
-											},
-											taskE);
-									},
-									taskD);
-							},
-							taskC);
-					},
-					taskB);
-			},
-			taskA);
-	});
-var _elm_lang$core$Task$sequence = function (tasks) {
-	var _p3 = tasks;
-	if (_p3.ctor === '[]') {
-		return _elm_lang$core$Task$succeed(
-			{ctor: '[]'});
-	} else {
-		return A3(
-			_elm_lang$core$Task$map2,
-			F2(
-				function (x, y) {
-					return {ctor: '::', _0: x, _1: y};
-				}),
-			_p3._0,
-			_elm_lang$core$Task$sequence(_p3._1));
-	}
-};
-var _elm_lang$core$Task$onEffects = F3(
-	function (router, commands, state) {
-		return A2(
-			_elm_lang$core$Task$map,
-			function (_p4) {
-				return {ctor: '_Tuple0'};
-			},
-			_elm_lang$core$Task$sequence(
-				A2(
-					_elm_lang$core$List$map,
-					_elm_lang$core$Task$spawnCmd(router),
-					commands)));
-	});
-var _elm_lang$core$Task$init = _elm_lang$core$Task$succeed(
-	{ctor: '_Tuple0'});
-var _elm_lang$core$Task$onSelfMsg = F3(
-	function (_p7, _p6, _p5) {
-		return _elm_lang$core$Task$succeed(
-			{ctor: '_Tuple0'});
-	});
-var _elm_lang$core$Task$command = _elm_lang$core$Native_Platform.leaf('Task');
-var _elm_lang$core$Task$Perform = function (a) {
-	return {ctor: 'Perform', _0: a};
-};
-var _elm_lang$core$Task$perform = F2(
-	function (toMessage, task) {
-		return _elm_lang$core$Task$command(
-			_elm_lang$core$Task$Perform(
-				A2(_elm_lang$core$Task$map, toMessage, task)));
-	});
-var _elm_lang$core$Task$attempt = F2(
-	function (resultToMessage, task) {
-		return _elm_lang$core$Task$command(
-			_elm_lang$core$Task$Perform(
-				A2(
-					_elm_lang$core$Task$onError,
-					function (_p8) {
-						return _elm_lang$core$Task$succeed(
-							resultToMessage(
-								_elm_lang$core$Result$Err(_p8)));
-					},
-					A2(
-						_elm_lang$core$Task$andThen,
-						function (_p9) {
-							return _elm_lang$core$Task$succeed(
-								resultToMessage(
-									_elm_lang$core$Result$Ok(_p9)));
-						},
-						task))));
-	});
-var _elm_lang$core$Task$cmdMap = F2(
-	function (tagger, _p10) {
-		var _p11 = _p10;
-		return _elm_lang$core$Task$Perform(
-			A2(_elm_lang$core$Task$map, tagger, _p11._0));
-	});
-_elm_lang$core$Native_Platform.effectManagers['Task'] = {pkg: 'elm-lang/core', init: _elm_lang$core$Task$init, onEffects: _elm_lang$core$Task$onEffects, onSelfMsg: _elm_lang$core$Task$onSelfMsg, tag: 'cmd', cmdMap: _elm_lang$core$Task$cmdMap};
-
-//import Native.Scheduler //
-
-var _elm_lang$core$Native_Time = function() {
-
-var now = _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
-{
-	callback(_elm_lang$core$Native_Scheduler.succeed(Date.now()));
-});
-
-function setInterval_(interval, task)
-{
-	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
-	{
-		var id = setInterval(function() {
-			_elm_lang$core$Native_Scheduler.rawSpawn(task);
-		}, interval);
-
-		return function() { clearInterval(id); };
-	});
-}
-
-return {
-	now: now,
-	setInterval_: F2(setInterval_)
-};
-
-}();
-var _elm_lang$core$Time$setInterval = _elm_lang$core$Native_Time.setInterval_;
-var _elm_lang$core$Time$spawnHelp = F3(
-	function (router, intervals, processes) {
-		var _p0 = intervals;
-		if (_p0.ctor === '[]') {
-			return _elm_lang$core$Task$succeed(processes);
-		} else {
-			var _p1 = _p0._0;
-			var spawnRest = function (id) {
-				return A3(
-					_elm_lang$core$Time$spawnHelp,
-					router,
-					_p0._1,
-					A3(_elm_lang$core$Dict$insert, _p1, id, processes));
-			};
-			var spawnTimer = _elm_lang$core$Native_Scheduler.spawn(
-				A2(
-					_elm_lang$core$Time$setInterval,
-					_p1,
-					A2(_elm_lang$core$Platform$sendToSelf, router, _p1)));
-			return A2(_elm_lang$core$Task$andThen, spawnRest, spawnTimer);
-		}
-	});
-var _elm_lang$core$Time$addMySub = F2(
-	function (_p2, state) {
-		var _p3 = _p2;
-		var _p6 = _p3._1;
-		var _p5 = _p3._0;
-		var _p4 = A2(_elm_lang$core$Dict$get, _p5, state);
-		if (_p4.ctor === 'Nothing') {
-			return A3(
-				_elm_lang$core$Dict$insert,
-				_p5,
-				{
-					ctor: '::',
-					_0: _p6,
-					_1: {ctor: '[]'}
-				},
-				state);
-		} else {
-			return A3(
-				_elm_lang$core$Dict$insert,
-				_p5,
-				{ctor: '::', _0: _p6, _1: _p4._0},
-				state);
-		}
-	});
-var _elm_lang$core$Time$inMilliseconds = function (t) {
-	return t;
-};
-var _elm_lang$core$Time$millisecond = 1;
-var _elm_lang$core$Time$second = 1000 * _elm_lang$core$Time$millisecond;
-var _elm_lang$core$Time$minute = 60 * _elm_lang$core$Time$second;
-var _elm_lang$core$Time$hour = 60 * _elm_lang$core$Time$minute;
-var _elm_lang$core$Time$inHours = function (t) {
-	return t / _elm_lang$core$Time$hour;
-};
-var _elm_lang$core$Time$inMinutes = function (t) {
-	return t / _elm_lang$core$Time$minute;
-};
-var _elm_lang$core$Time$inSeconds = function (t) {
-	return t / _elm_lang$core$Time$second;
-};
-var _elm_lang$core$Time$now = _elm_lang$core$Native_Time.now;
-var _elm_lang$core$Time$onSelfMsg = F3(
-	function (router, interval, state) {
-		var _p7 = A2(_elm_lang$core$Dict$get, interval, state.taggers);
-		if (_p7.ctor === 'Nothing') {
-			return _elm_lang$core$Task$succeed(state);
-		} else {
-			var tellTaggers = function (time) {
-				return _elm_lang$core$Task$sequence(
-					A2(
-						_elm_lang$core$List$map,
-						function (tagger) {
-							return A2(
-								_elm_lang$core$Platform$sendToApp,
-								router,
-								tagger(time));
-						},
-						_p7._0));
-			};
-			return A2(
-				_elm_lang$core$Task$andThen,
-				function (_p8) {
-					return _elm_lang$core$Task$succeed(state);
-				},
-				A2(_elm_lang$core$Task$andThen, tellTaggers, _elm_lang$core$Time$now));
-		}
-	});
-var _elm_lang$core$Time$subscription = _elm_lang$core$Native_Platform.leaf('Time');
-var _elm_lang$core$Time$State = F2(
-	function (a, b) {
-		return {taggers: a, processes: b};
-	});
-var _elm_lang$core$Time$init = _elm_lang$core$Task$succeed(
-	A2(_elm_lang$core$Time$State, _elm_lang$core$Dict$empty, _elm_lang$core$Dict$empty));
-var _elm_lang$core$Time$onEffects = F3(
-	function (router, subs, _p9) {
-		var _p10 = _p9;
-		var rightStep = F3(
-			function (_p12, id, _p11) {
-				var _p13 = _p11;
-				return {
-					ctor: '_Tuple3',
-					_0: _p13._0,
-					_1: _p13._1,
-					_2: A2(
-						_elm_lang$core$Task$andThen,
-						function (_p14) {
-							return _p13._2;
-						},
-						_elm_lang$core$Native_Scheduler.kill(id))
-				};
-			});
-		var bothStep = F4(
-			function (interval, taggers, id, _p15) {
-				var _p16 = _p15;
-				return {
-					ctor: '_Tuple3',
-					_0: _p16._0,
-					_1: A3(_elm_lang$core$Dict$insert, interval, id, _p16._1),
-					_2: _p16._2
-				};
-			});
-		var leftStep = F3(
-			function (interval, taggers, _p17) {
-				var _p18 = _p17;
-				return {
-					ctor: '_Tuple3',
-					_0: {ctor: '::', _0: interval, _1: _p18._0},
-					_1: _p18._1,
-					_2: _p18._2
-				};
-			});
-		var newTaggers = A3(_elm_lang$core$List$foldl, _elm_lang$core$Time$addMySub, _elm_lang$core$Dict$empty, subs);
-		var _p19 = A6(
-			_elm_lang$core$Dict$merge,
-			leftStep,
-			bothStep,
-			rightStep,
-			newTaggers,
-			_p10.processes,
-			{
-				ctor: '_Tuple3',
-				_0: {ctor: '[]'},
-				_1: _elm_lang$core$Dict$empty,
-				_2: _elm_lang$core$Task$succeed(
-					{ctor: '_Tuple0'})
-			});
-		var spawnList = _p19._0;
-		var existingDict = _p19._1;
-		var killTask = _p19._2;
-		return A2(
-			_elm_lang$core$Task$andThen,
-			function (newProcesses) {
-				return _elm_lang$core$Task$succeed(
-					A2(_elm_lang$core$Time$State, newTaggers, newProcesses));
-			},
-			A2(
-				_elm_lang$core$Task$andThen,
-				function (_p20) {
-					return A3(_elm_lang$core$Time$spawnHelp, router, spawnList, existingDict);
-				},
-				killTask));
-	});
-var _elm_lang$core$Time$Every = F2(
-	function (a, b) {
-		return {ctor: 'Every', _0: a, _1: b};
-	});
-var _elm_lang$core$Time$every = F2(
-	function (interval, tagger) {
-		return _elm_lang$core$Time$subscription(
-			A2(_elm_lang$core$Time$Every, interval, tagger));
-	});
-var _elm_lang$core$Time$subMap = F2(
-	function (f, _p21) {
-		var _p22 = _p21;
-		return A2(
-			_elm_lang$core$Time$Every,
-			_p22._0,
-			function (_p23) {
-				return f(
-					_p22._1(_p23));
-			});
-	});
-_elm_lang$core$Native_Platform.effectManagers['Time'] = {pkg: 'elm-lang/core', init: _elm_lang$core$Time$init, onEffects: _elm_lang$core$Time$onEffects, onSelfMsg: _elm_lang$core$Time$onSelfMsg, tag: 'sub', subMap: _elm_lang$core$Time$subMap};
-
-var _elm_lang$core$Process$kill = _elm_lang$core$Native_Scheduler.kill;
-var _elm_lang$core$Process$sleep = _elm_lang$core$Native_Scheduler.sleep;
-var _elm_lang$core$Process$spawn = _elm_lang$core$Native_Scheduler.spawn;
-
-var _elm_lang$dom$Native_Dom = function() {
-
-var fakeNode = {
-	addEventListener: function() {},
-	removeEventListener: function() {}
-};
-
-var onDocument = on(typeof document !== 'undefined' ? document : fakeNode);
-var onWindow = on(typeof window !== 'undefined' ? window : fakeNode);
-
-function on(node)
-{
-	return function(eventName, decoder, toTask)
-	{
-		return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
-
-			function performTask(event)
-			{
-				var result = A2(_elm_lang$core$Json_Decode$decodeValue, decoder, event);
-				if (result.ctor === 'Ok')
-				{
-					_elm_lang$core$Native_Scheduler.rawSpawn(toTask(result._0));
-				}
-			}
-
-			node.addEventListener(eventName, performTask);
-
-			return function()
-			{
-				node.removeEventListener(eventName, performTask);
-			};
-		});
-	};
-}
-
-var rAF = typeof requestAnimationFrame !== 'undefined'
-	? requestAnimationFrame
-	: function(callback) { callback(); };
-
-function withNode(id, doStuff)
-{
-	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
-	{
-		rAF(function()
-		{
-			var node = document.getElementById(id);
-			if (node === null)
-			{
-				callback(_elm_lang$core$Native_Scheduler.fail({ ctor: 'NotFound', _0: id }));
-				return;
-			}
-			callback(_elm_lang$core$Native_Scheduler.succeed(doStuff(node)));
-		});
-	});
-}
-
-
-// FOCUS
-
-function focus(id)
-{
-	return withNode(id, function(node) {
-		node.focus();
-		return _elm_lang$core$Native_Utils.Tuple0;
-	});
-}
-
-function blur(id)
-{
-	return withNode(id, function(node) {
-		node.blur();
-		return _elm_lang$core$Native_Utils.Tuple0;
-	});
-}
-
-
-// SCROLLING
-
-function getScrollTop(id)
-{
-	return withNode(id, function(node) {
-		return node.scrollTop;
-	});
-}
-
-function setScrollTop(id, desiredScrollTop)
-{
-	return withNode(id, function(node) {
-		node.scrollTop = desiredScrollTop;
-		return _elm_lang$core$Native_Utils.Tuple0;
-	});
-}
-
-function toBottom(id)
-{
-	return withNode(id, function(node) {
-		node.scrollTop = node.scrollHeight;
-		return _elm_lang$core$Native_Utils.Tuple0;
-	});
-}
-
-function getScrollLeft(id)
-{
-	return withNode(id, function(node) {
-		return node.scrollLeft;
-	});
-}
-
-function setScrollLeft(id, desiredScrollLeft)
-{
-	return withNode(id, function(node) {
-		node.scrollLeft = desiredScrollLeft;
-		return _elm_lang$core$Native_Utils.Tuple0;
-	});
-}
-
-function toRight(id)
-{
-	return withNode(id, function(node) {
-		node.scrollLeft = node.scrollWidth;
-		return _elm_lang$core$Native_Utils.Tuple0;
-	});
-}
-
-
-// SIZE
-
-function width(options, id)
-{
-	return withNode(id, function(node) {
-		switch (options.ctor)
-		{
-			case 'Content':
-				return node.scrollWidth;
-			case 'VisibleContent':
-				return node.clientWidth;
-			case 'VisibleContentWithBorders':
-				return node.offsetWidth;
-			case 'VisibleContentWithBordersAndMargins':
-				var rect = node.getBoundingClientRect();
-				return rect.right - rect.left;
-		}
-	});
-}
-
-function height(options, id)
-{
-	return withNode(id, function(node) {
-		switch (options.ctor)
-		{
-			case 'Content':
-				return node.scrollHeight;
-			case 'VisibleContent':
-				return node.clientHeight;
-			case 'VisibleContentWithBorders':
-				return node.offsetHeight;
-			case 'VisibleContentWithBordersAndMargins':
-				var rect = node.getBoundingClientRect();
-				return rect.bottom - rect.top;
-		}
-	});
-}
-
-return {
-	onDocument: F3(onDocument),
-	onWindow: F3(onWindow),
-
-	focus: focus,
-	blur: blur,
-
-	getScrollTop: getScrollTop,
-	setScrollTop: F2(setScrollTop),
-	getScrollLeft: getScrollLeft,
-	setScrollLeft: F2(setScrollLeft),
-	toBottom: toBottom,
-	toRight: toRight,
-
-	height: F2(height),
-	width: F2(width)
-};
-
-}();
-
-var _elm_lang$dom$Dom_LowLevel$onWindow = _elm_lang$dom$Native_Dom.onWindow;
-var _elm_lang$dom$Dom_LowLevel$onDocument = _elm_lang$dom$Native_Dom.onDocument;
-
 var _elm_lang$virtual_dom$VirtualDom_Debug$wrap;
 var _elm_lang$virtual_dom$VirtualDom_Debug$wrapWithFlags;
 
@@ -8320,6 +7718,203 @@ return {
 };
 
 }();
+
+var _elm_lang$core$Task$onError = _elm_lang$core$Native_Scheduler.onError;
+var _elm_lang$core$Task$andThen = _elm_lang$core$Native_Scheduler.andThen;
+var _elm_lang$core$Task$spawnCmd = F2(
+	function (router, _p0) {
+		var _p1 = _p0;
+		return _elm_lang$core$Native_Scheduler.spawn(
+			A2(
+				_elm_lang$core$Task$andThen,
+				_elm_lang$core$Platform$sendToApp(router),
+				_p1._0));
+	});
+var _elm_lang$core$Task$fail = _elm_lang$core$Native_Scheduler.fail;
+var _elm_lang$core$Task$mapError = F2(
+	function (convert, task) {
+		return A2(
+			_elm_lang$core$Task$onError,
+			function (_p2) {
+				return _elm_lang$core$Task$fail(
+					convert(_p2));
+			},
+			task);
+	});
+var _elm_lang$core$Task$succeed = _elm_lang$core$Native_Scheduler.succeed;
+var _elm_lang$core$Task$map = F2(
+	function (func, taskA) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (a) {
+				return _elm_lang$core$Task$succeed(
+					func(a));
+			},
+			taskA);
+	});
+var _elm_lang$core$Task$map2 = F3(
+	function (func, taskA, taskB) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (a) {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (b) {
+						return _elm_lang$core$Task$succeed(
+							A2(func, a, b));
+					},
+					taskB);
+			},
+			taskA);
+	});
+var _elm_lang$core$Task$map3 = F4(
+	function (func, taskA, taskB, taskC) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (a) {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (b) {
+						return A2(
+							_elm_lang$core$Task$andThen,
+							function (c) {
+								return _elm_lang$core$Task$succeed(
+									A3(func, a, b, c));
+							},
+							taskC);
+					},
+					taskB);
+			},
+			taskA);
+	});
+var _elm_lang$core$Task$map4 = F5(
+	function (func, taskA, taskB, taskC, taskD) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (a) {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (b) {
+						return A2(
+							_elm_lang$core$Task$andThen,
+							function (c) {
+								return A2(
+									_elm_lang$core$Task$andThen,
+									function (d) {
+										return _elm_lang$core$Task$succeed(
+											A4(func, a, b, c, d));
+									},
+									taskD);
+							},
+							taskC);
+					},
+					taskB);
+			},
+			taskA);
+	});
+var _elm_lang$core$Task$map5 = F6(
+	function (func, taskA, taskB, taskC, taskD, taskE) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (a) {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (b) {
+						return A2(
+							_elm_lang$core$Task$andThen,
+							function (c) {
+								return A2(
+									_elm_lang$core$Task$andThen,
+									function (d) {
+										return A2(
+											_elm_lang$core$Task$andThen,
+											function (e) {
+												return _elm_lang$core$Task$succeed(
+													A5(func, a, b, c, d, e));
+											},
+											taskE);
+									},
+									taskD);
+							},
+							taskC);
+					},
+					taskB);
+			},
+			taskA);
+	});
+var _elm_lang$core$Task$sequence = function (tasks) {
+	var _p3 = tasks;
+	if (_p3.ctor === '[]') {
+		return _elm_lang$core$Task$succeed(
+			{ctor: '[]'});
+	} else {
+		return A3(
+			_elm_lang$core$Task$map2,
+			F2(
+				function (x, y) {
+					return {ctor: '::', _0: x, _1: y};
+				}),
+			_p3._0,
+			_elm_lang$core$Task$sequence(_p3._1));
+	}
+};
+var _elm_lang$core$Task$onEffects = F3(
+	function (router, commands, state) {
+		return A2(
+			_elm_lang$core$Task$map,
+			function (_p4) {
+				return {ctor: '_Tuple0'};
+			},
+			_elm_lang$core$Task$sequence(
+				A2(
+					_elm_lang$core$List$map,
+					_elm_lang$core$Task$spawnCmd(router),
+					commands)));
+	});
+var _elm_lang$core$Task$init = _elm_lang$core$Task$succeed(
+	{ctor: '_Tuple0'});
+var _elm_lang$core$Task$onSelfMsg = F3(
+	function (_p7, _p6, _p5) {
+		return _elm_lang$core$Task$succeed(
+			{ctor: '_Tuple0'});
+	});
+var _elm_lang$core$Task$command = _elm_lang$core$Native_Platform.leaf('Task');
+var _elm_lang$core$Task$Perform = function (a) {
+	return {ctor: 'Perform', _0: a};
+};
+var _elm_lang$core$Task$perform = F2(
+	function (toMessage, task) {
+		return _elm_lang$core$Task$command(
+			_elm_lang$core$Task$Perform(
+				A2(_elm_lang$core$Task$map, toMessage, task)));
+	});
+var _elm_lang$core$Task$attempt = F2(
+	function (resultToMessage, task) {
+		return _elm_lang$core$Task$command(
+			_elm_lang$core$Task$Perform(
+				A2(
+					_elm_lang$core$Task$onError,
+					function (_p8) {
+						return _elm_lang$core$Task$succeed(
+							resultToMessage(
+								_elm_lang$core$Result$Err(_p8)));
+					},
+					A2(
+						_elm_lang$core$Task$andThen,
+						function (_p9) {
+							return _elm_lang$core$Task$succeed(
+								resultToMessage(
+									_elm_lang$core$Result$Ok(_p9)));
+						},
+						task))));
+	});
+var _elm_lang$core$Task$cmdMap = F2(
+	function (tagger, _p10) {
+		var _p11 = _p10;
+		return _elm_lang$core$Task$Perform(
+			A2(_elm_lang$core$Task$map, tagger, _p11._0));
+	});
+_elm_lang$core$Native_Platform.effectManagers['Task'] = {pkg: 'elm-lang/core', init: _elm_lang$core$Task$init, onEffects: _elm_lang$core$Task$onEffects, onSelfMsg: _elm_lang$core$Task$onSelfMsg, tag: 'cmd', cmdMap: _elm_lang$core$Task$cmdMap};
 
 var _elm_lang$virtual_dom$Native_Debug = function() {
 
@@ -12901,6 +12496,549 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
+var _abadi199$elm_input_extra$MultiSelect$defaultOptions = function (onChange) {
+	return {
+		items: {ctor: '[]'},
+		onChange: onChange
+	};
+};
+var _abadi199$elm_input_extra$MultiSelect$Item = F3(
+	function (a, b, c) {
+		return {value: a, text: b, enabled: c};
+	});
+var _abadi199$elm_input_extra$MultiSelect$Options = F2(
+	function (a, b) {
+		return {items: a, onChange: b};
+	});
+var _abadi199$elm_input_extra$MultiSelect$Option = F3(
+	function (a, b, c) {
+		return {value: a, text: b, selected: c};
+	});
+var _abadi199$elm_input_extra$MultiSelect$optionDecoder = A4(
+	_elm_lang$core$Json_Decode$map3,
+	_abadi199$elm_input_extra$MultiSelect$Option,
+	A2(_elm_lang$core$Json_Decode$field, 'value', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'text', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'selected', _elm_lang$core$Json_Decode$bool));
+var _abadi199$elm_input_extra$MultiSelect$optionsDecoder = function () {
+	var loop = F2(
+		function (idx, xs) {
+			return A2(
+				_elm_lang$core$Json_Decode$andThen,
+				function (_p0) {
+					return A2(
+						_elm_lang$core$Maybe$withDefault,
+						_elm_lang$core$Json_Decode$succeed(xs),
+						A2(
+							_elm_lang$core$Maybe$map,
+							function (x) {
+								return A2(
+									loop,
+									idx + 1,
+									{ctor: '::', _0: x, _1: xs});
+							},
+							_p0));
+				},
+				_elm_lang$core$Json_Decode$maybe(
+					A2(
+						_elm_lang$core$Json_Decode$field,
+						_elm_lang$core$Basics$toString(idx),
+						_abadi199$elm_input_extra$MultiSelect$optionDecoder)));
+		});
+	return A2(
+		_elm_lang$core$Json_Decode$map,
+		_elm_lang$core$List$reverse,
+		A2(
+			_elm_lang$core$Json_Decode$field,
+			'options',
+			A2(
+				loop,
+				0,
+				{ctor: '[]'})));
+}();
+var _abadi199$elm_input_extra$MultiSelect$selectedOptionsDecoder = function () {
+	var filterSelected = function (options) {
+		return A2(
+			_elm_lang$core$List$map,
+			function (_) {
+				return _.value;
+			},
+			A2(
+				_elm_lang$core$List$filter,
+				function (_) {
+					return _.selected;
+				},
+				options));
+	};
+	return A2(
+		_elm_lang$core$Json_Decode$map,
+		filterSelected,
+		A2(_elm_lang$core$Json_Decode$field, 'target', _abadi199$elm_input_extra$MultiSelect$optionsDecoder));
+}();
+var _abadi199$elm_input_extra$MultiSelect$onChange = function (tagger) {
+	return A2(
+		_elm_lang$html$Html_Events$on,
+		'change',
+		A2(_elm_lang$core$Json_Decode$map, tagger, _abadi199$elm_input_extra$MultiSelect$selectedOptionsDecoder));
+};
+var _abadi199$elm_input_extra$MultiSelect$multiSelect = F3(
+	function (options, attributes, currentValue) {
+		var isSelected = function (value) {
+			return A2(
+				_elm_lang$core$List$any,
+				F2(
+					function (x, y) {
+						return _elm_lang$core$Native_Utils.eq(x, y);
+					})(value),
+				currentValue);
+		};
+		var toOption = function (_p1) {
+			var _p2 = _p1;
+			var _p3 = _p2.value;
+			return A2(
+				_elm_lang$html$Html$option,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$value(_p3),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$selected(
+							isSelected(_p3)),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$disabled(!_p2.enabled),
+							_1: {ctor: '[]'}
+						}
+					}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text(_p2.text),
+					_1: {ctor: '[]'}
+				});
+		};
+		return A2(
+			_elm_lang$html$Html$select,
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				attributes,
+				{
+					ctor: '::',
+					_0: _abadi199$elm_input_extra$MultiSelect$onChange(options.onChange),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$multiple(true),
+						_1: {ctor: '[]'}
+					}
+				}),
+			A2(_elm_lang$core$List$map, toOption, options.items));
+	});
+
+//import Native.Scheduler //
+
+var _elm_lang$core$Native_Time = function() {
+
+var now = _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+{
+	callback(_elm_lang$core$Native_Scheduler.succeed(Date.now()));
+});
+
+function setInterval_(interval, task)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		var id = setInterval(function() {
+			_elm_lang$core$Native_Scheduler.rawSpawn(task);
+		}, interval);
+
+		return function() { clearInterval(id); };
+	});
+}
+
+return {
+	now: now,
+	setInterval_: F2(setInterval_)
+};
+
+}();
+var _elm_lang$core$Time$setInterval = _elm_lang$core$Native_Time.setInterval_;
+var _elm_lang$core$Time$spawnHelp = F3(
+	function (router, intervals, processes) {
+		var _p0 = intervals;
+		if (_p0.ctor === '[]') {
+			return _elm_lang$core$Task$succeed(processes);
+		} else {
+			var _p1 = _p0._0;
+			var spawnRest = function (id) {
+				return A3(
+					_elm_lang$core$Time$spawnHelp,
+					router,
+					_p0._1,
+					A3(_elm_lang$core$Dict$insert, _p1, id, processes));
+			};
+			var spawnTimer = _elm_lang$core$Native_Scheduler.spawn(
+				A2(
+					_elm_lang$core$Time$setInterval,
+					_p1,
+					A2(_elm_lang$core$Platform$sendToSelf, router, _p1)));
+			return A2(_elm_lang$core$Task$andThen, spawnRest, spawnTimer);
+		}
+	});
+var _elm_lang$core$Time$addMySub = F2(
+	function (_p2, state) {
+		var _p3 = _p2;
+		var _p6 = _p3._1;
+		var _p5 = _p3._0;
+		var _p4 = A2(_elm_lang$core$Dict$get, _p5, state);
+		if (_p4.ctor === 'Nothing') {
+			return A3(
+				_elm_lang$core$Dict$insert,
+				_p5,
+				{
+					ctor: '::',
+					_0: _p6,
+					_1: {ctor: '[]'}
+				},
+				state);
+		} else {
+			return A3(
+				_elm_lang$core$Dict$insert,
+				_p5,
+				{ctor: '::', _0: _p6, _1: _p4._0},
+				state);
+		}
+	});
+var _elm_lang$core$Time$inMilliseconds = function (t) {
+	return t;
+};
+var _elm_lang$core$Time$millisecond = 1;
+var _elm_lang$core$Time$second = 1000 * _elm_lang$core$Time$millisecond;
+var _elm_lang$core$Time$minute = 60 * _elm_lang$core$Time$second;
+var _elm_lang$core$Time$hour = 60 * _elm_lang$core$Time$minute;
+var _elm_lang$core$Time$inHours = function (t) {
+	return t / _elm_lang$core$Time$hour;
+};
+var _elm_lang$core$Time$inMinutes = function (t) {
+	return t / _elm_lang$core$Time$minute;
+};
+var _elm_lang$core$Time$inSeconds = function (t) {
+	return t / _elm_lang$core$Time$second;
+};
+var _elm_lang$core$Time$now = _elm_lang$core$Native_Time.now;
+var _elm_lang$core$Time$onSelfMsg = F3(
+	function (router, interval, state) {
+		var _p7 = A2(_elm_lang$core$Dict$get, interval, state.taggers);
+		if (_p7.ctor === 'Nothing') {
+			return _elm_lang$core$Task$succeed(state);
+		} else {
+			var tellTaggers = function (time) {
+				return _elm_lang$core$Task$sequence(
+					A2(
+						_elm_lang$core$List$map,
+						function (tagger) {
+							return A2(
+								_elm_lang$core$Platform$sendToApp,
+								router,
+								tagger(time));
+						},
+						_p7._0));
+			};
+			return A2(
+				_elm_lang$core$Task$andThen,
+				function (_p8) {
+					return _elm_lang$core$Task$succeed(state);
+				},
+				A2(_elm_lang$core$Task$andThen, tellTaggers, _elm_lang$core$Time$now));
+		}
+	});
+var _elm_lang$core$Time$subscription = _elm_lang$core$Native_Platform.leaf('Time');
+var _elm_lang$core$Time$State = F2(
+	function (a, b) {
+		return {taggers: a, processes: b};
+	});
+var _elm_lang$core$Time$init = _elm_lang$core$Task$succeed(
+	A2(_elm_lang$core$Time$State, _elm_lang$core$Dict$empty, _elm_lang$core$Dict$empty));
+var _elm_lang$core$Time$onEffects = F3(
+	function (router, subs, _p9) {
+		var _p10 = _p9;
+		var rightStep = F3(
+			function (_p12, id, _p11) {
+				var _p13 = _p11;
+				return {
+					ctor: '_Tuple3',
+					_0: _p13._0,
+					_1: _p13._1,
+					_2: A2(
+						_elm_lang$core$Task$andThen,
+						function (_p14) {
+							return _p13._2;
+						},
+						_elm_lang$core$Native_Scheduler.kill(id))
+				};
+			});
+		var bothStep = F4(
+			function (interval, taggers, id, _p15) {
+				var _p16 = _p15;
+				return {
+					ctor: '_Tuple3',
+					_0: _p16._0,
+					_1: A3(_elm_lang$core$Dict$insert, interval, id, _p16._1),
+					_2: _p16._2
+				};
+			});
+		var leftStep = F3(
+			function (interval, taggers, _p17) {
+				var _p18 = _p17;
+				return {
+					ctor: '_Tuple3',
+					_0: {ctor: '::', _0: interval, _1: _p18._0},
+					_1: _p18._1,
+					_2: _p18._2
+				};
+			});
+		var newTaggers = A3(_elm_lang$core$List$foldl, _elm_lang$core$Time$addMySub, _elm_lang$core$Dict$empty, subs);
+		var _p19 = A6(
+			_elm_lang$core$Dict$merge,
+			leftStep,
+			bothStep,
+			rightStep,
+			newTaggers,
+			_p10.processes,
+			{
+				ctor: '_Tuple3',
+				_0: {ctor: '[]'},
+				_1: _elm_lang$core$Dict$empty,
+				_2: _elm_lang$core$Task$succeed(
+					{ctor: '_Tuple0'})
+			});
+		var spawnList = _p19._0;
+		var existingDict = _p19._1;
+		var killTask = _p19._2;
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (newProcesses) {
+				return _elm_lang$core$Task$succeed(
+					A2(_elm_lang$core$Time$State, newTaggers, newProcesses));
+			},
+			A2(
+				_elm_lang$core$Task$andThen,
+				function (_p20) {
+					return A3(_elm_lang$core$Time$spawnHelp, router, spawnList, existingDict);
+				},
+				killTask));
+	});
+var _elm_lang$core$Time$Every = F2(
+	function (a, b) {
+		return {ctor: 'Every', _0: a, _1: b};
+	});
+var _elm_lang$core$Time$every = F2(
+	function (interval, tagger) {
+		return _elm_lang$core$Time$subscription(
+			A2(_elm_lang$core$Time$Every, interval, tagger));
+	});
+var _elm_lang$core$Time$subMap = F2(
+	function (f, _p21) {
+		var _p22 = _p21;
+		return A2(
+			_elm_lang$core$Time$Every,
+			_p22._0,
+			function (_p23) {
+				return f(
+					_p22._1(_p23));
+			});
+	});
+_elm_lang$core$Native_Platform.effectManagers['Time'] = {pkg: 'elm-lang/core', init: _elm_lang$core$Time$init, onEffects: _elm_lang$core$Time$onEffects, onSelfMsg: _elm_lang$core$Time$onSelfMsg, tag: 'sub', subMap: _elm_lang$core$Time$subMap};
+
+var _elm_lang$core$Process$kill = _elm_lang$core$Native_Scheduler.kill;
+var _elm_lang$core$Process$sleep = _elm_lang$core$Native_Scheduler.sleep;
+var _elm_lang$core$Process$spawn = _elm_lang$core$Native_Scheduler.spawn;
+
+var _elm_lang$dom$Native_Dom = function() {
+
+var fakeNode = {
+	addEventListener: function() {},
+	removeEventListener: function() {}
+};
+
+var onDocument = on(typeof document !== 'undefined' ? document : fakeNode);
+var onWindow = on(typeof window !== 'undefined' ? window : fakeNode);
+
+function on(node)
+{
+	return function(eventName, decoder, toTask)
+	{
+		return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
+
+			function performTask(event)
+			{
+				var result = A2(_elm_lang$core$Json_Decode$decodeValue, decoder, event);
+				if (result.ctor === 'Ok')
+				{
+					_elm_lang$core$Native_Scheduler.rawSpawn(toTask(result._0));
+				}
+			}
+
+			node.addEventListener(eventName, performTask);
+
+			return function()
+			{
+				node.removeEventListener(eventName, performTask);
+			};
+		});
+	};
+}
+
+var rAF = typeof requestAnimationFrame !== 'undefined'
+	? requestAnimationFrame
+	: function(callback) { callback(); };
+
+function withNode(id, doStuff)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		rAF(function()
+		{
+			var node = document.getElementById(id);
+			if (node === null)
+			{
+				callback(_elm_lang$core$Native_Scheduler.fail({ ctor: 'NotFound', _0: id }));
+				return;
+			}
+			callback(_elm_lang$core$Native_Scheduler.succeed(doStuff(node)));
+		});
+	});
+}
+
+
+// FOCUS
+
+function focus(id)
+{
+	return withNode(id, function(node) {
+		node.focus();
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+function blur(id)
+{
+	return withNode(id, function(node) {
+		node.blur();
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+
+// SCROLLING
+
+function getScrollTop(id)
+{
+	return withNode(id, function(node) {
+		return node.scrollTop;
+	});
+}
+
+function setScrollTop(id, desiredScrollTop)
+{
+	return withNode(id, function(node) {
+		node.scrollTop = desiredScrollTop;
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+function toBottom(id)
+{
+	return withNode(id, function(node) {
+		node.scrollTop = node.scrollHeight;
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+function getScrollLeft(id)
+{
+	return withNode(id, function(node) {
+		return node.scrollLeft;
+	});
+}
+
+function setScrollLeft(id, desiredScrollLeft)
+{
+	return withNode(id, function(node) {
+		node.scrollLeft = desiredScrollLeft;
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+function toRight(id)
+{
+	return withNode(id, function(node) {
+		node.scrollLeft = node.scrollWidth;
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+
+// SIZE
+
+function width(options, id)
+{
+	return withNode(id, function(node) {
+		switch (options.ctor)
+		{
+			case 'Content':
+				return node.scrollWidth;
+			case 'VisibleContent':
+				return node.clientWidth;
+			case 'VisibleContentWithBorders':
+				return node.offsetWidth;
+			case 'VisibleContentWithBordersAndMargins':
+				var rect = node.getBoundingClientRect();
+				return rect.right - rect.left;
+		}
+	});
+}
+
+function height(options, id)
+{
+	return withNode(id, function(node) {
+		switch (options.ctor)
+		{
+			case 'Content':
+				return node.scrollHeight;
+			case 'VisibleContent':
+				return node.clientHeight;
+			case 'VisibleContentWithBorders':
+				return node.offsetHeight;
+			case 'VisibleContentWithBordersAndMargins':
+				var rect = node.getBoundingClientRect();
+				return rect.bottom - rect.top;
+		}
+	});
+}
+
+return {
+	onDocument: F3(onDocument),
+	onWindow: F3(onWindow),
+
+	focus: focus,
+	blur: blur,
+
+	getScrollTop: getScrollTop,
+	setScrollTop: F2(setScrollTop),
+	getScrollLeft: getScrollLeft,
+	setScrollLeft: F2(setScrollLeft),
+	toBottom: toBottom,
+	toRight: toRight,
+
+	height: F2(height),
+	width: F2(width)
+};
+
+}();
+
+var _elm_lang$dom$Dom_LowLevel$onWindow = _elm_lang$dom$Native_Dom.onWindow;
+var _elm_lang$dom$Dom_LowLevel$onDocument = _elm_lang$dom$Native_Dom.onDocument;
+
 var _elm_lang$html$Html_Lazy$lazy3 = _elm_lang$virtual_dom$VirtualDom$lazy3;
 var _elm_lang$html$Html_Lazy$lazy2 = _elm_lang$virtual_dom$VirtualDom$lazy2;
 var _elm_lang$html$Html_Lazy$lazy = _elm_lang$virtual_dom$VirtualDom$lazy;
@@ -14153,6 +14291,10 @@ var _shohamh$learnmath_frontend$Data_AuthToken$encode = function (_p1) {
 	var _p2 = _p1;
 	return _elm_lang$core$Json_Encode$string(_p2._0);
 };
+var _shohamh$learnmath_frontend$Data_AuthToken$toString = function (_p3) {
+	var _p4 = _p3;
+	return _p4._0;
+};
 var _shohamh$learnmath_frontend$Data_AuthToken$AuthToken = function (a) {
 	return {ctor: 'AuthToken', _0: a};
 };
@@ -14341,6 +14483,14 @@ var _shohamh$learnmath_frontend$Data_Session$attempt = F3(
 				toCmd(_p0._0));
 		}
 	});
+var _shohamh$learnmath_frontend$Data_Session$getSid = function (session) {
+	var _p1 = session.user;
+	if (_p1.ctor === 'Just') {
+		return _shohamh$learnmath_frontend$Data_AuthToken$toString(_p1._0.token);
+	} else {
+		return '';
+	}
+};
 var _shohamh$learnmath_frontend$Data_Session$Session = function (a) {
 	return {user: a};
 };
@@ -14384,6 +14534,18 @@ var _shohamh$learnmath_frontend$Page_AddQuestion$viewErrorMessages = function (e
 				{ctor: '[]'}),
 			A2(_elm_lang$core$List$map, _elm_lang$html$Html$text, errorMessages)));
 };
+var _shohamh$learnmath_frontend$Page_AddQuestion$loadCurriculumsAndSubjectsEncoder = function (sid) {
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'sid',
+				_1: _elm_lang$core$Json_Encode$string(sid)
+			},
+			_1: {ctor: '[]'}
+		});
+};
 var _shohamh$learnmath_frontend$Page_AddQuestion$questionEncoder = function (question) {
 	return _elm_lang$core$Json_Encode$object(
 		{
@@ -14399,11 +14561,15 @@ var _shohamh$learnmath_frontend$Page_AddQuestion$questionEncoder = function (que
 var _shohamh$learnmath_frontend$Page_AddQuestion$model = {
 	successMessage: '',
 	errorMessages: {ctor: '[]'},
-	lastExport: ''
+	lastExport: '',
+	curriculums: {ctor: '[]'},
+	selectedCurriculum: '',
+	selectedSubjects: {ctor: '[]'},
+	subjectsInCurriculums: _elm_lang$core$Dict$empty
 };
-var _shohamh$learnmath_frontend$Page_AddQuestion$Model = F3(
-	function (a, b, c) {
-		return {successMessage: a, errorMessages: b, lastExport: c};
+var _shohamh$learnmath_frontend$Page_AddQuestion$Model = F7(
+	function (a, b, c, d, e, f, g) {
+		return {successMessage: a, errorMessages: b, lastExport: c, curriculums: d, selectedCurriculum: e, selectedSubjects: f, subjectsInCurriculums: g};
 	});
 var _shohamh$learnmath_frontend$Page_AddQuestion$Question = function (a) {
 	return {mathml: a};
@@ -14413,6 +14579,7 @@ var _shohamh$learnmath_frontend$Page_AddQuestion$questionFromModel = function (m
 };
 var _shohamh$learnmath_frontend$Page_AddQuestion$addQuestionRequestEncoder = function (_p0) {
 	var _p1 = _p0;
+	var _p3 = _p1._1;
 	return _elm_lang$core$Json_Encode$object(
 		{
 			ctor: '::',
@@ -14420,23 +14587,32 @@ var _shohamh$learnmath_frontend$Page_AddQuestion$addQuestionRequestEncoder = fun
 				ctor: '_Tuple2',
 				_0: 'question',
 				_1: _shohamh$learnmath_frontend$Page_AddQuestion$questionEncoder(
-					_shohamh$learnmath_frontend$Page_AddQuestion$questionFromModel(_p1._1))
+					_shohamh$learnmath_frontend$Page_AddQuestion$questionFromModel(_p3))
 			},
 			_1: {
 				ctor: '::',
 				_0: {
 					ctor: '_Tuple2',
-					_0: 'user',
+					_0: 'sid',
 					_1: function () {
 						var _p2 = _p1._0.user;
 						if (_p2.ctor === 'Just') {
-							return _shohamh$learnmath_frontend$Data_User$encode(_p2._0);
+							return _shohamh$learnmath_frontend$Data_AuthToken$encode(_p2._0.token);
 						} else {
 							return _elm_lang$core$Json_Encode$null;
 						}
 					}()
 				},
-				_1: {ctor: '[]'}
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'subjects',
+						_1: _elm_lang$core$Json_Encode$list(
+							A2(_elm_lang$core$List$map, _elm_lang$core$Json_Encode$string, _p3.selectedSubjects))
+					},
+					_1: {ctor: '[]'}
+				}
 			}
 		});
 };
@@ -14456,6 +14632,39 @@ var _shohamh$learnmath_frontend$Page_AddQuestion$responseDecoder = A3(
 		'success',
 		_elm_lang$core$Json_Decode$bool,
 		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_shohamh$learnmath_frontend$Page_AddQuestion$ResponseData)));
+var _shohamh$learnmath_frontend$Page_AddQuestion$SubjectsInCurriculums = F3(
+	function (a, b, c) {
+		return {subjectsInCurriculums: a, success: b, error_messages: c};
+	});
+var _shohamh$learnmath_frontend$Page_AddQuestion$loadCursAndSubjectsRespDecoder = A3(
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+	'error_messages',
+	_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string),
+	A3(
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+		'success',
+		_elm_lang$core$Json_Decode$bool,
+		A3(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+			'subjects_in_curriculums',
+			_elm_lang$core$Json_Decode$dict(
+				_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)),
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_shohamh$learnmath_frontend$Page_AddQuestion$SubjectsInCurriculums))));
+var _shohamh$learnmath_frontend$Page_AddQuestion$LoadSubjectsInCurriculums = function (a) {
+	return {ctor: 'LoadSubjectsInCurriculums', _0: a};
+};
+var _shohamh$learnmath_frontend$Page_AddQuestion$loadCurriculumsAndSubjects = F2(
+	function (session, model) {
+		var sid = function () {
+			var _p4 = session.user;
+			if (_p4.ctor === 'Just') {
+				return _shohamh$learnmath_frontend$Data_AuthToken$toString(_p4._0.token);
+			} else {
+				return '';
+			}
+		}();
+		return A5(_shohamh$learnmath_frontend$Util$httpPost, 'subjects_in_all_curriculums', sid, _shohamh$learnmath_frontend$Page_AddQuestion$loadCurriculumsAndSubjectsEncoder, _shohamh$learnmath_frontend$Page_AddQuestion$loadCursAndSubjectsRespDecoder, _shohamh$learnmath_frontend$Page_AddQuestion$LoadSubjectsInCurriculums);
+	});
 var _shohamh$learnmath_frontend$Page_AddQuestion$AddQuestionResult = function (a) {
 	return {ctor: 'AddQuestionResult', _0: a};
 };
@@ -14471,16 +14680,30 @@ var _shohamh$learnmath_frontend$Page_AddQuestion$addQuestion = F2(
 	});
 var _shohamh$learnmath_frontend$Page_AddQuestion$update = F3(
 	function (session, msg, model) {
-		var _p3 = msg;
-		switch (_p3.ctor) {
+		var _p5 = msg;
+		switch (_p5.ctor) {
 			case 'MyScriptExport':
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							lastExport: A2(_elm_lang$core$Debug$log, 'latestExport', _p3._0)
+							lastExport: A2(_elm_lang$core$Debug$log, 'latestExport', _p5._0)
 						}),
+					{ctor: '[]'});
+			case 'SelectCurriculum':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{selectedCurriculum: _p5._0}),
+					{ctor: '[]'});
+			case 'SelectSubjects':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{selectedSubjects: _p5._0}),
 					{ctor: '[]'});
 			case 'AddQuestion':
 				return A2(
@@ -14491,13 +14714,13 @@ var _shohamh$learnmath_frontend$Page_AddQuestion$update = F3(
 						_0: A2(_shohamh$learnmath_frontend$Page_AddQuestion$addQuestion, session, model),
 						_1: {ctor: '[]'}
 					});
-			default:
-				if (_p3._0.ctor === 'Err') {
+			case 'AddQuestionResult':
+				if (_p5._0.ctor === 'Err') {
 					var errorMessage = function () {
-						var _p4 = _p3._0._0;
-						switch (_p4.ctor) {
+						var _p6 = _p5._0._0;
+						switch (_p6.ctor) {
 							case 'BadUrl':
-								return A2(_elm_lang$core$Basics_ops['++'], 'Bad url: ', _p4._0);
+								return A2(_elm_lang$core$Basics_ops['++'], 'Bad url: ', _p6._0);
 							case 'Timeout':
 								return 'Request timed out.';
 							case 'NetworkError':
@@ -14506,9 +14729,9 @@ var _shohamh$learnmath_frontend$Page_AddQuestion$update = F3(
 								return A2(
 									_elm_lang$core$Basics_ops['++'],
 									'Bad status code returned: ',
-									_elm_lang$core$Basics$toString(_p4._0.status.code));
+									_elm_lang$core$Basics$toString(_p6._0.status.code));
 							default:
-								return A2(_elm_lang$core$Basics_ops['++'], 'JSON decoding of response failed: ', _p4._0);
+								return A2(_elm_lang$core$Basics_ops['++'], 'JSON decoding of response failed: ', _p6._0);
 						}
 					}();
 					return A2(
@@ -14530,9 +14753,62 @@ var _shohamh$learnmath_frontend$Page_AddQuestion$update = F3(
 					var newModel = model;
 					return A2(_shohamh$learnmath_frontend$Util_ops['=>'], newModel, _elm_lang$core$Platform_Cmd$none);
 				}
+			default:
+				if (_p5._0.ctor === 'Ok') {
+					var _p7 = _p5._0._0;
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								curriculums: _elm_lang$core$Dict$keys(_p7.subjectsInCurriculums),
+								subjectsInCurriculums: _p7.subjectsInCurriculums
+							}),
+						{ctor: '[]'});
+				} else {
+					var errorMessage = function () {
+						var _p8 = _p5._0._0;
+						switch (_p8.ctor) {
+							case 'BadUrl':
+								return A2(_elm_lang$core$Basics_ops['++'], 'Bad url: ', _p8._0);
+							case 'Timeout':
+								return 'Request timed out.';
+							case 'NetworkError':
+								return 'Network error (no connectivity).';
+							case 'BadStatus':
+								return A2(
+									_elm_lang$core$Basics_ops['++'],
+									'Bad status code returned: ',
+									_elm_lang$core$Basics$toString(_p8._0.status.code));
+							default:
+								return A2(_elm_lang$core$Basics_ops['++'], 'JSON decoding of response failed: ', _p8._0);
+						}
+					}();
+					return A2(
+						_shohamh$learnmath_frontend$Util_ops['=>'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								errorMessages: A2(
+									_elm_lang$core$List$append,
+									model.errorMessages,
+									{
+										ctor: '::',
+										_0: errorMessage,
+										_1: {ctor: '[]'}
+									})
+							}),
+						_elm_lang$core$Platform_Cmd$none);
+				}
 		}
 	});
 var _shohamh$learnmath_frontend$Page_AddQuestion$AddQuestion = {ctor: 'AddQuestion'};
+var _shohamh$learnmath_frontend$Page_AddQuestion$SelectSubjects = function (a) {
+	return {ctor: 'SelectSubjects', _0: a};
+};
+var _shohamh$learnmath_frontend$Page_AddQuestion$SelectCurriculum = function (a) {
+	return {ctor: 'SelectCurriculum', _0: a};
+};
 var _shohamh$learnmath_frontend$Page_AddQuestion$MyScriptExport = function (a) {
 	return {ctor: 'MyScriptExport', _0: a};
 };
@@ -14565,88 +14841,156 @@ var _shohamh$learnmath_frontend$Page_AddQuestion$view = F2(
 							},
 							{
 								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$div,
-									{
+								_0: _elm_lang$html$Html$text('Curriculum:'),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$select,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Events$onInput(_shohamh$learnmath_frontend$Page_AddQuestion$SelectCurriculum),
+											_1: {ctor: '[]'}
+										},
+										A2(
+											_elm_lang$core$List$map,
+											function (x) {
+												return A2(
+													_elm_lang$html$Html$option,
+													{ctor: '[]'},
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html$text(x),
+														_1: {ctor: '[]'}
+													});
+											},
+											model.curriculums)),
+									_1: {
 										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('col-md-6 offset-md-3 col-xs-12'),
-										_1: {ctor: '[]'}
-									},
-									{
-										ctor: '::',
-										_0: function () {
-											var mimetypes = {
-												ctor: '::',
-												_0: 'application/x-latex',
-												_1: {
+										_0: _elm_lang$html$Html$text('Pick subjects (Hold Ctrl to select multiple subjects) this question fits in:'),
+										_1: {
+											ctor: '::',
+											_0: function () {
+												var items = function () {
+													var _p9 = A2(_elm_lang$core$Dict$get, model.selectedCurriculum, model.subjectsInCurriculums);
+													if (_p9.ctor === 'Just') {
+														return _p9._0;
+													} else {
+														return {ctor: '[]'};
+													}
+												}();
+												return A3(
+													_abadi199$elm_input_extra$MultiSelect$multiSelect,
+													A2(
+														_abadi199$elm_input_extra$MultiSelect$Options,
+														A2(
+															_elm_lang$core$List$map,
+															function (x) {
+																return A3(_abadi199$elm_input_extra$MultiSelect$Item, x, x, true);
+															},
+															items),
+														_shohamh$learnmath_frontend$Page_AddQuestion$SelectSubjects),
+													{ctor: '[]'},
+													model.selectedSubjects);
+											}(),
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('row'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$div,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('col-md-10 offset-md-1 col-xs-12'),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: function () {
+												var mimetypes = {
 													ctor: '::',
-													_0: 'application/mathml+xml',
-													_1: {ctor: '[]'}
-												}
-											};
-											var mimetypesEncoded = A2(
-												_elm_lang$core$Json_Encode$encode,
-												0,
-												_elm_lang$core$Json_Encode$list(
-													A2(_elm_lang$core$List$map, _elm_lang$core$Json_Encode$string, mimetypes)));
-											return A3(
-												_elm_lang$html$Html$node,
-												'myscript-math-web',
-												{
-													ctor: '::',
-													_0: A2(_elm_lang$html$Html_Attributes$attribute, 'mimetypes', mimetypesEncoded),
+													_0: 'application/x-latex',
 													_1: {
 														ctor: '::',
-														_0: A2(_elm_lang$html$Html_Attributes$attribute, 'scheme', 'https'),
+														_0: 'application/mathml+xml',
+														_1: {ctor: '[]'}
+													}
+												};
+												var mimetypesEncoded = A2(
+													_elm_lang$core$Json_Encode$encode,
+													0,
+													_elm_lang$core$Json_Encode$list(
+														A2(_elm_lang$core$List$map, _elm_lang$core$Json_Encode$string, mimetypes)));
+												return A3(
+													_elm_lang$html$Html$node,
+													'myscript-math-web',
+													{
+														ctor: '::',
+														_0: A2(_elm_lang$html$Html_Attributes$attribute, 'mimetypes', mimetypesEncoded),
 														_1: {
 															ctor: '::',
-															_0: A2(_elm_lang$html$Html_Attributes$attribute, 'host', 'cloud.myscript.com'),
+															_0: A2(_elm_lang$html$Html_Attributes$attribute, 'scheme', 'https'),
 															_1: {
 																ctor: '::',
-																_0: _shohamh$learnmath_frontend$Page_AddQuestion$onExport(_shohamh$learnmath_frontend$Page_AddQuestion$MyScriptExport),
+																_0: A2(_elm_lang$html$Html_Attributes$attribute, 'host', 'cloud.myscript.com'),
 																_1: {
 																	ctor: '::',
-																	_0: A2(_elm_lang$html$Html_Attributes$attribute, 'applicationkey', '22bd37fa-2ee4-4bfd-98d9-137a39b81720'),
+																	_0: _shohamh$learnmath_frontend$Page_AddQuestion$onExport(_shohamh$learnmath_frontend$Page_AddQuestion$MyScriptExport),
 																	_1: {
 																		ctor: '::',
-																		_0: A2(_elm_lang$html$Html_Attributes$attribute, 'hmackey', 'b79d64ad-89ba-4eed-a302-dee159005446'),
-																		_1: {ctor: '[]'}
+																		_0: A2(_elm_lang$html$Html_Attributes$attribute, 'applicationkey', '22bd37fa-2ee4-4bfd-98d9-137a39b81720'),
+																		_1: {
+																			ctor: '::',
+																			_0: A2(_elm_lang$html$Html_Attributes$attribute, 'hmackey', 'b79d64ad-89ba-4eed-a302-dee159005446'),
+																			_1: {ctor: '[]'}
+																		}
 																	}
 																}
 															}
 														}
-													}
-												},
-												{ctor: '[]'});
-										}(),
-										_1: {
-											ctor: '::',
-											_0: _shohamh$learnmath_frontend$Page_AddQuestion$viewErrorMessages(model.errorMessages),
+													},
+													{ctor: '[]'});
+											}(),
 											_1: {
 												ctor: '::',
-												_0: A2(
-													_elm_lang$html$Html$button,
-													{
-														ctor: '::',
-														_0: _elm_lang$html$Html_Attributes$class('btn btn-lg btn-primary pull-xs-right'),
-														_1: {
+												_0: _shohamh$learnmath_frontend$Page_AddQuestion$viewErrorMessages(model.errorMessages),
+												_1: {
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$button,
+														{
 															ctor: '::',
-															_0: _elm_lang$html$Html_Events$onClick(_shohamh$learnmath_frontend$Page_AddQuestion$AddQuestion),
+															_0: _elm_lang$html$Html_Attributes$class('btn btn-lg btn-primary pull-xs-right'),
+															_1: {
+																ctor: '::',
+																_0: _elm_lang$html$Html_Events$onClick(_shohamh$learnmath_frontend$Page_AddQuestion$AddQuestion),
+																_1: {ctor: '[]'}
+															}
+														},
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html$text('Add Question'),
 															_1: {ctor: '[]'}
-														}
-													},
-													{
-														ctor: '::',
-														_0: _elm_lang$html$Html$text('Add Question'),
-														_1: {ctor: '[]'}
-													}),
-												_1: {ctor: '[]'}
+														}),
+													_1: {ctor: '[]'}
+												}
 											}
-										}
-									}),
-								_1: {ctor: '[]'}
-							}),
-						_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
 					}),
 				_1: {ctor: '[]'}
 			});
@@ -16162,6 +16506,18 @@ var _shohamh$learnmath_frontend$Page_Question$solquesEncoder = function (model) 
 			}
 		});
 };
+var _shohamh$learnmath_frontend$Page_Question$loadQuestionEncoder = function (sid) {
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'sid',
+				_1: _elm_lang$core$Json_Encode$string(sid)
+			},
+			_1: {ctor: '[]'}
+		});
+};
 var _shohamh$learnmath_frontend$Page_Question$model = {
 	successMessage: '',
 	errorMessages: {ctor: '[]'},
@@ -16222,6 +16578,23 @@ var _shohamh$learnmath_frontend$Page_Question$checkSolutionResponseDecoder = A3(
 			'success',
 			_elm_lang$core$Json_Decode$bool,
 			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_shohamh$learnmath_frontend$Page_Question$CheckSolutionResponseData))));
+var _shohamh$learnmath_frontend$Page_Question$LoadQuestionData = F3(
+	function (a, b, c) {
+		return {question: a, success: b, error_messages: c};
+	});
+var _shohamh$learnmath_frontend$Page_Question$loadQuestionRespDecoder = A3(
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+	'error_messages',
+	_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string),
+	A3(
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+		'success',
+		_elm_lang$core$Json_Decode$bool,
+		A3(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+			'problem',
+			_elm_lang$core$Json_Decode$string,
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_shohamh$learnmath_frontend$Page_Question$LoadQuestionData))));
 var _shohamh$learnmath_frontend$Page_Question$CheckSolutionResult = function (a) {
 	return {ctor: 'CheckSolutionResult', _0: a};
 };
@@ -16370,8 +16743,8 @@ var _shohamh$learnmath_frontend$Page_Question$loadQuestion = F2(
 		return A5(
 			_shohamh$learnmath_frontend$Util$httpPost,
 			'question',
-			_shohamh$learnmath_frontend$Page_Question$questionFromModel(model),
-			_shohamh$learnmath_frontend$Page_Question$questionEncoder,
+			_shohamh$learnmath_frontend$Data_Session$getSid(session),
+			_shohamh$learnmath_frontend$Page_Question$loadQuestionEncoder,
 			_shohamh$learnmath_frontend$Page_Question$loadQuestionResponseDecoder,
 			_shohamh$learnmath_frontend$Page_Question$LoadQuestionResult);
 	});
@@ -17469,7 +17842,10 @@ var _shohamh$learnmath_frontend$Main$setRoute = F2(
 								pageState: _shohamh$learnmath_frontend$Main$Loaded(
 									_shohamh$learnmath_frontend$Main$AddQuestion(_shohamh$learnmath_frontend$Page_AddQuestion$model))
 							}),
-						_elm_lang$core$Platform_Cmd$none);
+						A2(
+							_elm_lang$core$Platform_Cmd$map,
+							_shohamh$learnmath_frontend$Main$AddQuestionMsg,
+							A2(_shohamh$learnmath_frontend$Page_AddQuestion$loadCurriculumsAndSubjects, model.session, _shohamh$learnmath_frontend$Page_AddQuestion$model)));
 				case 'Login':
 					return A2(
 						_shohamh$learnmath_frontend$Util_ops['=>'],
@@ -17763,7 +18139,7 @@ var _shohamh$learnmath_frontend$Main$main = A2(
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};
 if (typeof _shohamh$learnmath_frontend$Main$main !== 'undefined') {
-    _shohamh$learnmath_frontend$Main$main(Elm['Main'], 'Main', {"types":{"unions":{"Dict.LeafColor":{"args":[],"tags":{"LBBlack":[],"LBlack":[]}},"Data.User.Username":{"args":[],"tags":{"Username":["String"]}},"Page.AddQuestion.Msg":{"args":[],"tags":{"AddQuestion":[],"MyScriptExport":["String"],"AddQuestionResult":["Result.Result Http.Error Page.AddQuestion.ResponseData"]}},"Data.User.Role":{"args":[],"tags":{"Teacher":[],"Student":[]}},"Data.AuthToken.AuthToken":{"args":[],"tags":{"AuthToken":["String"]}},"Dict.Dict":{"args":["k","v"],"tags":{"RBNode_elm_builtin":["Dict.NColor","k","v","Dict.Dict k v","Dict.Dict k v"],"RBEmpty_elm_builtin":["Dict.LeafColor"]}},"Route.Route":{"args":[],"tags":{"AddQuestion":[],"Home":[],"Logout":[],"TeacherDashboard":[],"Register":[],"Dashboard":["Data.User.Username"],"Login":[],"Question":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Page.Dashboard.Msg":{"args":[],"tags":{"NoOp":[]}},"Main.Msg":{"args":[],"tags":{"QuestionMsg":["Page.Question.Msg"],"LoginMsg":["Page.Login.Msg"],"HomeLoaded":["Result.Result Page.Errored.PageLoadError Page.Home.Model"],"SetUser":["Maybe.Maybe Data.User.User"],"SetRoute":["Maybe.Maybe Route.Route"],"HomeMsg":["Page.Home.Msg"],"AddQuestionMsg":["Page.AddQuestion.Msg"],"TeacherDashboardMsg":["Page.TeacherDashboard.Msg"],"DashboardMsg":["Page.Dashboard.Msg"],"RegisterMsg":["Page.Register.Msg"]}},"Page.Question.Msg":{"args":[],"tags":{"MyScriptConvert":["String"],"CheckSolution":[],"MyScriptExport":["String"],"CheckSolutionResult":["Result.Result Http.Error Page.Question.CheckSolutionResponseData"],"LoadQuestionResult":["Result.Result Http.Error Page.Question.LoadQuestionResponseData"]}},"Page.Errored.PageLoadError":{"args":[],"tags":{"PageLoadError":["Page.Errored.Model"]}},"Dict.NColor":{"args":[],"tags":{"BBlack":[],"Red":[],"NBlack":[],"Black":[]}},"Page.TeacherDashboard.Msg":{"args":[],"tags":{"NoOp":[]}},"Views.Page.ActivePage":{"args":[],"tags":{"Other":[],"AddQuestion":[],"Home":[],"TeacherDashboard":[],"Register":[],"Dashboard":["Data.User.Username"],"Login":[],"Question":[]}},"Page.Home.Msg":{"args":[],"tags":{"NoOp":[]}},"Page.Register.Msg":{"args":[],"tags":{"SetPasswordAgain":["String"],"RegisterResult":["Result.Result Http.Error Page.Register.ResponseData"],"Register":[],"SetUsername":["String"],"SetUserRole":["Data.User.Role"],"SetPassword":["String"],"SetEmail":["String"]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String"],"NetworkError":[],"Timeout":[],"BadStatus":["Http.Response String"],"BadPayload":["String","Http.Response String"]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}},"Page.Login.Msg":{"args":[],"tags":{"SetUsername":["String"],"Submit":[],"SubmitResult":["Result.Result Http.Error Page.Login.ResponseData"],"SetPassword":["String"]}}},"aliases":{"Page.AddQuestion.ResponseData":{"args":[],"type":"{ success : Bool, error_messages : List String }"},"Http.Response":{"args":["body"],"type":"{ url : String , status : { code : Int, message : String } , headers : Dict.Dict String String , body : body }"},"Page.Errored.Model":{"args":[],"type":"{ activePage : Views.Page.ActivePage, errorMessage : String }"},"Page.Home.Model":{"args":[],"type":"{}"},"Page.Question.LoadQuestionResponseData":{"args":[],"type":"{ success : Bool, error_messages : List String, problem : String }"},"Data.User.User":{"args":[],"type":"{ email : String , token : Data.AuthToken.AuthToken , username : Data.User.Username , role : Data.User.Role }"},"Page.Login.ResponseData":{"args":[],"type":"{ success : Bool , user : Data.User.User , error_messages : List String }"},"Page.Register.ResponseData":{"args":[],"type":"{ success : Bool, errorMessages : List String }"},"Page.Question.CheckSolutionResponseData":{"args":[],"type":"{ success : Bool, error_messages : List String, correct : Bool }"}},"message":"Main.Msg"},"versions":{"elm":"0.18.0"}});
+    _shohamh$learnmath_frontend$Main$main(Elm['Main'], 'Main', {"types":{"unions":{"Dict.LeafColor":{"args":[],"tags":{"LBBlack":[],"LBlack":[]}},"Data.User.Username":{"args":[],"tags":{"Username":["String"]}},"Page.AddQuestion.Msg":{"args":[],"tags":{"AddQuestion":[],"MyScriptExport":["String"],"SelectSubjects":["List String"],"SelectCurriculum":["String"],"LoadSubjectsInCurriculums":["Result.Result Http.Error Page.AddQuestion.SubjectsInCurriculums"],"AddQuestionResult":["Result.Result Http.Error Page.AddQuestion.ResponseData"]}},"Data.User.Role":{"args":[],"tags":{"Teacher":[],"Student":[]}},"Data.AuthToken.AuthToken":{"args":[],"tags":{"AuthToken":["String"]}},"Dict.Dict":{"args":["k","v"],"tags":{"RBNode_elm_builtin":["Dict.NColor","k","v","Dict.Dict k v","Dict.Dict k v"],"RBEmpty_elm_builtin":["Dict.LeafColor"]}},"Route.Route":{"args":[],"tags":{"AddQuestion":[],"Home":[],"Logout":[],"TeacherDashboard":[],"Register":[],"Dashboard":["Data.User.Username"],"Login":[],"Question":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Page.Dashboard.Msg":{"args":[],"tags":{"NoOp":[]}},"Main.Msg":{"args":[],"tags":{"QuestionMsg":["Page.Question.Msg"],"LoginMsg":["Page.Login.Msg"],"HomeLoaded":["Result.Result Page.Errored.PageLoadError Page.Home.Model"],"SetUser":["Maybe.Maybe Data.User.User"],"SetRoute":["Maybe.Maybe Route.Route"],"HomeMsg":["Page.Home.Msg"],"AddQuestionMsg":["Page.AddQuestion.Msg"],"TeacherDashboardMsg":["Page.TeacherDashboard.Msg"],"DashboardMsg":["Page.Dashboard.Msg"],"RegisterMsg":["Page.Register.Msg"]}},"Page.Question.Msg":{"args":[],"tags":{"MyScriptConvert":["String"],"CheckSolution":[],"MyScriptExport":["String"],"CheckSolutionResult":["Result.Result Http.Error Page.Question.CheckSolutionResponseData"],"LoadQuestionResult":["Result.Result Http.Error Page.Question.LoadQuestionResponseData"]}},"Page.Errored.PageLoadError":{"args":[],"tags":{"PageLoadError":["Page.Errored.Model"]}},"Dict.NColor":{"args":[],"tags":{"BBlack":[],"Red":[],"NBlack":[],"Black":[]}},"Page.TeacherDashboard.Msg":{"args":[],"tags":{"NoOp":[]}},"Views.Page.ActivePage":{"args":[],"tags":{"Other":[],"AddQuestion":[],"Home":[],"TeacherDashboard":[],"Register":[],"Dashboard":["Data.User.Username"],"Login":[],"Question":[]}},"Page.Home.Msg":{"args":[],"tags":{"NoOp":[]}},"Page.Register.Msg":{"args":[],"tags":{"SetPasswordAgain":["String"],"RegisterResult":["Result.Result Http.Error Page.Register.ResponseData"],"Register":[],"SetUsername":["String"],"SetUserRole":["Data.User.Role"],"SetPassword":["String"],"SetEmail":["String"]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String"],"NetworkError":[],"Timeout":[],"BadStatus":["Http.Response String"],"BadPayload":["String","Http.Response String"]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}},"Page.Login.Msg":{"args":[],"tags":{"SetUsername":["String"],"Submit":[],"SubmitResult":["Result.Result Http.Error Page.Login.ResponseData"],"SetPassword":["String"]}}},"aliases":{"Page.AddQuestion.ResponseData":{"args":[],"type":"{ success : Bool, error_messages : List String }"},"Page.AddQuestion.SubjectsInCurriculums":{"args":[],"type":"{ subjectsInCurriculums : Dict.Dict String (List String) , success : Bool , error_messages : List String }"},"Http.Response":{"args":["body"],"type":"{ url : String , status : { code : Int, message : String } , headers : Dict.Dict String String , body : body }"},"Page.Errored.Model":{"args":[],"type":"{ activePage : Views.Page.ActivePage, errorMessage : String }"},"Page.Home.Model":{"args":[],"type":"{}"},"Page.Question.LoadQuestionResponseData":{"args":[],"type":"{ success : Bool, error_messages : List String, problem : String }"},"Data.User.User":{"args":[],"type":"{ email : String , token : Data.AuthToken.AuthToken , username : Data.User.Username , role : Data.User.Role }"},"Page.Login.ResponseData":{"args":[],"type":"{ success : Bool , user : Data.User.User , error_messages : List String }"},"Page.Register.ResponseData":{"args":[],"type":"{ success : Bool, errorMessages : List String }"},"Page.Question.CheckSolutionResponseData":{"args":[],"type":"{ success : Bool, error_messages : List String, correct : Bool }"}},"message":"Main.Msg"},"versions":{"elm":"0.18.0"}});
 }
 
 if (typeof define === "function" && define['amd'])

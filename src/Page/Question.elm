@@ -160,7 +160,29 @@ type alias CheckSolutionResponseData =
 
 loadQuestion : Session -> Model -> Cmd Msg
 loadQuestion session model =
-    httpPost "question" (questionFromModel model) questionEncoder loadQuestionResponseDecoder LoadQuestionResult
+    httpPost "question" (Session.getSid session) loadQuestionEncoder loadQuestionResponseDecoder LoadQuestionResult
+
+
+loadQuestionEncoder : String -> JE.Value
+loadQuestionEncoder sid =
+    JE.object
+        [ ( "sid", JE.string sid )
+        ]
+
+
+type alias LoadQuestionData =
+    { question : String
+    , success : Bool
+    , error_messages : List String
+    }
+
+
+loadQuestionRespDecoder : Decoder LoadQuestionData
+loadQuestionRespDecoder =
+    JDP.decode LoadQuestionData
+        |> JDP.required "problem" JD.string
+        |> JDP.required "success" JD.bool
+        |> JDP.required "error_messages" (JD.list JD.string)
 
 
 checkSolution : Session -> Model -> Cmd Msg

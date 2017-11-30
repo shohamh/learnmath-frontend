@@ -1,4 +1,4 @@
-module Data.AuthToken exposing (AuthToken, decoder, encode, withAuthorization)
+module Data.AuthToken exposing (AuthToken, decoder, encode, toString, withAuthorization)
 
 import HttpBuilder exposing (RequestBuilder, withHeader)
 import Json.Decode as Decode exposing (Decoder)
@@ -7,6 +7,11 @@ import Json.Encode as Encode exposing (Value)
 
 type AuthToken
     = AuthToken String
+
+
+toString : AuthToken -> String
+toString (AuthToken token) =
+    token
 
 
 encode : AuthToken -> Value

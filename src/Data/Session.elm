@@ -1,4 +1,4 @@
-module Data.Session exposing (Session, attempt)
+module Data.Session exposing (Session, attempt, getSid)
 
 import Data.AuthToken exposing (AuthToken)
 import Data.User as User exposing (User)
@@ -7,6 +7,16 @@ import Util exposing ((=>))
 
 type alias Session =
     { user : Maybe User }
+
+
+getSid : Session -> String
+getSid session =
+    case session.user of
+        Just user ->
+            Data.AuthToken.toString user.token
+
+        Nothing ->
+            ""
 
 
 attempt : String -> (AuthToken -> Cmd msg) -> Session -> ( List String, Cmd msg )

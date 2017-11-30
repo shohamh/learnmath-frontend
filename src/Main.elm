@@ -111,7 +111,7 @@ setRoute maybeRoute model =
             { model | pageState = Loaded (Question Question.model) } => Cmd.map QuestionMsg (Question.loadQuestion model.session Question.model)
 
         Just Route.AddQuestion ->
-            { model | pageState = Loaded (AddQuestion AddQuestion.model) } => Cmd.none
+            { model | pageState = Loaded (AddQuestion AddQuestion.model) } => Cmd.map AddQuestionMsg (AddQuestion.loadCurriculumsAndSubjects model.session AddQuestion.model)
 
         Just Route.Login ->
             { model | pageState = Loaded (Login Login.model) } => Cmd.none

@@ -1,7 +1,8 @@
 module Page.AddQuestion exposing (..)
 
+import Data.AuthToken
 import Data.Session as Session exposing (Session)
-import Data.User as User
+import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -9,6 +10,7 @@ import Http
 import Json.Decode as JD exposing (..)
 import Json.Decode.Pipeline as JDP exposing (decode, required)
 import Json.Encode as JE exposing (..)
+import MultiSelect exposing (multiSelect)
 import Util exposing ((=>), httpPost)
 
 
@@ -16,6 +18,10 @@ type alias Model =
     { successMessage : String
     , errorMessages : List String
     , lastExport : String
+    , curriculums : List String
+    , selectedCurriculum : String
+    , selectedSubjects : List String
+    , subjectsInCurriculums : Dict String (List String)
     }
 
 
@@ -24,13 +30,20 @@ model =
     { successMessage = ""
     , errorMessages = []
     , lastExport = ""
+    , curriculums = []
+    , selectedCurriculum = ""
+    , selectedSubjects = []
+    , subjectsInCurriculums = Dict.empty
     }
 
 
 type Msg
     = MyScriptExport String
+    | SelectCurriculum String
+    | SelectSubjects (List String)
     | AddQuestion
     | AddQuestionResult (Result Http.Error ResponseData)
+    | LoadSubjectsInCurriculums (Result Http.Error SubjectsInCurriculums)
 
 
 update : Session -> Msg -> Model -> ( Model, Cmd Msg )
@@ -39,6 +52,12 @@ update session msg model =
         MyScriptExport str ->
             { model | lastExport = Debug.log "latestExport" str }
                 ! []
+
+        SelectCurriculum str ->
+            { model | selectedCurriculum = str } ! []
+
+        SelectSubjects strList ->
+            { model | selectedSubjects = strList } ! []
 
         AddQuestion ->
             model ! [ addQuestion session model ]
@@ -76,6 +95,36 @@ update session msg model =
                     model
             in
             newModel => Cmd.none
+
+        LoadSubjectsInCurriculums (Ok resp) ->
+            { model | curriculums = Dict.keys resp.subjectsInCurriculums, subjectsInCurriculums = resp.subjectsInCurriculums } ! []
+
+        LoadSubjectsInCurriculums (Err httpError) ->
+            let
+                errorMessage =
+                    case httpError of
+                        Http.BadUrl str ->
+                            "Bad url: " ++ str
+
+                        Http.Timeout ->
+                            "Request timed out."
+
+                        Http.NetworkError ->
+                            "Network error (no connectivity)."
+
+                        Http.BadStatus response ->
+                            "Bad status code returned: " ++ Basics.toString response.status.code
+
+                        Http.BadPayload debug_str response ->
+                            "JSON decoding of response failed: " ++ debug_str
+            in
+            { model
+                | errorMessages =
+                    List.append model.errorMessages
+                        [ errorMessage
+                        ]
+            }
+                => Cmd.none
 
 
 type alias Question =
@@ -115,15 +164,50 @@ addQuestionRequestEncoder : ( Session, Model ) -> JE.Value
 addQuestionRequestEncoder ( session, model ) =
     JE.object
         [ ( "question", questionEncoder (questionFromModel model) )
-        , ( "user"
+        , ( "sid"
           , case session.user of
                 Just user ->
-                    User.encode user
+                    Data.AuthToken.encode user.token
 
                 Nothing ->
                     JE.null
           )
+        , ( "subjects", JE.list (List.map JE.string model.selectedSubjects) )
         ]
+
+
+loadCurriculumsAndSubjects : Session -> Model -> Cmd Msg
+loadCurriculumsAndSubjects session model =
+    let
+        sid =
+            case session.user of
+                Just user ->
+                    Data.AuthToken.toString user.token
+
+                Nothing ->
+                    ""
+    in
+    httpPost "subjects_in_all_curriculums" sid loadCurriculumsAndSubjectsEncoder loadCursAndSubjectsRespDecoder LoadSubjectsInCurriculums
+
+
+loadCurriculumsAndSubjectsEncoder : String -> JE.Value
+loadCurriculumsAndSubjectsEncoder sid =
+    JE.object [ ( "sid", JE.string sid ) ]
+
+
+type alias SubjectsInCurriculums =
+    { subjectsInCurriculums : Dict String (List String)
+    , success : Bool
+    , error_messages : List String
+    }
+
+
+loadCursAndSubjectsRespDecoder : Decoder SubjectsInCurriculums
+loadCursAndSubjectsRespDecoder =
+    JDP.decode SubjectsInCurriculums
+        |> JDP.required "subjects_in_curriculums" (JD.dict (JD.list JD.string))
+        |> JDP.required "success" JD.bool
+        |> JDP.required "error_messages" (JD.list JD.string)
 
 
 responseDecoder : Decoder ResponseData
@@ -148,7 +232,28 @@ view session model =
     div [ class "add-question-page" ]
         [ div [ class "container page" ]
             [ div [ class "row" ]
-                [ div [ class "col-md-6 offset-md-3 col-xs-12" ]
+                [ text "Curriculum:"
+                , select [ onInput SelectCurriculum ] (List.map (\x -> option [] [ text x ]) model.curriculums)
+                , text "Pick subjects (Hold Ctrl to select multiple subjects) this question fits in:"
+                , let
+                    items =
+                        case Dict.get model.selectedCurriculum model.subjectsInCurriculums of
+                            Just list ->
+                                list
+
+                            Nothing ->
+                                []
+                  in
+                  multiSelect
+                    (MultiSelect.Options
+                        (List.map (\x -> MultiSelect.Item x x True) items)
+                        SelectSubjects
+                    )
+                    []
+                    model.selectedSubjects
+                ]
+            , div [ class "row" ]
+                [ div [ class "col-md-10 offset-md-1 col-xs-12" ]
                     [ let
                         mimetypes =
                             [ "application/x-latex", "application/mathml+xml" ]
