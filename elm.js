@@ -14414,6 +14414,24 @@ var _shohamh$learnmath_frontend$Data_User$decoder = A3(
 				_elm_lang$core$Json_Decode$string,
 				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_shohamh$learnmath_frontend$Data_User$User)))));
 
+var _shohamh$learnmath_frontend$Util$httpErrorToString = function (httpError) {
+	var _p0 = httpError;
+	switch (_p0.ctor) {
+		case 'BadUrl':
+			return A2(_elm_lang$core$Basics_ops['++'], 'Bad url: ', _p0._0);
+		case 'Timeout':
+			return 'Request timed out.';
+		case 'NetworkError':
+			return 'Network error (no connectivity).';
+		case 'BadStatus':
+			return A2(
+				_elm_lang$core$Basics_ops['++'],
+				'Bad status code returned: ',
+				_elm_lang$core$Basics$toString(_p0._0.status.code));
+		default:
+			return A2(_elm_lang$core$Basics_ops['++'], 'JSON decoding of response failed: ', _p0._0);
+	}
+};
 var _shohamh$learnmath_frontend$Util$httpPost = F5(
 	function (endpoint, payload, payloadEncoder, responseDecoder, responseMsg) {
 		var body = _elm_lang$http$Http$jsonBody(
@@ -16462,47 +16480,43 @@ var _shohamh$learnmath_frontend$Page_Question$viewErrorMessages = function (erro
 				{ctor: '[]'}),
 			A2(_elm_lang$core$List$map, _elm_lang$html$Html$text, errorMessages)));
 };
-var _shohamh$learnmath_frontend$Page_Question$questionEncoder = function (question) {
+var _shohamh$learnmath_frontend$Page_Question$checkSolutionEncoder = function (_p0) {
+	var _p1 = _p0;
+	var _p2 = _p1._1;
 	return _elm_lang$core$Json_Encode$object(
 		{
 			ctor: '::',
 			_0: {
 				ctor: '_Tuple2',
-				_0: 'mathml',
-				_1: _elm_lang$core$Json_Encode$string(question.mathml)
-			},
-			_1: {ctor: '[]'}
-		});
-};
-var _shohamh$learnmath_frontend$Page_Question$solutionEncoder = function (solution) {
-	return _elm_lang$core$Json_Encode$object(
-		{
-			ctor: '::',
-			_0: {
-				ctor: '_Tuple2',
-				_0: 'solution',
-				_1: _elm_lang$core$Json_Encode$string(solution.mathml)
-			},
-			_1: {ctor: '[]'}
-		});
-};
-var _shohamh$learnmath_frontend$Page_Question$solquesEncoder = function (model) {
-	return _elm_lang$core$Json_Encode$object(
-		{
-			ctor: '::',
-			_0: {
-				ctor: '_Tuple2',
-				_0: 'solutions',
-				_1: _elm_lang$core$Json_Encode$string(model.lastExport)
+				_0: 'sid',
+				_1: _elm_lang$core$Json_Encode$string(
+					_shohamh$learnmath_frontend$Data_Session$getSid(_p1._0))
 			},
 			_1: {
 				ctor: '::',
 				_0: {
 					ctor: '_Tuple2',
 					_0: 'question',
-					_1: _elm_lang$core$Json_Encode$string(model.question)
+					_1: _elm_lang$core$Json_Encode$string(_p2.question)
 				},
-				_1: {ctor: '[]'}
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'solutions',
+						_1: _elm_lang$core$Json_Encode$string(_p2.lastExport)
+					},
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'subjects',
+							_1: _elm_lang$core$Json_Encode$list(
+								A2(_elm_lang$core$List$map, _elm_lang$core$Json_Encode$string, _p2.subjects))
+						},
+						_1: {ctor: '[]'}
+					}
+				}
 			}
 		});
 };
@@ -16526,41 +16540,34 @@ var _shohamh$learnmath_frontend$Page_Question$model = {
 	lastConvert: '',
 	convertCount: 0,
 	question: '',
+	subjects: {ctor: '[]'},
 	isCorrect: _elm_lang$core$Maybe$Nothing
 };
-var _shohamh$learnmath_frontend$Page_Question$Model = F8(
-	function (a, b, c, d, e, f, g, h) {
-		return {successMessage: a, errorMessages: b, lastExport: c, exportCount: d, lastConvert: e, convertCount: f, question: g, isCorrect: h};
+var _shohamh$learnmath_frontend$Page_Question$Model = F9(
+	function (a, b, c, d, e, f, g, h, i) {
+		return {successMessage: a, errorMessages: b, lastExport: c, exportCount: d, lastConvert: e, convertCount: f, question: g, subjects: h, isCorrect: i};
 	});
-var _shohamh$learnmath_frontend$Page_Question$Question = function (a) {
-	return {mathml: a};
-};
-var _shohamh$learnmath_frontend$Page_Question$questionFromModel = function (model) {
-	return _shohamh$learnmath_frontend$Page_Question$Question(model.question);
-};
-var _shohamh$learnmath_frontend$Page_Question$Solution = function (a) {
-	return {mathml: a};
-};
-var _shohamh$learnmath_frontend$Page_Question$solutionFromModel = function (model) {
-	return _shohamh$learnmath_frontend$Page_Question$Solution(model.lastExport);
-};
-var _shohamh$learnmath_frontend$Page_Question$LoadQuestionResponseData = F3(
-	function (a, b, c) {
-		return {success: a, error_messages: b, problem: c};
+var _shohamh$learnmath_frontend$Page_Question$LoadQuestionResponseData = F4(
+	function (a, b, c, d) {
+		return {success: a, error_messages: b, problem: c, subjects: d};
 	});
 var _shohamh$learnmath_frontend$Page_Question$loadQuestionResponseDecoder = A3(
 	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-	'problem',
-	_elm_lang$core$Json_Decode$string,
+	'subjects',
+	_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string),
 	A3(
 		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-		'error_messages',
-		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string),
+		'problem',
+		_elm_lang$core$Json_Decode$string,
 		A3(
 			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-			'success',
-			_elm_lang$core$Json_Decode$bool,
-			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_shohamh$learnmath_frontend$Page_Question$LoadQuestionResponseData))));
+			'error_messages',
+			_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string),
+			A3(
+				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+				'success',
+				_elm_lang$core$Json_Decode$bool,
+				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_shohamh$learnmath_frontend$Page_Question$LoadQuestionResponseData)))));
 var _shohamh$learnmath_frontend$Page_Question$CheckSolutionResponseData = F3(
 	function (a, b, c) {
 		return {success: a, error_messages: b, correct: c};
@@ -16578,41 +16585,30 @@ var _shohamh$learnmath_frontend$Page_Question$checkSolutionResponseDecoder = A3(
 			'success',
 			_elm_lang$core$Json_Decode$bool,
 			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_shohamh$learnmath_frontend$Page_Question$CheckSolutionResponseData))));
-var _shohamh$learnmath_frontend$Page_Question$LoadQuestionData = F3(
-	function (a, b, c) {
-		return {question: a, success: b, error_messages: c};
-	});
-var _shohamh$learnmath_frontend$Page_Question$loadQuestionRespDecoder = A3(
-	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-	'error_messages',
-	_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string),
-	A3(
-		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-		'success',
-		_elm_lang$core$Json_Decode$bool,
-		A3(
-			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-			'problem',
-			_elm_lang$core$Json_Decode$string,
-			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_shohamh$learnmath_frontend$Page_Question$LoadQuestionData))));
 var _shohamh$learnmath_frontend$Page_Question$CheckSolutionResult = function (a) {
 	return {ctor: 'CheckSolutionResult', _0: a};
 };
 var _shohamh$learnmath_frontend$Page_Question$checkSolution = F2(
 	function (session, model) {
-		return A5(_shohamh$learnmath_frontend$Util$httpPost, 'check_solution', model, _shohamh$learnmath_frontend$Page_Question$solquesEncoder, _shohamh$learnmath_frontend$Page_Question$checkSolutionResponseDecoder, _shohamh$learnmath_frontend$Page_Question$CheckSolutionResult);
+		return A5(
+			_shohamh$learnmath_frontend$Util$httpPost,
+			'check_solution',
+			{ctor: '_Tuple2', _0: session, _1: model},
+			_shohamh$learnmath_frontend$Page_Question$checkSolutionEncoder,
+			_shohamh$learnmath_frontend$Page_Question$checkSolutionResponseDecoder,
+			_shohamh$learnmath_frontend$Page_Question$CheckSolutionResult);
 	});
 var _shohamh$learnmath_frontend$Page_Question$update = F3(
 	function (session, msg, model) {
-		var _p0 = msg;
-		switch (_p0.ctor) {
+		var _p3 = msg;
+		switch (_p3.ctor) {
 			case 'MyScriptExport':
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							lastExport: A2(_elm_lang$core$Debug$log, 'latestExport', _p0._0),
+							lastExport: A2(_elm_lang$core$Debug$log, 'latestExport', _p3._0),
 							exportCount: model.exportCount + 1
 						}),
 					{
@@ -16627,7 +16623,7 @@ var _shohamh$learnmath_frontend$Page_Question$update = F3(
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							lastConvert: A2(_elm_lang$core$Debug$log, 'latestConvert', _p0._0),
+							lastConvert: A2(_elm_lang$core$Debug$log, 'latestConvert', _p3._0),
 							convertCount: model.convertCount + 1
 						}),
 					{ctor: '[]'});
@@ -16641,25 +16637,8 @@ var _shohamh$learnmath_frontend$Page_Question$update = F3(
 						_1: {ctor: '[]'}
 					});
 			case 'CheckSolutionResult':
-				if (_p0._0.ctor === 'Err') {
-					var errorMessage = function () {
-						var _p1 = _p0._0._0;
-						switch (_p1.ctor) {
-							case 'BadUrl':
-								return A2(_elm_lang$core$Basics_ops['++'], 'Bad url: ', _p1._0);
-							case 'Timeout':
-								return 'Request timed out.';
-							case 'NetworkError':
-								return 'Network error (no connectivity).';
-							case 'BadStatus':
-								return A2(
-									_elm_lang$core$Basics_ops['++'],
-									'Bad status code returned: ',
-									_elm_lang$core$Basics$toString(_p1._0.status.code));
-							default:
-								return A2(_elm_lang$core$Basics_ops['++'], 'JSON decoding of response failed: ', _p1._0);
-						}
-					}();
+				if (_p3._0.ctor === 'Err') {
+					var errorMessage = _shohamh$learnmath_frontend$Util$httpErrorToString(_p3._0._0);
 					return A2(
 						_shohamh$learnmath_frontend$Util_ops['=>'],
 						_elm_lang$core$Native_Utils.update(
@@ -16676,37 +16655,20 @@ var _shohamh$learnmath_frontend$Page_Question$update = F3(
 							}),
 						_elm_lang$core$Platform_Cmd$none);
 				} else {
-					var _p2 = _p0._0._0;
+					var _p4 = _p3._0._0;
 					return A2(
 						_shohamh$learnmath_frontend$Util_ops['=>'],
 						_elm_lang$core$Native_Utils.update(
 							model,
 							{
-								isCorrect: _elm_lang$core$Maybe$Just(_p2.correct),
-								errorMessages: _p2.error_messages
+								isCorrect: _elm_lang$core$Maybe$Just(_p4.correct),
+								errorMessages: _p4.error_messages
 							}),
 						_elm_lang$core$Platform_Cmd$none);
 				}
 			default:
-				if (_p0._0.ctor === 'Err') {
-					var errorMessage = function () {
-						var _p3 = _p0._0._0;
-						switch (_p3.ctor) {
-							case 'BadUrl':
-								return A2(_elm_lang$core$Basics_ops['++'], 'Bad url: ', _p3._0);
-							case 'Timeout':
-								return 'Request timed out.';
-							case 'NetworkError':
-								return 'Network error (no connectivity).';
-							case 'BadStatus':
-								return A2(
-									_elm_lang$core$Basics_ops['++'],
-									'Bad status code returned: ',
-									_elm_lang$core$Basics$toString(_p3._0.status.code));
-							default:
-								return A2(_elm_lang$core$Basics_ops['++'], 'JSON decoding of response failed: ', _p3._0);
-						}
-					}();
+				if (_p3._0.ctor === 'Err') {
+					var errorMessage = _shohamh$learnmath_frontend$Util$httpErrorToString(_p3._0._0);
 					return A2(
 						_shohamh$learnmath_frontend$Util_ops['=>'],
 						_elm_lang$core$Native_Utils.update(
@@ -16723,9 +16685,10 @@ var _shohamh$learnmath_frontend$Page_Question$update = F3(
 							}),
 						_elm_lang$core$Platform_Cmd$none);
 				} else {
+					var _p5 = _p3._0._0;
 					var newModel = _elm_lang$core$Native_Utils.update(
 						model,
-						{question: _p0._0._0.problem});
+						{question: _p5.problem, subjects: _p5.subjects});
 					return A2(
 						_shohamh$learnmath_frontend$Util_ops['=>'],
 						newModel,
@@ -16784,67 +16747,27 @@ var _shohamh$learnmath_frontend$Page_Question$view = F2(
 							},
 							{
 								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$div,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('col-md-12'),
-										_1: {ctor: '[]'}
-									},
-									{
-										ctor: '::',
-										_0: function () {
-											var mimetypes = {
-												ctor: '::',
-												_0: 'application/x-latex',
-												_1: {
-													ctor: '::',
-													_0: 'application/mathml+xml',
-													_1: {ctor: '[]'}
-												}
-											};
-											var mimetypesEncoded = A2(
-												_elm_lang$core$Json_Encode$encode,
-												0,
-												_elm_lang$core$Json_Encode$list(
-													A2(_elm_lang$core$List$map, _elm_lang$core$Json_Encode$string, mimetypes)));
-											return A3(
-												_elm_lang$html$Html$node,
-												'myscript-math-web',
-												{
-													ctor: '::',
-													_0: A2(_elm_lang$html$Html_Attributes$attribute, 'mimetypes', mimetypesEncoded),
-													_1: {
+								_0: _elm_lang$html$Html$text('Question subjects:'),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$ul,
+										{ctor: '[]'},
+										A2(
+											_elm_lang$core$List$map,
+											function (x) {
+												return A2(
+													_elm_lang$html$Html$li,
+													{ctor: '[]'},
+													{
 														ctor: '::',
-														_0: A2(_elm_lang$html$Html_Attributes$attribute, 'scheme', 'https'),
-														_1: {
-															ctor: '::',
-															_0: A2(_elm_lang$html$Html_Attributes$attribute, 'host', 'cloud.myscript.com'),
-															_1: {
-																ctor: '::',
-																_0: _shohamh$learnmath_frontend$Page_Question$onExport(_shohamh$learnmath_frontend$Page_Question$MyScriptExport),
-																_1: {
-																	ctor: '::',
-																	_0: _shohamh$learnmath_frontend$Page_Question$onConvert(_shohamh$learnmath_frontend$Page_Question$MyScriptConvert),
-																	_1: {
-																		ctor: '::',
-																		_0: A2(_elm_lang$html$Html_Attributes$attribute, 'applicationkey', '22bd37fa-2ee4-4bfd-98d9-137a39b81720'),
-																		_1: {
-																			ctor: '::',
-																			_0: A2(_elm_lang$html$Html_Attributes$attribute, 'hmackey', 'b79d64ad-89ba-4eed-a302-dee159005446'),
-																			_1: {ctor: '[]'}
-																		}
-																	}
-																}
-															}
-														}
-													}
-												},
-												{ctor: '[]'});
-										}(),
-										_1: {ctor: '[]'}
-									}),
-								_1: {ctor: '[]'}
+														_0: _elm_lang$html$Html$text(x),
+														_1: {ctor: '[]'}
+													});
+											},
+											model.subjects)),
+									_1: {ctor: '[]'}
+								}
 							}),
 						_1: {
 							ctor: '::',
@@ -16866,59 +16789,133 @@ var _shohamh$learnmath_frontend$Page_Question$view = F2(
 										},
 										{
 											ctor: '::',
-											_0: _shohamh$learnmath_frontend$Page_Question$viewErrorMessages(model.errorMessages),
-											_1: {
-												ctor: '::',
-												_0: function () {
-													var _p4 = model.isCorrect;
-													if (_p4.ctor === 'Nothing') {
-														return A2(
-															_elm_lang$html$Html$div,
-															{ctor: '[]'},
-															{ctor: '[]'});
-													} else {
-														return A2(
-															_elm_lang$html$Html$div,
-															{ctor: '[]'},
-															{
-																ctor: '::',
-																_0: function () {
-																	var _p5 = _p4._0;
-																	if (_p5 === true) {
-																		return _elm_lang$html$Html$text('Correct! Good job!');
-																	} else {
-																		return _elm_lang$html$Html$text('Incorrect, check your work for mistakes and try again!');
-																	}
-																}(),
-																_1: {ctor: '[]'}
-															});
-													}
-												}(),
-												_1: {
+											_0: function () {
+												var mimetypes = {
 													ctor: '::',
-													_0: A2(
-														_elm_lang$html$Html$button,
-														{
+													_0: 'application/x-latex',
+													_1: {
+														ctor: '::',
+														_0: 'application/mathml+xml',
+														_1: {ctor: '[]'}
+													}
+												};
+												var mimetypesEncoded = A2(
+													_elm_lang$core$Json_Encode$encode,
+													0,
+													_elm_lang$core$Json_Encode$list(
+														A2(_elm_lang$core$List$map, _elm_lang$core$Json_Encode$string, mimetypes)));
+												return A3(
+													_elm_lang$html$Html$node,
+													'myscript-math-web',
+													{
+														ctor: '::',
+														_0: A2(_elm_lang$html$Html_Attributes$attribute, 'mimetypes', mimetypesEncoded),
+														_1: {
 															ctor: '::',
-															_0: _elm_lang$html$Html_Attributes$class('btn btn-lg btn-primary pull-xs-right'),
+															_0: A2(_elm_lang$html$Html_Attributes$attribute, 'scheme', 'https'),
 															_1: {
 																ctor: '::',
-																_0: _elm_lang$html$Html_Events$onClick(_shohamh$learnmath_frontend$Page_Question$CheckSolution),
-																_1: {ctor: '[]'}
+																_0: A2(_elm_lang$html$Html_Attributes$attribute, 'host', 'cloud.myscript.com'),
+																_1: {
+																	ctor: '::',
+																	_0: _shohamh$learnmath_frontend$Page_Question$onExport(_shohamh$learnmath_frontend$Page_Question$MyScriptExport),
+																	_1: {
+																		ctor: '::',
+																		_0: _shohamh$learnmath_frontend$Page_Question$onConvert(_shohamh$learnmath_frontend$Page_Question$MyScriptConvert),
+																		_1: {
+																			ctor: '::',
+																			_0: A2(_elm_lang$html$Html_Attributes$attribute, 'applicationkey', '22bd37fa-2ee4-4bfd-98d9-137a39b81720'),
+																			_1: {
+																				ctor: '::',
+																				_0: A2(_elm_lang$html$Html_Attributes$attribute, 'hmackey', 'b79d64ad-89ba-4eed-a302-dee159005446'),
+																				_1: {ctor: '[]'}
+																			}
+																		}
+																	}
+																}
 															}
-														},
-														{
-															ctor: '::',
-															_0: _elm_lang$html$Html$text('Check Solution'),
-															_1: {ctor: '[]'}
-														}),
-													_1: {ctor: '[]'}
-												}
-											}
+														}
+													},
+													{ctor: '[]'});
+											}(),
+											_1: {ctor: '[]'}
 										}),
 									_1: {ctor: '[]'}
 								}),
-							_1: {ctor: '[]'}
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$div,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('row'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$div,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$class('col-md-12'),
+												_1: {ctor: '[]'}
+											},
+											{
+												ctor: '::',
+												_0: _shohamh$learnmath_frontend$Page_Question$viewErrorMessages(model.errorMessages),
+												_1: {
+													ctor: '::',
+													_0: function () {
+														var _p6 = model.isCorrect;
+														if (_p6.ctor === 'Nothing') {
+															return A2(
+																_elm_lang$html$Html$div,
+																{ctor: '[]'},
+																{ctor: '[]'});
+														} else {
+															return A2(
+																_elm_lang$html$Html$div,
+																{ctor: '[]'},
+																{
+																	ctor: '::',
+																	_0: function () {
+																		var _p7 = _p6._0;
+																		if (_p7 === true) {
+																			return _elm_lang$html$Html$text('Correct! Good job!');
+																		} else {
+																			return _elm_lang$html$Html$text('Incorrect, check your work for mistakes and try again!');
+																		}
+																	}(),
+																	_1: {ctor: '[]'}
+																});
+														}
+													}(),
+													_1: {
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$button,
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$class('btn btn-lg btn-primary pull-xs-right'),
+																_1: {
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Events$onClick(_shohamh$learnmath_frontend$Page_Question$CheckSolution),
+																	_1: {ctor: '[]'}
+																}
+															},
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html$text('Check Solution'),
+																_1: {ctor: '[]'}
+															}),
+														_1: {ctor: '[]'}
+													}
+												}
+											}),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}
 						}
 					}),
 				_1: {ctor: '[]'}
@@ -18139,7 +18136,7 @@ var _shohamh$learnmath_frontend$Main$main = A2(
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};
 if (typeof _shohamh$learnmath_frontend$Main$main !== 'undefined') {
-    _shohamh$learnmath_frontend$Main$main(Elm['Main'], 'Main', {"types":{"unions":{"Dict.LeafColor":{"args":[],"tags":{"LBBlack":[],"LBlack":[]}},"Data.User.Username":{"args":[],"tags":{"Username":["String"]}},"Page.AddQuestion.Msg":{"args":[],"tags":{"AddQuestion":[],"MyScriptExport":["String"],"SelectSubjects":["List String"],"SelectCurriculum":["String"],"LoadSubjectsInCurriculums":["Result.Result Http.Error Page.AddQuestion.SubjectsInCurriculums"],"AddQuestionResult":["Result.Result Http.Error Page.AddQuestion.ResponseData"]}},"Data.User.Role":{"args":[],"tags":{"Teacher":[],"Student":[]}},"Data.AuthToken.AuthToken":{"args":[],"tags":{"AuthToken":["String"]}},"Dict.Dict":{"args":["k","v"],"tags":{"RBNode_elm_builtin":["Dict.NColor","k","v","Dict.Dict k v","Dict.Dict k v"],"RBEmpty_elm_builtin":["Dict.LeafColor"]}},"Route.Route":{"args":[],"tags":{"AddQuestion":[],"Home":[],"Logout":[],"TeacherDashboard":[],"Register":[],"Dashboard":["Data.User.Username"],"Login":[],"Question":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Page.Dashboard.Msg":{"args":[],"tags":{"NoOp":[]}},"Main.Msg":{"args":[],"tags":{"QuestionMsg":["Page.Question.Msg"],"LoginMsg":["Page.Login.Msg"],"HomeLoaded":["Result.Result Page.Errored.PageLoadError Page.Home.Model"],"SetUser":["Maybe.Maybe Data.User.User"],"SetRoute":["Maybe.Maybe Route.Route"],"HomeMsg":["Page.Home.Msg"],"AddQuestionMsg":["Page.AddQuestion.Msg"],"TeacherDashboardMsg":["Page.TeacherDashboard.Msg"],"DashboardMsg":["Page.Dashboard.Msg"],"RegisterMsg":["Page.Register.Msg"]}},"Page.Question.Msg":{"args":[],"tags":{"MyScriptConvert":["String"],"CheckSolution":[],"MyScriptExport":["String"],"CheckSolutionResult":["Result.Result Http.Error Page.Question.CheckSolutionResponseData"],"LoadQuestionResult":["Result.Result Http.Error Page.Question.LoadQuestionResponseData"]}},"Page.Errored.PageLoadError":{"args":[],"tags":{"PageLoadError":["Page.Errored.Model"]}},"Dict.NColor":{"args":[],"tags":{"BBlack":[],"Red":[],"NBlack":[],"Black":[]}},"Page.TeacherDashboard.Msg":{"args":[],"tags":{"NoOp":[]}},"Views.Page.ActivePage":{"args":[],"tags":{"Other":[],"AddQuestion":[],"Home":[],"TeacherDashboard":[],"Register":[],"Dashboard":["Data.User.Username"],"Login":[],"Question":[]}},"Page.Home.Msg":{"args":[],"tags":{"NoOp":[]}},"Page.Register.Msg":{"args":[],"tags":{"SetPasswordAgain":["String"],"RegisterResult":["Result.Result Http.Error Page.Register.ResponseData"],"Register":[],"SetUsername":["String"],"SetUserRole":["Data.User.Role"],"SetPassword":["String"],"SetEmail":["String"]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String"],"NetworkError":[],"Timeout":[],"BadStatus":["Http.Response String"],"BadPayload":["String","Http.Response String"]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}},"Page.Login.Msg":{"args":[],"tags":{"SetUsername":["String"],"Submit":[],"SubmitResult":["Result.Result Http.Error Page.Login.ResponseData"],"SetPassword":["String"]}}},"aliases":{"Page.AddQuestion.ResponseData":{"args":[],"type":"{ success : Bool, error_messages : List String }"},"Page.AddQuestion.SubjectsInCurriculums":{"args":[],"type":"{ subjectsInCurriculums : Dict.Dict String (List String) , success : Bool , error_messages : List String }"},"Http.Response":{"args":["body"],"type":"{ url : String , status : { code : Int, message : String } , headers : Dict.Dict String String , body : body }"},"Page.Errored.Model":{"args":[],"type":"{ activePage : Views.Page.ActivePage, errorMessage : String }"},"Page.Home.Model":{"args":[],"type":"{}"},"Page.Question.LoadQuestionResponseData":{"args":[],"type":"{ success : Bool, error_messages : List String, problem : String }"},"Data.User.User":{"args":[],"type":"{ email : String , token : Data.AuthToken.AuthToken , username : Data.User.Username , role : Data.User.Role }"},"Page.Login.ResponseData":{"args":[],"type":"{ success : Bool , user : Data.User.User , error_messages : List String }"},"Page.Register.ResponseData":{"args":[],"type":"{ success : Bool, errorMessages : List String }"},"Page.Question.CheckSolutionResponseData":{"args":[],"type":"{ success : Bool, error_messages : List String, correct : Bool }"}},"message":"Main.Msg"},"versions":{"elm":"0.18.0"}});
+    _shohamh$learnmath_frontend$Main$main(Elm['Main'], 'Main', {"types":{"unions":{"Dict.LeafColor":{"args":[],"tags":{"LBBlack":[],"LBlack":[]}},"Data.User.Username":{"args":[],"tags":{"Username":["String"]}},"Page.AddQuestion.Msg":{"args":[],"tags":{"AddQuestion":[],"MyScriptExport":["String"],"SelectSubjects":["List String"],"SelectCurriculum":["String"],"LoadSubjectsInCurriculums":["Result.Result Http.Error Page.AddQuestion.SubjectsInCurriculums"],"AddQuestionResult":["Result.Result Http.Error Page.AddQuestion.ResponseData"]}},"Data.User.Role":{"args":[],"tags":{"Teacher":[],"Student":[]}},"Data.AuthToken.AuthToken":{"args":[],"tags":{"AuthToken":["String"]}},"Dict.Dict":{"args":["k","v"],"tags":{"RBNode_elm_builtin":["Dict.NColor","k","v","Dict.Dict k v","Dict.Dict k v"],"RBEmpty_elm_builtin":["Dict.LeafColor"]}},"Route.Route":{"args":[],"tags":{"AddQuestion":[],"Home":[],"Logout":[],"TeacherDashboard":[],"Register":[],"Dashboard":["Data.User.Username"],"Login":[],"Question":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Page.Dashboard.Msg":{"args":[],"tags":{"NoOp":[]}},"Main.Msg":{"args":[],"tags":{"QuestionMsg":["Page.Question.Msg"],"LoginMsg":["Page.Login.Msg"],"HomeLoaded":["Result.Result Page.Errored.PageLoadError Page.Home.Model"],"SetUser":["Maybe.Maybe Data.User.User"],"SetRoute":["Maybe.Maybe Route.Route"],"HomeMsg":["Page.Home.Msg"],"AddQuestionMsg":["Page.AddQuestion.Msg"],"TeacherDashboardMsg":["Page.TeacherDashboard.Msg"],"DashboardMsg":["Page.Dashboard.Msg"],"RegisterMsg":["Page.Register.Msg"]}},"Page.Question.Msg":{"args":[],"tags":{"MyScriptConvert":["String"],"CheckSolution":[],"MyScriptExport":["String"],"CheckSolutionResult":["Result.Result Http.Error Page.Question.CheckSolutionResponseData"],"LoadQuestionResult":["Result.Result Http.Error Page.Question.LoadQuestionResponseData"]}},"Page.Errored.PageLoadError":{"args":[],"tags":{"PageLoadError":["Page.Errored.Model"]}},"Dict.NColor":{"args":[],"tags":{"BBlack":[],"Red":[],"NBlack":[],"Black":[]}},"Page.TeacherDashboard.Msg":{"args":[],"tags":{"NoOp":[]}},"Views.Page.ActivePage":{"args":[],"tags":{"Other":[],"AddQuestion":[],"Home":[],"TeacherDashboard":[],"Register":[],"Dashboard":["Data.User.Username"],"Login":[],"Question":[]}},"Page.Home.Msg":{"args":[],"tags":{"NoOp":[]}},"Page.Register.Msg":{"args":[],"tags":{"SetPasswordAgain":["String"],"RegisterResult":["Result.Result Http.Error Page.Register.ResponseData"],"Register":[],"SetUsername":["String"],"SetUserRole":["Data.User.Role"],"SetPassword":["String"],"SetEmail":["String"]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String"],"NetworkError":[],"Timeout":[],"BadStatus":["Http.Response String"],"BadPayload":["String","Http.Response String"]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}},"Page.Login.Msg":{"args":[],"tags":{"SetUsername":["String"],"Submit":[],"SubmitResult":["Result.Result Http.Error Page.Login.ResponseData"],"SetPassword":["String"]}}},"aliases":{"Page.AddQuestion.ResponseData":{"args":[],"type":"{ success : Bool, error_messages : List String }"},"Page.AddQuestion.SubjectsInCurriculums":{"args":[],"type":"{ subjectsInCurriculums : Dict.Dict String (List String) , success : Bool , error_messages : List String }"},"Http.Response":{"args":["body"],"type":"{ url : String , status : { code : Int, message : String } , headers : Dict.Dict String String , body : body }"},"Page.Errored.Model":{"args":[],"type":"{ activePage : Views.Page.ActivePage, errorMessage : String }"},"Page.Home.Model":{"args":[],"type":"{}"},"Page.Question.LoadQuestionResponseData":{"args":[],"type":"{ success : Bool , error_messages : List String , problem : String , subjects : List String }"},"Data.User.User":{"args":[],"type":"{ email : String , token : Data.AuthToken.AuthToken , username : Data.User.Username , role : Data.User.Role }"},"Page.Login.ResponseData":{"args":[],"type":"{ success : Bool , user : Data.User.User , error_messages : List String }"},"Page.Register.ResponseData":{"args":[],"type":"{ success : Bool, errorMessages : List String }"},"Page.Question.CheckSolutionResponseData":{"args":[],"type":"{ success : Bool, error_messages : List String, correct : Bool }"}},"message":"Main.Msg"},"versions":{"elm":"0.18.0"}});
 }
 
 if (typeof define === "function" && define['amd'])

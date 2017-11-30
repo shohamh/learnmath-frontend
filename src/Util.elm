@@ -1,4 +1,4 @@
-module Util exposing ((=>), appendErrors, httpPost, onClickStopPropagation, pair, viewIf)
+module Util exposing ((=>), appendErrors, httpErrorToString, httpPost, onClickStopPropagation, pair, viewIf)
 
 import Config
 import Html exposing (Attribute, Html)
@@ -64,3 +64,22 @@ httpPost endpoint payload payloadEncoder responseDecoder responseMsg =
             Http.post url body responseDecoder
     in
     Http.send responseMsg request
+
+
+httpErrorToString : Http.Error -> String
+httpErrorToString httpError =
+    case httpError of
+        Http.BadUrl str ->
+            "Bad url: " ++ str
+
+        Http.Timeout ->
+            "Request timed out."
+
+        Http.NetworkError ->
+            "Network error (no connectivity)."
+
+        Http.BadStatus response ->
+            "Bad status code returned: " ++ Basics.toString response.status.code
+
+        Http.BadPayload debug_str response ->
+            "JSON decoding of response failed: " ++ debug_str

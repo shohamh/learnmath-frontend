@@ -20,6 +20,7 @@ type alias Model =
     , lastConvert : String
     , convertCount : Int
     , question : String
+    , subjects : List String
     , isCorrect : Maybe Bool
     }
 
@@ -33,6 +34,7 @@ model =
     , lastConvert = ""
     , convertCount = 0
     , question = ""
+    , subjects = []
     , isCorrect = Nothing
     }
 
@@ -66,21 +68,7 @@ update session msg model =
         CheckSolutionResult (Err httpError) ->
             let
                 errorMessage =
-                    case httpError of
-                        Http.BadUrl str ->
-                            "Bad url: " ++ str
-
-                        Http.Timeout ->
-                            "Request timed out."
-
-                        Http.NetworkError ->
-                            "Network error (no connectivity)."
-
-                        Http.BadStatus response ->
-                            "Bad status code returned: " ++ Basics.toString response.status.code
-
-                        Http.BadPayload debug_str response ->
-                            "JSON decoding of response failed: " ++ debug_str
+                    Util.httpErrorToString httpError
             in
             { model
                 | errorMessages =
@@ -100,21 +88,7 @@ update session msg model =
         LoadQuestionResult (Err httpError) ->
             let
                 errorMessage =
-                    case httpError of
-                        Http.BadUrl str ->
-                            "Bad url: " ++ str
-
-                        Http.Timeout ->
-                            "Request timed out."
-
-                        Http.NetworkError ->
-                            "Network error (no connectivity)."
-
-                        Http.BadStatus response ->
-                            "Bad status code returned: " ++ Basics.toString response.status.code
-
-                        Http.BadPayload debug_str response ->
-                            "JSON decoding of response failed: " ++ debug_str
+                    Util.httpErrorToString httpError
             in
             { model
                 | errorMessages =
@@ -129,25 +103,17 @@ update session msg model =
                 newModel =
                     { model
                         | question = resp.problem
+                        , subjects = resp.subjects
                     }
             in
             newModel => Ports.importQuestion (Just (Debug.log "question from server" newModel.question))
-
-
-type alias Question =
-    { mathml : String
-    }
-
-
-type alias Solution =
-    { mathml : String
-    }
 
 
 type alias LoadQuestionResponseData =
     { success : Bool
     , error_messages : List String
     , problem : String
+    , subjects : List String
     }
 
 
@@ -170,57 +136,19 @@ loadQuestionEncoder sid =
         ]
 
 
-type alias LoadQuestionData =
-    { question : String
-    , success : Bool
-    , error_messages : List String
-    }
-
-
-loadQuestionRespDecoder : Decoder LoadQuestionData
-loadQuestionRespDecoder =
-    JDP.decode LoadQuestionData
-        |> JDP.required "problem" JD.string
-        |> JDP.required "success" JD.bool
-        |> JDP.required "error_messages" (JD.list JD.string)
+checkSolutionEncoder : ( Session, Model ) -> JE.Value
+checkSolutionEncoder ( session, model ) =
+    JE.object
+        [ ( "sid", JE.string (Session.getSid session) )
+        , ( "question", JE.string model.question )
+        , ( "solutions", JE.string model.lastExport )
+        , ( "subjects", JE.list (List.map JE.string model.subjects) )
+        ]
 
 
 checkSolution : Session -> Model -> Cmd Msg
 checkSolution session model =
-    httpPost "check_solution" model solquesEncoder checkSolutionResponseDecoder CheckSolutionResult
-
-
-questionFromModel : Model -> Question
-questionFromModel model =
-    Question model.question
-
-
-solutionFromModel : Model -> Solution
-solutionFromModel model =
-    Solution model.lastExport
-
-
-
--- temp
-
-
-solquesEncoder : Model -> JE.Value
-solquesEncoder model =
-    JE.object [ ( "solutions", JE.string model.lastExport ), ( "question", JE.string model.question ) ]
-
-
-solutionEncoder : Solution -> JE.Value
-solutionEncoder solution =
-    JE.object
-        [ ( "solution", JE.string solution.mathml )
-        ]
-
-
-questionEncoder : Question -> JE.Value
-questionEncoder question =
-    JE.object
-        [ ( "mathml", JE.string question.mathml )
-        ]
+    httpPost "check_solution" ( session, model ) checkSolutionEncoder checkSolutionResponseDecoder CheckSolutionResult
 
 
 loadQuestionResponseDecoder : Decoder LoadQuestionResponseData
@@ -229,6 +157,7 @@ loadQuestionResponseDecoder =
         |> JDP.required "success" JD.bool
         |> JDP.required "error_messages" (JD.list JD.string)
         |> JDP.required "problem" JD.string
+        |> JDP.required "subjects" (JD.list JD.string)
 
 
 checkSolutionResponseDecoder : Decoder CheckSolutionResponseData
@@ -254,6 +183,10 @@ view session model =
     div [ class "question-page" ]
         [ div [ class "container page" ]
             [ div [ class "row" ]
+                [ text "Question subjects:"
+                , ul [] (List.map (\x -> li [] [ text x ]) model.subjects)
+                ]
+            , div [ class "row" ]
                 [ div [ class "col-md-12" ]
                     [ let
                         mimetypes =
