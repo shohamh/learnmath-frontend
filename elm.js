@@ -12496,6 +12496,143 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
+//import Maybe, Native.List //
+
+var _elm_lang$core$Native_Regex = function() {
+
+function escape(str)
+{
+	return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+}
+function caseInsensitive(re)
+{
+	return new RegExp(re.source, 'gi');
+}
+function regex(raw)
+{
+	return new RegExp(raw, 'g');
+}
+
+function contains(re, string)
+{
+	return string.match(re) !== null;
+}
+
+function find(n, re, str)
+{
+	n = n.ctor === 'All' ? Infinity : n._0;
+	var out = [];
+	var number = 0;
+	var string = str;
+	var lastIndex = re.lastIndex;
+	var prevLastIndex = -1;
+	var result;
+	while (number++ < n && (result = re.exec(string)))
+	{
+		if (prevLastIndex === re.lastIndex) break;
+		var i = result.length - 1;
+		var subs = new Array(i);
+		while (i > 0)
+		{
+			var submatch = result[i];
+			subs[--i] = submatch === undefined
+				? _elm_lang$core$Maybe$Nothing
+				: _elm_lang$core$Maybe$Just(submatch);
+		}
+		out.push({
+			match: result[0],
+			submatches: _elm_lang$core$Native_List.fromArray(subs),
+			index: result.index,
+			number: number
+		});
+		prevLastIndex = re.lastIndex;
+	}
+	re.lastIndex = lastIndex;
+	return _elm_lang$core$Native_List.fromArray(out);
+}
+
+function replace(n, re, replacer, string)
+{
+	n = n.ctor === 'All' ? Infinity : n._0;
+	var count = 0;
+	function jsReplacer(match)
+	{
+		if (count++ >= n)
+		{
+			return match;
+		}
+		var i = arguments.length - 3;
+		var submatches = new Array(i);
+		while (i > 0)
+		{
+			var submatch = arguments[i];
+			submatches[--i] = submatch === undefined
+				? _elm_lang$core$Maybe$Nothing
+				: _elm_lang$core$Maybe$Just(submatch);
+		}
+		return replacer({
+			match: match,
+			submatches: _elm_lang$core$Native_List.fromArray(submatches),
+			index: arguments[arguments.length - 2],
+			number: count
+		});
+	}
+	return string.replace(re, jsReplacer);
+}
+
+function split(n, re, str)
+{
+	n = n.ctor === 'All' ? Infinity : n._0;
+	if (n === Infinity)
+	{
+		return _elm_lang$core$Native_List.fromArray(str.split(re));
+	}
+	var string = str;
+	var result;
+	var out = [];
+	var start = re.lastIndex;
+	var restoreLastIndex = re.lastIndex;
+	while (n--)
+	{
+		if (!(result = re.exec(string))) break;
+		out.push(string.slice(start, result.index));
+		start = re.lastIndex;
+	}
+	out.push(string.slice(start));
+	re.lastIndex = restoreLastIndex;
+	return _elm_lang$core$Native_List.fromArray(out);
+}
+
+return {
+	regex: regex,
+	caseInsensitive: caseInsensitive,
+	escape: escape,
+
+	contains: F2(contains),
+	find: F3(find),
+	replace: F4(replace),
+	split: F3(split)
+};
+
+}();
+
+var _elm_lang$core$Regex$split = _elm_lang$core$Native_Regex.split;
+var _elm_lang$core$Regex$replace = _elm_lang$core$Native_Regex.replace;
+var _elm_lang$core$Regex$find = _elm_lang$core$Native_Regex.find;
+var _elm_lang$core$Regex$contains = _elm_lang$core$Native_Regex.contains;
+var _elm_lang$core$Regex$caseInsensitive = _elm_lang$core$Native_Regex.caseInsensitive;
+var _elm_lang$core$Regex$regex = _elm_lang$core$Native_Regex.regex;
+var _elm_lang$core$Regex$escape = _elm_lang$core$Native_Regex.escape;
+var _elm_lang$core$Regex$Match = F4(
+	function (a, b, c, d) {
+		return {match: a, submatches: b, index: c, number: d};
+	});
+var _elm_lang$core$Regex$Regex = {ctor: 'Regex'};
+var _elm_lang$core$Regex$AtMost = function (a) {
+	return {ctor: 'AtMost', _0: a};
+};
+var _elm_lang$core$Regex$All = {ctor: 'All'};
+
 var _abadi199$elm_input_extra$MultiSelect$defaultOptions = function (onChange) {
 	return {
 		items: {ctor: '[]'},
@@ -12634,6 +12771,39 @@ var _abadi199$elm_input_extra$MultiSelect$multiSelect = F3(
 			A2(_elm_lang$core$List$map, toOption, options.items));
 	});
 
+//import Result //
+
+var _elm_lang$core$Native_Date = function() {
+
+function fromString(str)
+{
+	var date = new Date(str);
+	return isNaN(date.getTime())
+		? _elm_lang$core$Result$Err('Unable to parse \'' + str + '\' as a date. Dates must be in the ISO 8601 format.')
+		: _elm_lang$core$Result$Ok(date);
+}
+
+var dayTable = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+var monthTable =
+	['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+	 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+
+return {
+	fromString: fromString,
+	year: function(d) { return d.getFullYear(); },
+	month: function(d) { return { ctor: monthTable[d.getMonth()] }; },
+	day: function(d) { return d.getDate(); },
+	hour: function(d) { return d.getHours(); },
+	minute: function(d) { return d.getMinutes(); },
+	second: function(d) { return d.getSeconds(); },
+	millisecond: function(d) { return d.getMilliseconds(); },
+	toTime: function(d) { return d.getTime(); },
+	fromTime: function(t) { return new Date(t); },
+	dayOfWeek: function(d) { return { ctor: dayTable[d.getDay()] }; }
+};
+
+}();
 //import Native.Scheduler //
 
 var _elm_lang$core$Native_Time = function() {
@@ -12848,6 +13018,205 @@ var _elm_lang$core$Time$subMap = F2(
 			});
 	});
 _elm_lang$core$Native_Platform.effectManagers['Time'] = {pkg: 'elm-lang/core', init: _elm_lang$core$Time$init, onEffects: _elm_lang$core$Time$onEffects, onSelfMsg: _elm_lang$core$Time$onSelfMsg, tag: 'sub', subMap: _elm_lang$core$Time$subMap};
+
+var _elm_lang$core$Date$millisecond = _elm_lang$core$Native_Date.millisecond;
+var _elm_lang$core$Date$second = _elm_lang$core$Native_Date.second;
+var _elm_lang$core$Date$minute = _elm_lang$core$Native_Date.minute;
+var _elm_lang$core$Date$hour = _elm_lang$core$Native_Date.hour;
+var _elm_lang$core$Date$dayOfWeek = _elm_lang$core$Native_Date.dayOfWeek;
+var _elm_lang$core$Date$day = _elm_lang$core$Native_Date.day;
+var _elm_lang$core$Date$month = _elm_lang$core$Native_Date.month;
+var _elm_lang$core$Date$year = _elm_lang$core$Native_Date.year;
+var _elm_lang$core$Date$fromTime = _elm_lang$core$Native_Date.fromTime;
+var _elm_lang$core$Date$toTime = _elm_lang$core$Native_Date.toTime;
+var _elm_lang$core$Date$fromString = _elm_lang$core$Native_Date.fromString;
+var _elm_lang$core$Date$now = A2(_elm_lang$core$Task$map, _elm_lang$core$Date$fromTime, _elm_lang$core$Time$now);
+var _elm_lang$core$Date$Date = {ctor: 'Date'};
+var _elm_lang$core$Date$Sun = {ctor: 'Sun'};
+var _elm_lang$core$Date$Sat = {ctor: 'Sat'};
+var _elm_lang$core$Date$Fri = {ctor: 'Fri'};
+var _elm_lang$core$Date$Thu = {ctor: 'Thu'};
+var _elm_lang$core$Date$Wed = {ctor: 'Wed'};
+var _elm_lang$core$Date$Tue = {ctor: 'Tue'};
+var _elm_lang$core$Date$Mon = {ctor: 'Mon'};
+var _elm_lang$core$Date$Dec = {ctor: 'Dec'};
+var _elm_lang$core$Date$Nov = {ctor: 'Nov'};
+var _elm_lang$core$Date$Oct = {ctor: 'Oct'};
+var _elm_lang$core$Date$Sep = {ctor: 'Sep'};
+var _elm_lang$core$Date$Aug = {ctor: 'Aug'};
+var _elm_lang$core$Date$Jul = {ctor: 'Jul'};
+var _elm_lang$core$Date$Jun = {ctor: 'Jun'};
+var _elm_lang$core$Date$May = {ctor: 'May'};
+var _elm_lang$core$Date$Apr = {ctor: 'Apr'};
+var _elm_lang$core$Date$Mar = {ctor: 'Mar'};
+var _elm_lang$core$Date$Feb = {ctor: 'Feb'};
+var _elm_lang$core$Date$Jan = {ctor: 'Jan'};
+
+var _elm_lang$core$Color$fmod = F2(
+	function (f, n) {
+		var integer = _elm_lang$core$Basics$floor(f);
+		return (_elm_lang$core$Basics$toFloat(
+			A2(_elm_lang$core$Basics_ops['%'], integer, n)) + f) - _elm_lang$core$Basics$toFloat(integer);
+	});
+var _elm_lang$core$Color$rgbToHsl = F3(
+	function (red, green, blue) {
+		var b = _elm_lang$core$Basics$toFloat(blue) / 255;
+		var g = _elm_lang$core$Basics$toFloat(green) / 255;
+		var r = _elm_lang$core$Basics$toFloat(red) / 255;
+		var cMax = A2(
+			_elm_lang$core$Basics$max,
+			A2(_elm_lang$core$Basics$max, r, g),
+			b);
+		var cMin = A2(
+			_elm_lang$core$Basics$min,
+			A2(_elm_lang$core$Basics$min, r, g),
+			b);
+		var c = cMax - cMin;
+		var lightness = (cMax + cMin) / 2;
+		var saturation = _elm_lang$core$Native_Utils.eq(lightness, 0) ? 0 : (c / (1 - _elm_lang$core$Basics$abs((2 * lightness) - 1)));
+		var hue = _elm_lang$core$Basics$degrees(60) * (_elm_lang$core$Native_Utils.eq(cMax, r) ? A2(_elm_lang$core$Color$fmod, (g - b) / c, 6) : (_elm_lang$core$Native_Utils.eq(cMax, g) ? (((b - r) / c) + 2) : (((r - g) / c) + 4)));
+		return {ctor: '_Tuple3', _0: hue, _1: saturation, _2: lightness};
+	});
+var _elm_lang$core$Color$hslToRgb = F3(
+	function (hue, saturation, lightness) {
+		var normHue = hue / _elm_lang$core$Basics$degrees(60);
+		var chroma = (1 - _elm_lang$core$Basics$abs((2 * lightness) - 1)) * saturation;
+		var x = chroma * (1 - _elm_lang$core$Basics$abs(
+			A2(_elm_lang$core$Color$fmod, normHue, 2) - 1));
+		var _p0 = (_elm_lang$core$Native_Utils.cmp(normHue, 0) < 0) ? {ctor: '_Tuple3', _0: 0, _1: 0, _2: 0} : ((_elm_lang$core$Native_Utils.cmp(normHue, 1) < 0) ? {ctor: '_Tuple3', _0: chroma, _1: x, _2: 0} : ((_elm_lang$core$Native_Utils.cmp(normHue, 2) < 0) ? {ctor: '_Tuple3', _0: x, _1: chroma, _2: 0} : ((_elm_lang$core$Native_Utils.cmp(normHue, 3) < 0) ? {ctor: '_Tuple3', _0: 0, _1: chroma, _2: x} : ((_elm_lang$core$Native_Utils.cmp(normHue, 4) < 0) ? {ctor: '_Tuple3', _0: 0, _1: x, _2: chroma} : ((_elm_lang$core$Native_Utils.cmp(normHue, 5) < 0) ? {ctor: '_Tuple3', _0: x, _1: 0, _2: chroma} : ((_elm_lang$core$Native_Utils.cmp(normHue, 6) < 0) ? {ctor: '_Tuple3', _0: chroma, _1: 0, _2: x} : {ctor: '_Tuple3', _0: 0, _1: 0, _2: 0}))))));
+		var r = _p0._0;
+		var g = _p0._1;
+		var b = _p0._2;
+		var m = lightness - (chroma / 2);
+		return {ctor: '_Tuple3', _0: r + m, _1: g + m, _2: b + m};
+	});
+var _elm_lang$core$Color$toRgb = function (color) {
+	var _p1 = color;
+	if (_p1.ctor === 'RGBA') {
+		return {red: _p1._0, green: _p1._1, blue: _p1._2, alpha: _p1._3};
+	} else {
+		var _p2 = A3(_elm_lang$core$Color$hslToRgb, _p1._0, _p1._1, _p1._2);
+		var r = _p2._0;
+		var g = _p2._1;
+		var b = _p2._2;
+		return {
+			red: _elm_lang$core$Basics$round(255 * r),
+			green: _elm_lang$core$Basics$round(255 * g),
+			blue: _elm_lang$core$Basics$round(255 * b),
+			alpha: _p1._3
+		};
+	}
+};
+var _elm_lang$core$Color$toHsl = function (color) {
+	var _p3 = color;
+	if (_p3.ctor === 'HSLA') {
+		return {hue: _p3._0, saturation: _p3._1, lightness: _p3._2, alpha: _p3._3};
+	} else {
+		var _p4 = A3(_elm_lang$core$Color$rgbToHsl, _p3._0, _p3._1, _p3._2);
+		var h = _p4._0;
+		var s = _p4._1;
+		var l = _p4._2;
+		return {hue: h, saturation: s, lightness: l, alpha: _p3._3};
+	}
+};
+var _elm_lang$core$Color$HSLA = F4(
+	function (a, b, c, d) {
+		return {ctor: 'HSLA', _0: a, _1: b, _2: c, _3: d};
+	});
+var _elm_lang$core$Color$hsla = F4(
+	function (hue, saturation, lightness, alpha) {
+		return A4(
+			_elm_lang$core$Color$HSLA,
+			hue - _elm_lang$core$Basics$turns(
+				_elm_lang$core$Basics$toFloat(
+					_elm_lang$core$Basics$floor(hue / (2 * _elm_lang$core$Basics$pi)))),
+			saturation,
+			lightness,
+			alpha);
+	});
+var _elm_lang$core$Color$hsl = F3(
+	function (hue, saturation, lightness) {
+		return A4(_elm_lang$core$Color$hsla, hue, saturation, lightness, 1);
+	});
+var _elm_lang$core$Color$complement = function (color) {
+	var _p5 = color;
+	if (_p5.ctor === 'HSLA') {
+		return A4(
+			_elm_lang$core$Color$hsla,
+			_p5._0 + _elm_lang$core$Basics$degrees(180),
+			_p5._1,
+			_p5._2,
+			_p5._3);
+	} else {
+		var _p6 = A3(_elm_lang$core$Color$rgbToHsl, _p5._0, _p5._1, _p5._2);
+		var h = _p6._0;
+		var s = _p6._1;
+		var l = _p6._2;
+		return A4(
+			_elm_lang$core$Color$hsla,
+			h + _elm_lang$core$Basics$degrees(180),
+			s,
+			l,
+			_p5._3);
+	}
+};
+var _elm_lang$core$Color$grayscale = function (p) {
+	return A4(_elm_lang$core$Color$HSLA, 0, 0, 1 - p, 1);
+};
+var _elm_lang$core$Color$greyscale = function (p) {
+	return A4(_elm_lang$core$Color$HSLA, 0, 0, 1 - p, 1);
+};
+var _elm_lang$core$Color$RGBA = F4(
+	function (a, b, c, d) {
+		return {ctor: 'RGBA', _0: a, _1: b, _2: c, _3: d};
+	});
+var _elm_lang$core$Color$rgba = _elm_lang$core$Color$RGBA;
+var _elm_lang$core$Color$rgb = F3(
+	function (r, g, b) {
+		return A4(_elm_lang$core$Color$RGBA, r, g, b, 1);
+	});
+var _elm_lang$core$Color$lightRed = A4(_elm_lang$core$Color$RGBA, 239, 41, 41, 1);
+var _elm_lang$core$Color$red = A4(_elm_lang$core$Color$RGBA, 204, 0, 0, 1);
+var _elm_lang$core$Color$darkRed = A4(_elm_lang$core$Color$RGBA, 164, 0, 0, 1);
+var _elm_lang$core$Color$lightOrange = A4(_elm_lang$core$Color$RGBA, 252, 175, 62, 1);
+var _elm_lang$core$Color$orange = A4(_elm_lang$core$Color$RGBA, 245, 121, 0, 1);
+var _elm_lang$core$Color$darkOrange = A4(_elm_lang$core$Color$RGBA, 206, 92, 0, 1);
+var _elm_lang$core$Color$lightYellow = A4(_elm_lang$core$Color$RGBA, 255, 233, 79, 1);
+var _elm_lang$core$Color$yellow = A4(_elm_lang$core$Color$RGBA, 237, 212, 0, 1);
+var _elm_lang$core$Color$darkYellow = A4(_elm_lang$core$Color$RGBA, 196, 160, 0, 1);
+var _elm_lang$core$Color$lightGreen = A4(_elm_lang$core$Color$RGBA, 138, 226, 52, 1);
+var _elm_lang$core$Color$green = A4(_elm_lang$core$Color$RGBA, 115, 210, 22, 1);
+var _elm_lang$core$Color$darkGreen = A4(_elm_lang$core$Color$RGBA, 78, 154, 6, 1);
+var _elm_lang$core$Color$lightBlue = A4(_elm_lang$core$Color$RGBA, 114, 159, 207, 1);
+var _elm_lang$core$Color$blue = A4(_elm_lang$core$Color$RGBA, 52, 101, 164, 1);
+var _elm_lang$core$Color$darkBlue = A4(_elm_lang$core$Color$RGBA, 32, 74, 135, 1);
+var _elm_lang$core$Color$lightPurple = A4(_elm_lang$core$Color$RGBA, 173, 127, 168, 1);
+var _elm_lang$core$Color$purple = A4(_elm_lang$core$Color$RGBA, 117, 80, 123, 1);
+var _elm_lang$core$Color$darkPurple = A4(_elm_lang$core$Color$RGBA, 92, 53, 102, 1);
+var _elm_lang$core$Color$lightBrown = A4(_elm_lang$core$Color$RGBA, 233, 185, 110, 1);
+var _elm_lang$core$Color$brown = A4(_elm_lang$core$Color$RGBA, 193, 125, 17, 1);
+var _elm_lang$core$Color$darkBrown = A4(_elm_lang$core$Color$RGBA, 143, 89, 2, 1);
+var _elm_lang$core$Color$black = A4(_elm_lang$core$Color$RGBA, 0, 0, 0, 1);
+var _elm_lang$core$Color$white = A4(_elm_lang$core$Color$RGBA, 255, 255, 255, 1);
+var _elm_lang$core$Color$lightGrey = A4(_elm_lang$core$Color$RGBA, 238, 238, 236, 1);
+var _elm_lang$core$Color$grey = A4(_elm_lang$core$Color$RGBA, 211, 215, 207, 1);
+var _elm_lang$core$Color$darkGrey = A4(_elm_lang$core$Color$RGBA, 186, 189, 182, 1);
+var _elm_lang$core$Color$lightGray = A4(_elm_lang$core$Color$RGBA, 238, 238, 236, 1);
+var _elm_lang$core$Color$gray = A4(_elm_lang$core$Color$RGBA, 211, 215, 207, 1);
+var _elm_lang$core$Color$darkGray = A4(_elm_lang$core$Color$RGBA, 186, 189, 182, 1);
+var _elm_lang$core$Color$lightCharcoal = A4(_elm_lang$core$Color$RGBA, 136, 138, 133, 1);
+var _elm_lang$core$Color$charcoal = A4(_elm_lang$core$Color$RGBA, 85, 87, 83, 1);
+var _elm_lang$core$Color$darkCharcoal = A4(_elm_lang$core$Color$RGBA, 46, 52, 54, 1);
+var _elm_lang$core$Color$Radial = F5(
+	function (a, b, c, d, e) {
+		return {ctor: 'Radial', _0: a, _1: b, _2: c, _3: d, _4: e};
+	});
+var _elm_lang$core$Color$radial = _elm_lang$core$Color$Radial;
+var _elm_lang$core$Color$Linear = F3(
+	function (a, b, c) {
+		return {ctor: 'Linear', _0: a, _1: b, _2: c};
+	});
+var _elm_lang$core$Color$linear = _elm_lang$core$Color$Linear;
 
 var _elm_lang$core$Process$kill = _elm_lang$core$Native_Scheduler.kill;
 var _elm_lang$core$Process$sleep = _elm_lang$core$Native_Scheduler.sleep;
@@ -13806,6 +14175,347 @@ var _elm_lang$navigation$Navigation$onEffects = F4(
 	});
 _elm_lang$core$Native_Platform.effectManagers['Navigation'] = {pkg: 'elm-lang/navigation', init: _elm_lang$navigation$Navigation$init, onEffects: _elm_lang$navigation$Navigation$onEffects, onSelfMsg: _elm_lang$navigation$Navigation$onSelfMsg, tag: 'fx', cmdMap: _elm_lang$navigation$Navigation$cmdMap, subMap: _elm_lang$navigation$Navigation$subMap};
 
+var _elm_lang$svg$Svg$map = _elm_lang$virtual_dom$VirtualDom$map;
+var _elm_lang$svg$Svg$text = _elm_lang$virtual_dom$VirtualDom$text;
+var _elm_lang$svg$Svg$svgNamespace = A2(
+	_elm_lang$virtual_dom$VirtualDom$property,
+	'namespace',
+	_elm_lang$core$Json_Encode$string('http://www.w3.org/2000/svg'));
+var _elm_lang$svg$Svg$node = F3(
+	function (name, attributes, children) {
+		return A3(
+			_elm_lang$virtual_dom$VirtualDom$node,
+			name,
+			{ctor: '::', _0: _elm_lang$svg$Svg$svgNamespace, _1: attributes},
+			children);
+	});
+var _elm_lang$svg$Svg$svg = _elm_lang$svg$Svg$node('svg');
+var _elm_lang$svg$Svg$foreignObject = _elm_lang$svg$Svg$node('foreignObject');
+var _elm_lang$svg$Svg$animate = _elm_lang$svg$Svg$node('animate');
+var _elm_lang$svg$Svg$animateColor = _elm_lang$svg$Svg$node('animateColor');
+var _elm_lang$svg$Svg$animateMotion = _elm_lang$svg$Svg$node('animateMotion');
+var _elm_lang$svg$Svg$animateTransform = _elm_lang$svg$Svg$node('animateTransform');
+var _elm_lang$svg$Svg$mpath = _elm_lang$svg$Svg$node('mpath');
+var _elm_lang$svg$Svg$set = _elm_lang$svg$Svg$node('set');
+var _elm_lang$svg$Svg$a = _elm_lang$svg$Svg$node('a');
+var _elm_lang$svg$Svg$defs = _elm_lang$svg$Svg$node('defs');
+var _elm_lang$svg$Svg$g = _elm_lang$svg$Svg$node('g');
+var _elm_lang$svg$Svg$marker = _elm_lang$svg$Svg$node('marker');
+var _elm_lang$svg$Svg$mask = _elm_lang$svg$Svg$node('mask');
+var _elm_lang$svg$Svg$pattern = _elm_lang$svg$Svg$node('pattern');
+var _elm_lang$svg$Svg$switch = _elm_lang$svg$Svg$node('switch');
+var _elm_lang$svg$Svg$symbol = _elm_lang$svg$Svg$node('symbol');
+var _elm_lang$svg$Svg$desc = _elm_lang$svg$Svg$node('desc');
+var _elm_lang$svg$Svg$metadata = _elm_lang$svg$Svg$node('metadata');
+var _elm_lang$svg$Svg$title = _elm_lang$svg$Svg$node('title');
+var _elm_lang$svg$Svg$feBlend = _elm_lang$svg$Svg$node('feBlend');
+var _elm_lang$svg$Svg$feColorMatrix = _elm_lang$svg$Svg$node('feColorMatrix');
+var _elm_lang$svg$Svg$feComponentTransfer = _elm_lang$svg$Svg$node('feComponentTransfer');
+var _elm_lang$svg$Svg$feComposite = _elm_lang$svg$Svg$node('feComposite');
+var _elm_lang$svg$Svg$feConvolveMatrix = _elm_lang$svg$Svg$node('feConvolveMatrix');
+var _elm_lang$svg$Svg$feDiffuseLighting = _elm_lang$svg$Svg$node('feDiffuseLighting');
+var _elm_lang$svg$Svg$feDisplacementMap = _elm_lang$svg$Svg$node('feDisplacementMap');
+var _elm_lang$svg$Svg$feFlood = _elm_lang$svg$Svg$node('feFlood');
+var _elm_lang$svg$Svg$feFuncA = _elm_lang$svg$Svg$node('feFuncA');
+var _elm_lang$svg$Svg$feFuncB = _elm_lang$svg$Svg$node('feFuncB');
+var _elm_lang$svg$Svg$feFuncG = _elm_lang$svg$Svg$node('feFuncG');
+var _elm_lang$svg$Svg$feFuncR = _elm_lang$svg$Svg$node('feFuncR');
+var _elm_lang$svg$Svg$feGaussianBlur = _elm_lang$svg$Svg$node('feGaussianBlur');
+var _elm_lang$svg$Svg$feImage = _elm_lang$svg$Svg$node('feImage');
+var _elm_lang$svg$Svg$feMerge = _elm_lang$svg$Svg$node('feMerge');
+var _elm_lang$svg$Svg$feMergeNode = _elm_lang$svg$Svg$node('feMergeNode');
+var _elm_lang$svg$Svg$feMorphology = _elm_lang$svg$Svg$node('feMorphology');
+var _elm_lang$svg$Svg$feOffset = _elm_lang$svg$Svg$node('feOffset');
+var _elm_lang$svg$Svg$feSpecularLighting = _elm_lang$svg$Svg$node('feSpecularLighting');
+var _elm_lang$svg$Svg$feTile = _elm_lang$svg$Svg$node('feTile');
+var _elm_lang$svg$Svg$feTurbulence = _elm_lang$svg$Svg$node('feTurbulence');
+var _elm_lang$svg$Svg$font = _elm_lang$svg$Svg$node('font');
+var _elm_lang$svg$Svg$linearGradient = _elm_lang$svg$Svg$node('linearGradient');
+var _elm_lang$svg$Svg$radialGradient = _elm_lang$svg$Svg$node('radialGradient');
+var _elm_lang$svg$Svg$stop = _elm_lang$svg$Svg$node('stop');
+var _elm_lang$svg$Svg$circle = _elm_lang$svg$Svg$node('circle');
+var _elm_lang$svg$Svg$ellipse = _elm_lang$svg$Svg$node('ellipse');
+var _elm_lang$svg$Svg$image = _elm_lang$svg$Svg$node('image');
+var _elm_lang$svg$Svg$line = _elm_lang$svg$Svg$node('line');
+var _elm_lang$svg$Svg$path = _elm_lang$svg$Svg$node('path');
+var _elm_lang$svg$Svg$polygon = _elm_lang$svg$Svg$node('polygon');
+var _elm_lang$svg$Svg$polyline = _elm_lang$svg$Svg$node('polyline');
+var _elm_lang$svg$Svg$rect = _elm_lang$svg$Svg$node('rect');
+var _elm_lang$svg$Svg$use = _elm_lang$svg$Svg$node('use');
+var _elm_lang$svg$Svg$feDistantLight = _elm_lang$svg$Svg$node('feDistantLight');
+var _elm_lang$svg$Svg$fePointLight = _elm_lang$svg$Svg$node('fePointLight');
+var _elm_lang$svg$Svg$feSpotLight = _elm_lang$svg$Svg$node('feSpotLight');
+var _elm_lang$svg$Svg$altGlyph = _elm_lang$svg$Svg$node('altGlyph');
+var _elm_lang$svg$Svg$altGlyphDef = _elm_lang$svg$Svg$node('altGlyphDef');
+var _elm_lang$svg$Svg$altGlyphItem = _elm_lang$svg$Svg$node('altGlyphItem');
+var _elm_lang$svg$Svg$glyph = _elm_lang$svg$Svg$node('glyph');
+var _elm_lang$svg$Svg$glyphRef = _elm_lang$svg$Svg$node('glyphRef');
+var _elm_lang$svg$Svg$textPath = _elm_lang$svg$Svg$node('textPath');
+var _elm_lang$svg$Svg$text_ = _elm_lang$svg$Svg$node('text');
+var _elm_lang$svg$Svg$tref = _elm_lang$svg$Svg$node('tref');
+var _elm_lang$svg$Svg$tspan = _elm_lang$svg$Svg$node('tspan');
+var _elm_lang$svg$Svg$clipPath = _elm_lang$svg$Svg$node('clipPath');
+var _elm_lang$svg$Svg$colorProfile = _elm_lang$svg$Svg$node('colorProfile');
+var _elm_lang$svg$Svg$cursor = _elm_lang$svg$Svg$node('cursor');
+var _elm_lang$svg$Svg$filter = _elm_lang$svg$Svg$node('filter');
+var _elm_lang$svg$Svg$script = _elm_lang$svg$Svg$node('script');
+var _elm_lang$svg$Svg$style = _elm_lang$svg$Svg$node('style');
+var _elm_lang$svg$Svg$view = _elm_lang$svg$Svg$node('view');
+
+var _elm_lang$svg$Svg_Attributes$writingMode = _elm_lang$virtual_dom$VirtualDom$attribute('writing-mode');
+var _elm_lang$svg$Svg_Attributes$wordSpacing = _elm_lang$virtual_dom$VirtualDom$attribute('word-spacing');
+var _elm_lang$svg$Svg_Attributes$visibility = _elm_lang$virtual_dom$VirtualDom$attribute('visibility');
+var _elm_lang$svg$Svg_Attributes$unicodeBidi = _elm_lang$virtual_dom$VirtualDom$attribute('unicode-bidi');
+var _elm_lang$svg$Svg_Attributes$textRendering = _elm_lang$virtual_dom$VirtualDom$attribute('text-rendering');
+var _elm_lang$svg$Svg_Attributes$textDecoration = _elm_lang$virtual_dom$VirtualDom$attribute('text-decoration');
+var _elm_lang$svg$Svg_Attributes$textAnchor = _elm_lang$virtual_dom$VirtualDom$attribute('text-anchor');
+var _elm_lang$svg$Svg_Attributes$stroke = _elm_lang$virtual_dom$VirtualDom$attribute('stroke');
+var _elm_lang$svg$Svg_Attributes$strokeWidth = _elm_lang$virtual_dom$VirtualDom$attribute('stroke-width');
+var _elm_lang$svg$Svg_Attributes$strokeOpacity = _elm_lang$virtual_dom$VirtualDom$attribute('stroke-opacity');
+var _elm_lang$svg$Svg_Attributes$strokeMiterlimit = _elm_lang$virtual_dom$VirtualDom$attribute('stroke-miterlimit');
+var _elm_lang$svg$Svg_Attributes$strokeLinejoin = _elm_lang$virtual_dom$VirtualDom$attribute('stroke-linejoin');
+var _elm_lang$svg$Svg_Attributes$strokeLinecap = _elm_lang$virtual_dom$VirtualDom$attribute('stroke-linecap');
+var _elm_lang$svg$Svg_Attributes$strokeDashoffset = _elm_lang$virtual_dom$VirtualDom$attribute('stroke-dashoffset');
+var _elm_lang$svg$Svg_Attributes$strokeDasharray = _elm_lang$virtual_dom$VirtualDom$attribute('stroke-dasharray');
+var _elm_lang$svg$Svg_Attributes$stopOpacity = _elm_lang$virtual_dom$VirtualDom$attribute('stop-opacity');
+var _elm_lang$svg$Svg_Attributes$stopColor = _elm_lang$virtual_dom$VirtualDom$attribute('stop-color');
+var _elm_lang$svg$Svg_Attributes$shapeRendering = _elm_lang$virtual_dom$VirtualDom$attribute('shape-rendering');
+var _elm_lang$svg$Svg_Attributes$pointerEvents = _elm_lang$virtual_dom$VirtualDom$attribute('pointer-events');
+var _elm_lang$svg$Svg_Attributes$overflow = _elm_lang$virtual_dom$VirtualDom$attribute('overflow');
+var _elm_lang$svg$Svg_Attributes$opacity = _elm_lang$virtual_dom$VirtualDom$attribute('opacity');
+var _elm_lang$svg$Svg_Attributes$mask = _elm_lang$virtual_dom$VirtualDom$attribute('mask');
+var _elm_lang$svg$Svg_Attributes$markerStart = _elm_lang$virtual_dom$VirtualDom$attribute('marker-start');
+var _elm_lang$svg$Svg_Attributes$markerMid = _elm_lang$virtual_dom$VirtualDom$attribute('marker-mid');
+var _elm_lang$svg$Svg_Attributes$markerEnd = _elm_lang$virtual_dom$VirtualDom$attribute('marker-end');
+var _elm_lang$svg$Svg_Attributes$lightingColor = _elm_lang$virtual_dom$VirtualDom$attribute('lighting-color');
+var _elm_lang$svg$Svg_Attributes$letterSpacing = _elm_lang$virtual_dom$VirtualDom$attribute('letter-spacing');
+var _elm_lang$svg$Svg_Attributes$kerning = _elm_lang$virtual_dom$VirtualDom$attribute('kerning');
+var _elm_lang$svg$Svg_Attributes$imageRendering = _elm_lang$virtual_dom$VirtualDom$attribute('image-rendering');
+var _elm_lang$svg$Svg_Attributes$glyphOrientationVertical = _elm_lang$virtual_dom$VirtualDom$attribute('glyph-orientation-vertical');
+var _elm_lang$svg$Svg_Attributes$glyphOrientationHorizontal = _elm_lang$virtual_dom$VirtualDom$attribute('glyph-orientation-horizontal');
+var _elm_lang$svg$Svg_Attributes$fontWeight = _elm_lang$virtual_dom$VirtualDom$attribute('font-weight');
+var _elm_lang$svg$Svg_Attributes$fontVariant = _elm_lang$virtual_dom$VirtualDom$attribute('font-variant');
+var _elm_lang$svg$Svg_Attributes$fontStyle = _elm_lang$virtual_dom$VirtualDom$attribute('font-style');
+var _elm_lang$svg$Svg_Attributes$fontStretch = _elm_lang$virtual_dom$VirtualDom$attribute('font-stretch');
+var _elm_lang$svg$Svg_Attributes$fontSize = _elm_lang$virtual_dom$VirtualDom$attribute('font-size');
+var _elm_lang$svg$Svg_Attributes$fontSizeAdjust = _elm_lang$virtual_dom$VirtualDom$attribute('font-size-adjust');
+var _elm_lang$svg$Svg_Attributes$fontFamily = _elm_lang$virtual_dom$VirtualDom$attribute('font-family');
+var _elm_lang$svg$Svg_Attributes$floodOpacity = _elm_lang$virtual_dom$VirtualDom$attribute('flood-opacity');
+var _elm_lang$svg$Svg_Attributes$floodColor = _elm_lang$virtual_dom$VirtualDom$attribute('flood-color');
+var _elm_lang$svg$Svg_Attributes$filter = _elm_lang$virtual_dom$VirtualDom$attribute('filter');
+var _elm_lang$svg$Svg_Attributes$fill = _elm_lang$virtual_dom$VirtualDom$attribute('fill');
+var _elm_lang$svg$Svg_Attributes$fillRule = _elm_lang$virtual_dom$VirtualDom$attribute('fill-rule');
+var _elm_lang$svg$Svg_Attributes$fillOpacity = _elm_lang$virtual_dom$VirtualDom$attribute('fill-opacity');
+var _elm_lang$svg$Svg_Attributes$enableBackground = _elm_lang$virtual_dom$VirtualDom$attribute('enable-background');
+var _elm_lang$svg$Svg_Attributes$dominantBaseline = _elm_lang$virtual_dom$VirtualDom$attribute('dominant-baseline');
+var _elm_lang$svg$Svg_Attributes$display = _elm_lang$virtual_dom$VirtualDom$attribute('display');
+var _elm_lang$svg$Svg_Attributes$direction = _elm_lang$virtual_dom$VirtualDom$attribute('direction');
+var _elm_lang$svg$Svg_Attributes$cursor = _elm_lang$virtual_dom$VirtualDom$attribute('cursor');
+var _elm_lang$svg$Svg_Attributes$color = _elm_lang$virtual_dom$VirtualDom$attribute('color');
+var _elm_lang$svg$Svg_Attributes$colorRendering = _elm_lang$virtual_dom$VirtualDom$attribute('color-rendering');
+var _elm_lang$svg$Svg_Attributes$colorProfile = _elm_lang$virtual_dom$VirtualDom$attribute('color-profile');
+var _elm_lang$svg$Svg_Attributes$colorInterpolation = _elm_lang$virtual_dom$VirtualDom$attribute('color-interpolation');
+var _elm_lang$svg$Svg_Attributes$colorInterpolationFilters = _elm_lang$virtual_dom$VirtualDom$attribute('color-interpolation-filters');
+var _elm_lang$svg$Svg_Attributes$clip = _elm_lang$virtual_dom$VirtualDom$attribute('clip');
+var _elm_lang$svg$Svg_Attributes$clipRule = _elm_lang$virtual_dom$VirtualDom$attribute('clip-rule');
+var _elm_lang$svg$Svg_Attributes$clipPath = _elm_lang$virtual_dom$VirtualDom$attribute('clip-path');
+var _elm_lang$svg$Svg_Attributes$baselineShift = _elm_lang$virtual_dom$VirtualDom$attribute('baseline-shift');
+var _elm_lang$svg$Svg_Attributes$alignmentBaseline = _elm_lang$virtual_dom$VirtualDom$attribute('alignment-baseline');
+var _elm_lang$svg$Svg_Attributes$zoomAndPan = _elm_lang$virtual_dom$VirtualDom$attribute('zoomAndPan');
+var _elm_lang$svg$Svg_Attributes$z = _elm_lang$virtual_dom$VirtualDom$attribute('z');
+var _elm_lang$svg$Svg_Attributes$yChannelSelector = _elm_lang$virtual_dom$VirtualDom$attribute('yChannelSelector');
+var _elm_lang$svg$Svg_Attributes$y2 = _elm_lang$virtual_dom$VirtualDom$attribute('y2');
+var _elm_lang$svg$Svg_Attributes$y1 = _elm_lang$virtual_dom$VirtualDom$attribute('y1');
+var _elm_lang$svg$Svg_Attributes$y = _elm_lang$virtual_dom$VirtualDom$attribute('y');
+var _elm_lang$svg$Svg_Attributes$xmlSpace = A2(_elm_lang$virtual_dom$VirtualDom$attributeNS, 'http://www.w3.org/XML/1998/namespace', 'xml:space');
+var _elm_lang$svg$Svg_Attributes$xmlLang = A2(_elm_lang$virtual_dom$VirtualDom$attributeNS, 'http://www.w3.org/XML/1998/namespace', 'xml:lang');
+var _elm_lang$svg$Svg_Attributes$xmlBase = A2(_elm_lang$virtual_dom$VirtualDom$attributeNS, 'http://www.w3.org/XML/1998/namespace', 'xml:base');
+var _elm_lang$svg$Svg_Attributes$xlinkType = A2(_elm_lang$virtual_dom$VirtualDom$attributeNS, 'http://www.w3.org/1999/xlink', 'xlink:type');
+var _elm_lang$svg$Svg_Attributes$xlinkTitle = A2(_elm_lang$virtual_dom$VirtualDom$attributeNS, 'http://www.w3.org/1999/xlink', 'xlink:title');
+var _elm_lang$svg$Svg_Attributes$xlinkShow = A2(_elm_lang$virtual_dom$VirtualDom$attributeNS, 'http://www.w3.org/1999/xlink', 'xlink:show');
+var _elm_lang$svg$Svg_Attributes$xlinkRole = A2(_elm_lang$virtual_dom$VirtualDom$attributeNS, 'http://www.w3.org/1999/xlink', 'xlink:role');
+var _elm_lang$svg$Svg_Attributes$xlinkHref = A2(_elm_lang$virtual_dom$VirtualDom$attributeNS, 'http://www.w3.org/1999/xlink', 'xlink:href');
+var _elm_lang$svg$Svg_Attributes$xlinkArcrole = A2(_elm_lang$virtual_dom$VirtualDom$attributeNS, 'http://www.w3.org/1999/xlink', 'xlink:arcrole');
+var _elm_lang$svg$Svg_Attributes$xlinkActuate = A2(_elm_lang$virtual_dom$VirtualDom$attributeNS, 'http://www.w3.org/1999/xlink', 'xlink:actuate');
+var _elm_lang$svg$Svg_Attributes$xChannelSelector = _elm_lang$virtual_dom$VirtualDom$attribute('xChannelSelector');
+var _elm_lang$svg$Svg_Attributes$x2 = _elm_lang$virtual_dom$VirtualDom$attribute('x2');
+var _elm_lang$svg$Svg_Attributes$x1 = _elm_lang$virtual_dom$VirtualDom$attribute('x1');
+var _elm_lang$svg$Svg_Attributes$xHeight = _elm_lang$virtual_dom$VirtualDom$attribute('x-height');
+var _elm_lang$svg$Svg_Attributes$x = _elm_lang$virtual_dom$VirtualDom$attribute('x');
+var _elm_lang$svg$Svg_Attributes$widths = _elm_lang$virtual_dom$VirtualDom$attribute('widths');
+var _elm_lang$svg$Svg_Attributes$width = _elm_lang$virtual_dom$VirtualDom$attribute('width');
+var _elm_lang$svg$Svg_Attributes$viewTarget = _elm_lang$virtual_dom$VirtualDom$attribute('viewTarget');
+var _elm_lang$svg$Svg_Attributes$viewBox = _elm_lang$virtual_dom$VirtualDom$attribute('viewBox');
+var _elm_lang$svg$Svg_Attributes$vertOriginY = _elm_lang$virtual_dom$VirtualDom$attribute('vert-origin-y');
+var _elm_lang$svg$Svg_Attributes$vertOriginX = _elm_lang$virtual_dom$VirtualDom$attribute('vert-origin-x');
+var _elm_lang$svg$Svg_Attributes$vertAdvY = _elm_lang$virtual_dom$VirtualDom$attribute('vert-adv-y');
+var _elm_lang$svg$Svg_Attributes$version = _elm_lang$virtual_dom$VirtualDom$attribute('version');
+var _elm_lang$svg$Svg_Attributes$values = _elm_lang$virtual_dom$VirtualDom$attribute('values');
+var _elm_lang$svg$Svg_Attributes$vMathematical = _elm_lang$virtual_dom$VirtualDom$attribute('v-mathematical');
+var _elm_lang$svg$Svg_Attributes$vIdeographic = _elm_lang$virtual_dom$VirtualDom$attribute('v-ideographic');
+var _elm_lang$svg$Svg_Attributes$vHanging = _elm_lang$virtual_dom$VirtualDom$attribute('v-hanging');
+var _elm_lang$svg$Svg_Attributes$vAlphabetic = _elm_lang$virtual_dom$VirtualDom$attribute('v-alphabetic');
+var _elm_lang$svg$Svg_Attributes$unitsPerEm = _elm_lang$virtual_dom$VirtualDom$attribute('units-per-em');
+var _elm_lang$svg$Svg_Attributes$unicodeRange = _elm_lang$virtual_dom$VirtualDom$attribute('unicode-range');
+var _elm_lang$svg$Svg_Attributes$unicode = _elm_lang$virtual_dom$VirtualDom$attribute('unicode');
+var _elm_lang$svg$Svg_Attributes$underlineThickness = _elm_lang$virtual_dom$VirtualDom$attribute('underline-thickness');
+var _elm_lang$svg$Svg_Attributes$underlinePosition = _elm_lang$virtual_dom$VirtualDom$attribute('underline-position');
+var _elm_lang$svg$Svg_Attributes$u2 = _elm_lang$virtual_dom$VirtualDom$attribute('u2');
+var _elm_lang$svg$Svg_Attributes$u1 = _elm_lang$virtual_dom$VirtualDom$attribute('u1');
+var _elm_lang$svg$Svg_Attributes$type_ = _elm_lang$virtual_dom$VirtualDom$attribute('type');
+var _elm_lang$svg$Svg_Attributes$transform = _elm_lang$virtual_dom$VirtualDom$attribute('transform');
+var _elm_lang$svg$Svg_Attributes$to = _elm_lang$virtual_dom$VirtualDom$attribute('to');
+var _elm_lang$svg$Svg_Attributes$title = _elm_lang$virtual_dom$VirtualDom$attribute('title');
+var _elm_lang$svg$Svg_Attributes$textLength = _elm_lang$virtual_dom$VirtualDom$attribute('textLength');
+var _elm_lang$svg$Svg_Attributes$targetY = _elm_lang$virtual_dom$VirtualDom$attribute('targetY');
+var _elm_lang$svg$Svg_Attributes$targetX = _elm_lang$virtual_dom$VirtualDom$attribute('targetX');
+var _elm_lang$svg$Svg_Attributes$target = _elm_lang$virtual_dom$VirtualDom$attribute('target');
+var _elm_lang$svg$Svg_Attributes$tableValues = _elm_lang$virtual_dom$VirtualDom$attribute('tableValues');
+var _elm_lang$svg$Svg_Attributes$systemLanguage = _elm_lang$virtual_dom$VirtualDom$attribute('systemLanguage');
+var _elm_lang$svg$Svg_Attributes$surfaceScale = _elm_lang$virtual_dom$VirtualDom$attribute('surfaceScale');
+var _elm_lang$svg$Svg_Attributes$style = _elm_lang$virtual_dom$VirtualDom$attribute('style');
+var _elm_lang$svg$Svg_Attributes$string = _elm_lang$virtual_dom$VirtualDom$attribute('string');
+var _elm_lang$svg$Svg_Attributes$strikethroughThickness = _elm_lang$virtual_dom$VirtualDom$attribute('strikethrough-thickness');
+var _elm_lang$svg$Svg_Attributes$strikethroughPosition = _elm_lang$virtual_dom$VirtualDom$attribute('strikethrough-position');
+var _elm_lang$svg$Svg_Attributes$stitchTiles = _elm_lang$virtual_dom$VirtualDom$attribute('stitchTiles');
+var _elm_lang$svg$Svg_Attributes$stemv = _elm_lang$virtual_dom$VirtualDom$attribute('stemv');
+var _elm_lang$svg$Svg_Attributes$stemh = _elm_lang$virtual_dom$VirtualDom$attribute('stemh');
+var _elm_lang$svg$Svg_Attributes$stdDeviation = _elm_lang$virtual_dom$VirtualDom$attribute('stdDeviation');
+var _elm_lang$svg$Svg_Attributes$startOffset = _elm_lang$virtual_dom$VirtualDom$attribute('startOffset');
+var _elm_lang$svg$Svg_Attributes$spreadMethod = _elm_lang$virtual_dom$VirtualDom$attribute('spreadMethod');
+var _elm_lang$svg$Svg_Attributes$speed = _elm_lang$virtual_dom$VirtualDom$attribute('speed');
+var _elm_lang$svg$Svg_Attributes$specularExponent = _elm_lang$virtual_dom$VirtualDom$attribute('specularExponent');
+var _elm_lang$svg$Svg_Attributes$specularConstant = _elm_lang$virtual_dom$VirtualDom$attribute('specularConstant');
+var _elm_lang$svg$Svg_Attributes$spacing = _elm_lang$virtual_dom$VirtualDom$attribute('spacing');
+var _elm_lang$svg$Svg_Attributes$slope = _elm_lang$virtual_dom$VirtualDom$attribute('slope');
+var _elm_lang$svg$Svg_Attributes$seed = _elm_lang$virtual_dom$VirtualDom$attribute('seed');
+var _elm_lang$svg$Svg_Attributes$scale = _elm_lang$virtual_dom$VirtualDom$attribute('scale');
+var _elm_lang$svg$Svg_Attributes$ry = _elm_lang$virtual_dom$VirtualDom$attribute('ry');
+var _elm_lang$svg$Svg_Attributes$rx = _elm_lang$virtual_dom$VirtualDom$attribute('rx');
+var _elm_lang$svg$Svg_Attributes$rotate = _elm_lang$virtual_dom$VirtualDom$attribute('rotate');
+var _elm_lang$svg$Svg_Attributes$result = _elm_lang$virtual_dom$VirtualDom$attribute('result');
+var _elm_lang$svg$Svg_Attributes$restart = _elm_lang$virtual_dom$VirtualDom$attribute('restart');
+var _elm_lang$svg$Svg_Attributes$requiredFeatures = _elm_lang$virtual_dom$VirtualDom$attribute('requiredFeatures');
+var _elm_lang$svg$Svg_Attributes$requiredExtensions = _elm_lang$virtual_dom$VirtualDom$attribute('requiredExtensions');
+var _elm_lang$svg$Svg_Attributes$repeatDur = _elm_lang$virtual_dom$VirtualDom$attribute('repeatDur');
+var _elm_lang$svg$Svg_Attributes$repeatCount = _elm_lang$virtual_dom$VirtualDom$attribute('repeatCount');
+var _elm_lang$svg$Svg_Attributes$renderingIntent = _elm_lang$virtual_dom$VirtualDom$attribute('rendering-intent');
+var _elm_lang$svg$Svg_Attributes$refY = _elm_lang$virtual_dom$VirtualDom$attribute('refY');
+var _elm_lang$svg$Svg_Attributes$refX = _elm_lang$virtual_dom$VirtualDom$attribute('refX');
+var _elm_lang$svg$Svg_Attributes$radius = _elm_lang$virtual_dom$VirtualDom$attribute('radius');
+var _elm_lang$svg$Svg_Attributes$r = _elm_lang$virtual_dom$VirtualDom$attribute('r');
+var _elm_lang$svg$Svg_Attributes$primitiveUnits = _elm_lang$virtual_dom$VirtualDom$attribute('primitiveUnits');
+var _elm_lang$svg$Svg_Attributes$preserveAspectRatio = _elm_lang$virtual_dom$VirtualDom$attribute('preserveAspectRatio');
+var _elm_lang$svg$Svg_Attributes$preserveAlpha = _elm_lang$virtual_dom$VirtualDom$attribute('preserveAlpha');
+var _elm_lang$svg$Svg_Attributes$pointsAtZ = _elm_lang$virtual_dom$VirtualDom$attribute('pointsAtZ');
+var _elm_lang$svg$Svg_Attributes$pointsAtY = _elm_lang$virtual_dom$VirtualDom$attribute('pointsAtY');
+var _elm_lang$svg$Svg_Attributes$pointsAtX = _elm_lang$virtual_dom$VirtualDom$attribute('pointsAtX');
+var _elm_lang$svg$Svg_Attributes$points = _elm_lang$virtual_dom$VirtualDom$attribute('points');
+var _elm_lang$svg$Svg_Attributes$pointOrder = _elm_lang$virtual_dom$VirtualDom$attribute('point-order');
+var _elm_lang$svg$Svg_Attributes$patternUnits = _elm_lang$virtual_dom$VirtualDom$attribute('patternUnits');
+var _elm_lang$svg$Svg_Attributes$patternTransform = _elm_lang$virtual_dom$VirtualDom$attribute('patternTransform');
+var _elm_lang$svg$Svg_Attributes$patternContentUnits = _elm_lang$virtual_dom$VirtualDom$attribute('patternContentUnits');
+var _elm_lang$svg$Svg_Attributes$pathLength = _elm_lang$virtual_dom$VirtualDom$attribute('pathLength');
+var _elm_lang$svg$Svg_Attributes$path = _elm_lang$virtual_dom$VirtualDom$attribute('path');
+var _elm_lang$svg$Svg_Attributes$panose1 = _elm_lang$virtual_dom$VirtualDom$attribute('panose-1');
+var _elm_lang$svg$Svg_Attributes$overlineThickness = _elm_lang$virtual_dom$VirtualDom$attribute('overline-thickness');
+var _elm_lang$svg$Svg_Attributes$overlinePosition = _elm_lang$virtual_dom$VirtualDom$attribute('overline-position');
+var _elm_lang$svg$Svg_Attributes$origin = _elm_lang$virtual_dom$VirtualDom$attribute('origin');
+var _elm_lang$svg$Svg_Attributes$orientation = _elm_lang$virtual_dom$VirtualDom$attribute('orientation');
+var _elm_lang$svg$Svg_Attributes$orient = _elm_lang$virtual_dom$VirtualDom$attribute('orient');
+var _elm_lang$svg$Svg_Attributes$order = _elm_lang$virtual_dom$VirtualDom$attribute('order');
+var _elm_lang$svg$Svg_Attributes$operator = _elm_lang$virtual_dom$VirtualDom$attribute('operator');
+var _elm_lang$svg$Svg_Attributes$offset = _elm_lang$virtual_dom$VirtualDom$attribute('offset');
+var _elm_lang$svg$Svg_Attributes$numOctaves = _elm_lang$virtual_dom$VirtualDom$attribute('numOctaves');
+var _elm_lang$svg$Svg_Attributes$name = _elm_lang$virtual_dom$VirtualDom$attribute('name');
+var _elm_lang$svg$Svg_Attributes$mode = _elm_lang$virtual_dom$VirtualDom$attribute('mode');
+var _elm_lang$svg$Svg_Attributes$min = _elm_lang$virtual_dom$VirtualDom$attribute('min');
+var _elm_lang$svg$Svg_Attributes$method = _elm_lang$virtual_dom$VirtualDom$attribute('method');
+var _elm_lang$svg$Svg_Attributes$media = _elm_lang$virtual_dom$VirtualDom$attribute('media');
+var _elm_lang$svg$Svg_Attributes$max = _elm_lang$virtual_dom$VirtualDom$attribute('max');
+var _elm_lang$svg$Svg_Attributes$mathematical = _elm_lang$virtual_dom$VirtualDom$attribute('mathematical');
+var _elm_lang$svg$Svg_Attributes$maskUnits = _elm_lang$virtual_dom$VirtualDom$attribute('maskUnits');
+var _elm_lang$svg$Svg_Attributes$maskContentUnits = _elm_lang$virtual_dom$VirtualDom$attribute('maskContentUnits');
+var _elm_lang$svg$Svg_Attributes$markerWidth = _elm_lang$virtual_dom$VirtualDom$attribute('markerWidth');
+var _elm_lang$svg$Svg_Attributes$markerUnits = _elm_lang$virtual_dom$VirtualDom$attribute('markerUnits');
+var _elm_lang$svg$Svg_Attributes$markerHeight = _elm_lang$virtual_dom$VirtualDom$attribute('markerHeight');
+var _elm_lang$svg$Svg_Attributes$local = _elm_lang$virtual_dom$VirtualDom$attribute('local');
+var _elm_lang$svg$Svg_Attributes$limitingConeAngle = _elm_lang$virtual_dom$VirtualDom$attribute('limitingConeAngle');
+var _elm_lang$svg$Svg_Attributes$lengthAdjust = _elm_lang$virtual_dom$VirtualDom$attribute('lengthAdjust');
+var _elm_lang$svg$Svg_Attributes$lang = _elm_lang$virtual_dom$VirtualDom$attribute('lang');
+var _elm_lang$svg$Svg_Attributes$keyTimes = _elm_lang$virtual_dom$VirtualDom$attribute('keyTimes');
+var _elm_lang$svg$Svg_Attributes$keySplines = _elm_lang$virtual_dom$VirtualDom$attribute('keySplines');
+var _elm_lang$svg$Svg_Attributes$keyPoints = _elm_lang$virtual_dom$VirtualDom$attribute('keyPoints');
+var _elm_lang$svg$Svg_Attributes$kernelUnitLength = _elm_lang$virtual_dom$VirtualDom$attribute('kernelUnitLength');
+var _elm_lang$svg$Svg_Attributes$kernelMatrix = _elm_lang$virtual_dom$VirtualDom$attribute('kernelMatrix');
+var _elm_lang$svg$Svg_Attributes$k4 = _elm_lang$virtual_dom$VirtualDom$attribute('k4');
+var _elm_lang$svg$Svg_Attributes$k3 = _elm_lang$virtual_dom$VirtualDom$attribute('k3');
+var _elm_lang$svg$Svg_Attributes$k2 = _elm_lang$virtual_dom$VirtualDom$attribute('k2');
+var _elm_lang$svg$Svg_Attributes$k1 = _elm_lang$virtual_dom$VirtualDom$attribute('k1');
+var _elm_lang$svg$Svg_Attributes$k = _elm_lang$virtual_dom$VirtualDom$attribute('k');
+var _elm_lang$svg$Svg_Attributes$intercept = _elm_lang$virtual_dom$VirtualDom$attribute('intercept');
+var _elm_lang$svg$Svg_Attributes$in2 = _elm_lang$virtual_dom$VirtualDom$attribute('in2');
+var _elm_lang$svg$Svg_Attributes$in_ = _elm_lang$virtual_dom$VirtualDom$attribute('in');
+var _elm_lang$svg$Svg_Attributes$ideographic = _elm_lang$virtual_dom$VirtualDom$attribute('ideographic');
+var _elm_lang$svg$Svg_Attributes$id = _elm_lang$virtual_dom$VirtualDom$attribute('id');
+var _elm_lang$svg$Svg_Attributes$horizOriginY = _elm_lang$virtual_dom$VirtualDom$attribute('horiz-origin-y');
+var _elm_lang$svg$Svg_Attributes$horizOriginX = _elm_lang$virtual_dom$VirtualDom$attribute('horiz-origin-x');
+var _elm_lang$svg$Svg_Attributes$horizAdvX = _elm_lang$virtual_dom$VirtualDom$attribute('horiz-adv-x');
+var _elm_lang$svg$Svg_Attributes$height = _elm_lang$virtual_dom$VirtualDom$attribute('height');
+var _elm_lang$svg$Svg_Attributes$hanging = _elm_lang$virtual_dom$VirtualDom$attribute('hanging');
+var _elm_lang$svg$Svg_Attributes$gradientUnits = _elm_lang$virtual_dom$VirtualDom$attribute('gradientUnits');
+var _elm_lang$svg$Svg_Attributes$gradientTransform = _elm_lang$virtual_dom$VirtualDom$attribute('gradientTransform');
+var _elm_lang$svg$Svg_Attributes$glyphRef = _elm_lang$virtual_dom$VirtualDom$attribute('glyphRef');
+var _elm_lang$svg$Svg_Attributes$glyphName = _elm_lang$virtual_dom$VirtualDom$attribute('glyph-name');
+var _elm_lang$svg$Svg_Attributes$g2 = _elm_lang$virtual_dom$VirtualDom$attribute('g2');
+var _elm_lang$svg$Svg_Attributes$g1 = _elm_lang$virtual_dom$VirtualDom$attribute('g1');
+var _elm_lang$svg$Svg_Attributes$fy = _elm_lang$virtual_dom$VirtualDom$attribute('fy');
+var _elm_lang$svg$Svg_Attributes$fx = _elm_lang$virtual_dom$VirtualDom$attribute('fx');
+var _elm_lang$svg$Svg_Attributes$from = _elm_lang$virtual_dom$VirtualDom$attribute('from');
+var _elm_lang$svg$Svg_Attributes$format = _elm_lang$virtual_dom$VirtualDom$attribute('format');
+var _elm_lang$svg$Svg_Attributes$filterUnits = _elm_lang$virtual_dom$VirtualDom$attribute('filterUnits');
+var _elm_lang$svg$Svg_Attributes$filterRes = _elm_lang$virtual_dom$VirtualDom$attribute('filterRes');
+var _elm_lang$svg$Svg_Attributes$externalResourcesRequired = _elm_lang$virtual_dom$VirtualDom$attribute('externalResourcesRequired');
+var _elm_lang$svg$Svg_Attributes$exponent = _elm_lang$virtual_dom$VirtualDom$attribute('exponent');
+var _elm_lang$svg$Svg_Attributes$end = _elm_lang$virtual_dom$VirtualDom$attribute('end');
+var _elm_lang$svg$Svg_Attributes$elevation = _elm_lang$virtual_dom$VirtualDom$attribute('elevation');
+var _elm_lang$svg$Svg_Attributes$edgeMode = _elm_lang$virtual_dom$VirtualDom$attribute('edgeMode');
+var _elm_lang$svg$Svg_Attributes$dy = _elm_lang$virtual_dom$VirtualDom$attribute('dy');
+var _elm_lang$svg$Svg_Attributes$dx = _elm_lang$virtual_dom$VirtualDom$attribute('dx');
+var _elm_lang$svg$Svg_Attributes$dur = _elm_lang$virtual_dom$VirtualDom$attribute('dur');
+var _elm_lang$svg$Svg_Attributes$divisor = _elm_lang$virtual_dom$VirtualDom$attribute('divisor');
+var _elm_lang$svg$Svg_Attributes$diffuseConstant = _elm_lang$virtual_dom$VirtualDom$attribute('diffuseConstant');
+var _elm_lang$svg$Svg_Attributes$descent = _elm_lang$virtual_dom$VirtualDom$attribute('descent');
+var _elm_lang$svg$Svg_Attributes$decelerate = _elm_lang$virtual_dom$VirtualDom$attribute('decelerate');
+var _elm_lang$svg$Svg_Attributes$d = _elm_lang$virtual_dom$VirtualDom$attribute('d');
+var _elm_lang$svg$Svg_Attributes$cy = _elm_lang$virtual_dom$VirtualDom$attribute('cy');
+var _elm_lang$svg$Svg_Attributes$cx = _elm_lang$virtual_dom$VirtualDom$attribute('cx');
+var _elm_lang$svg$Svg_Attributes$contentStyleType = _elm_lang$virtual_dom$VirtualDom$attribute('contentStyleType');
+var _elm_lang$svg$Svg_Attributes$contentScriptType = _elm_lang$virtual_dom$VirtualDom$attribute('contentScriptType');
+var _elm_lang$svg$Svg_Attributes$clipPathUnits = _elm_lang$virtual_dom$VirtualDom$attribute('clipPathUnits');
+var _elm_lang$svg$Svg_Attributes$class = _elm_lang$virtual_dom$VirtualDom$attribute('class');
+var _elm_lang$svg$Svg_Attributes$capHeight = _elm_lang$virtual_dom$VirtualDom$attribute('cap-height');
+var _elm_lang$svg$Svg_Attributes$calcMode = _elm_lang$virtual_dom$VirtualDom$attribute('calcMode');
+var _elm_lang$svg$Svg_Attributes$by = _elm_lang$virtual_dom$VirtualDom$attribute('by');
+var _elm_lang$svg$Svg_Attributes$bias = _elm_lang$virtual_dom$VirtualDom$attribute('bias');
+var _elm_lang$svg$Svg_Attributes$begin = _elm_lang$virtual_dom$VirtualDom$attribute('begin');
+var _elm_lang$svg$Svg_Attributes$bbox = _elm_lang$virtual_dom$VirtualDom$attribute('bbox');
+var _elm_lang$svg$Svg_Attributes$baseProfile = _elm_lang$virtual_dom$VirtualDom$attribute('baseProfile');
+var _elm_lang$svg$Svg_Attributes$baseFrequency = _elm_lang$virtual_dom$VirtualDom$attribute('baseFrequency');
+var _elm_lang$svg$Svg_Attributes$azimuth = _elm_lang$virtual_dom$VirtualDom$attribute('azimuth');
+var _elm_lang$svg$Svg_Attributes$autoReverse = _elm_lang$virtual_dom$VirtualDom$attribute('autoReverse');
+var _elm_lang$svg$Svg_Attributes$attributeType = _elm_lang$virtual_dom$VirtualDom$attribute('attributeType');
+var _elm_lang$svg$Svg_Attributes$attributeName = _elm_lang$virtual_dom$VirtualDom$attribute('attributeName');
+var _elm_lang$svg$Svg_Attributes$ascent = _elm_lang$virtual_dom$VirtualDom$attribute('ascent');
+var _elm_lang$svg$Svg_Attributes$arabicForm = _elm_lang$virtual_dom$VirtualDom$attribute('arabic-form');
+var _elm_lang$svg$Svg_Attributes$amplitude = _elm_lang$virtual_dom$VirtualDom$attribute('amplitude');
+var _elm_lang$svg$Svg_Attributes$allowReorder = _elm_lang$virtual_dom$VirtualDom$attribute('allowReorder');
+var _elm_lang$svg$Svg_Attributes$alphabetic = _elm_lang$virtual_dom$VirtualDom$attribute('alphabetic');
+var _elm_lang$svg$Svg_Attributes$additive = _elm_lang$virtual_dom$VirtualDom$attribute('additive');
+var _elm_lang$svg$Svg_Attributes$accumulate = _elm_lang$virtual_dom$VirtualDom$attribute('accumulate');
+var _elm_lang$svg$Svg_Attributes$accelerate = _elm_lang$virtual_dom$VirtualDom$attribute('accelerate');
+var _elm_lang$svg$Svg_Attributes$accentHeight = _elm_lang$virtual_dom$VirtualDom$attribute('accent-height');
+
 var _evancz$url_parser$UrlParser$toKeyValuePair = function (segment) {
 	var _p0 = A2(_elm_lang$core$String$split, '=', segment);
 	if (((_p0.ctor === '::') && (_p0._1.ctor === '::')) && (_p0._1._1.ctor === '[]')) {
@@ -14057,6 +14767,7566 @@ var _evancz$url_parser$UrlParser$intParam = function (name) {
 	return A2(_evancz$url_parser$UrlParser$customParam, name, _evancz$url_parser$UrlParser$intParamHelp);
 };
 
+var _gampleman$elm_visualization$Visualization_Scale_Band$indexOfHelp = F3(
+	function (index, value, list) {
+		indexOfHelp:
+		while (true) {
+			var _p0 = list;
+			if (_p0.ctor === '[]') {
+				return _elm_lang$core$Maybe$Nothing;
+			} else {
+				if (_elm_lang$core$Native_Utils.eq(value, _p0._0)) {
+					return _elm_lang$core$Maybe$Just(index);
+				} else {
+					var _v1 = index + 1,
+						_v2 = value,
+						_v3 = _p0._1;
+					index = _v1;
+					value = _v2;
+					list = _v3;
+					continue indexOfHelp;
+				}
+			}
+		}
+	});
+var _gampleman$elm_visualization$Visualization_Scale_Band$indexOf = _gampleman$elm_visualization$Visualization_Scale_Band$indexOfHelp(0);
+var _gampleman$elm_visualization$Visualization_Scale_Band$normalizeConfig = function (_p1) {
+	var _p2 = _p1;
+	return {
+		paddingInner: A3(_elm_lang$core$Basics$clamp, 0, 1, _p2.paddingInner),
+		paddingOuter: A3(_elm_lang$core$Basics$clamp, 0, 1, _p2.paddingOuter),
+		align: A3(_elm_lang$core$Basics$clamp, 0, 1, _p2.align)
+	};
+};
+var _gampleman$elm_visualization$Visualization_Scale_Band$bandwidth = F3(
+	function (cfg, domain, _p3) {
+		var _p4 = _p3;
+		var _p8 = _p4._1;
+		var _p7 = _p4._0;
+		var n = _elm_lang$core$Basics$toFloat(
+			_elm_lang$core$List$length(domain));
+		var _p5 = (_elm_lang$core$Native_Utils.cmp(_p7, _p8) < 0) ? {ctor: '_Tuple2', _0: _p7, _1: _p8} : {ctor: '_Tuple2', _0: _p8, _1: _p7};
+		var start = _p5._0;
+		var stop = _p5._1;
+		var _p6 = _gampleman$elm_visualization$Visualization_Scale_Band$normalizeConfig(cfg);
+		var paddingInner = _p6.paddingInner;
+		var paddingOuter = _p6.paddingOuter;
+		var align = _p6.align;
+		var step = (stop - start) / A2(_elm_lang$core$Basics$max, 1, (n - paddingInner) + (paddingOuter * 2));
+		return step * (1 - paddingInner);
+	});
+var _gampleman$elm_visualization$Visualization_Scale_Band$computePositions = F4(
+	function (index, cfg, n, _p9) {
+		var _p10 = _p9;
+		var _p13 = _p10._1;
+		var _p12 = _p10._0;
+		var _p11 = _gampleman$elm_visualization$Visualization_Scale_Band$normalizeConfig(cfg);
+		var paddingInner = _p11.paddingInner;
+		var paddingOuter = _p11.paddingOuter;
+		var align = _p11.align;
+		var step = (_p13 - _p12) / A2(_elm_lang$core$Basics$max, 1, (n - paddingInner) + (paddingOuter * 2));
+		var start2 = _p12 + (((_p13 - _p12) - (step * (n - paddingInner))) * align);
+		return {ctor: '_Tuple2', _0: start2, _1: step};
+	});
+var _gampleman$elm_visualization$Visualization_Scale_Band$convert = F4(
+	function (cfg, domain, _p14, value) {
+		var _p15 = _p14;
+		var _p21 = _p15._1;
+		var _p20 = _p15._0;
+		var _p16 = A2(_gampleman$elm_visualization$Visualization_Scale_Band$indexOf, value, domain);
+		if (_p16.ctor === 'Just') {
+			var _p19 = _p16._0;
+			var n = _elm_lang$core$Basics$toFloat(
+				_elm_lang$core$List$length(domain));
+			if (_elm_lang$core$Native_Utils.cmp(_p20, _p21) < 0) {
+				var _p17 = A4(
+					_gampleman$elm_visualization$Visualization_Scale_Band$computePositions,
+					_p19,
+					cfg,
+					n,
+					{ctor: '_Tuple2', _0: _p20, _1: _p21});
+				var start2 = _p17._0;
+				var step = _p17._1;
+				return start2 + (step * _p19);
+			} else {
+				var _p18 = A4(
+					_gampleman$elm_visualization$Visualization_Scale_Band$computePositions,
+					_p19,
+					cfg,
+					n,
+					{ctor: '_Tuple2', _0: _p21, _1: _p20});
+				var stop2 = _p18._0;
+				var step = _p18._1;
+				return stop2 + (step * ((n - _p19) - 1));
+			}
+		} else {
+			return 0 / 0;
+		}
+	});
+var _gampleman$elm_visualization$Visualization_Scale_Band$Config = F3(
+	function (a, b, c) {
+		return {paddingInner: a, paddingOuter: b, align: c};
+	});
+
+var _gampleman$elm_visualization$Visualization_Scale_Colors$cat20c = {
+	ctor: '::',
+	_0: A3(_elm_lang$core$Color$rgb, 49, 130, 189),
+	_1: {
+		ctor: '::',
+		_0: A3(_elm_lang$core$Color$rgb, 107, 174, 214),
+		_1: {
+			ctor: '::',
+			_0: A3(_elm_lang$core$Color$rgb, 158, 202, 225),
+			_1: {
+				ctor: '::',
+				_0: A3(_elm_lang$core$Color$rgb, 198, 219, 239),
+				_1: {
+					ctor: '::',
+					_0: A3(_elm_lang$core$Color$rgb, 230, 85, 13),
+					_1: {
+						ctor: '::',
+						_0: A3(_elm_lang$core$Color$rgb, 253, 141, 60),
+						_1: {
+							ctor: '::',
+							_0: A3(_elm_lang$core$Color$rgb, 253, 174, 107),
+							_1: {
+								ctor: '::',
+								_0: A3(_elm_lang$core$Color$rgb, 253, 208, 162),
+								_1: {
+									ctor: '::',
+									_0: A3(_elm_lang$core$Color$rgb, 49, 163, 84),
+									_1: {
+										ctor: '::',
+										_0: A3(_elm_lang$core$Color$rgb, 116, 196, 118),
+										_1: {
+											ctor: '::',
+											_0: A3(_elm_lang$core$Color$rgb, 161, 217, 155),
+											_1: {
+												ctor: '::',
+												_0: A3(_elm_lang$core$Color$rgb, 199, 233, 192),
+												_1: {
+													ctor: '::',
+													_0: A3(_elm_lang$core$Color$rgb, 117, 107, 177),
+													_1: {
+														ctor: '::',
+														_0: A3(_elm_lang$core$Color$rgb, 158, 154, 200),
+														_1: {
+															ctor: '::',
+															_0: A3(_elm_lang$core$Color$rgb, 188, 189, 220),
+															_1: {
+																ctor: '::',
+																_0: A3(_elm_lang$core$Color$rgb, 218, 218, 235),
+																_1: {
+																	ctor: '::',
+																	_0: A3(_elm_lang$core$Color$rgb, 99, 99, 99),
+																	_1: {
+																		ctor: '::',
+																		_0: A3(_elm_lang$core$Color$rgb, 150, 150, 150),
+																		_1: {
+																			ctor: '::',
+																			_0: A3(_elm_lang$core$Color$rgb, 189, 189, 189),
+																			_1: {
+																				ctor: '::',
+																				_0: A3(_elm_lang$core$Color$rgb, 217, 217, 217),
+																				_1: {ctor: '[]'}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+};
+var _gampleman$elm_visualization$Visualization_Scale_Colors$cat20b = {
+	ctor: '::',
+	_0: A3(_elm_lang$core$Color$rgb, 57, 59, 121),
+	_1: {
+		ctor: '::',
+		_0: A3(_elm_lang$core$Color$rgb, 82, 84, 163),
+		_1: {
+			ctor: '::',
+			_0: A3(_elm_lang$core$Color$rgb, 107, 110, 207),
+			_1: {
+				ctor: '::',
+				_0: A3(_elm_lang$core$Color$rgb, 156, 158, 222),
+				_1: {
+					ctor: '::',
+					_0: A3(_elm_lang$core$Color$rgb, 99, 121, 57),
+					_1: {
+						ctor: '::',
+						_0: A3(_elm_lang$core$Color$rgb, 140, 162, 82),
+						_1: {
+							ctor: '::',
+							_0: A3(_elm_lang$core$Color$rgb, 181, 207, 107),
+							_1: {
+								ctor: '::',
+								_0: A3(_elm_lang$core$Color$rgb, 206, 219, 156),
+								_1: {
+									ctor: '::',
+									_0: A3(_elm_lang$core$Color$rgb, 140, 109, 49),
+									_1: {
+										ctor: '::',
+										_0: A3(_elm_lang$core$Color$rgb, 189, 158, 57),
+										_1: {
+											ctor: '::',
+											_0: A3(_elm_lang$core$Color$rgb, 231, 186, 82),
+											_1: {
+												ctor: '::',
+												_0: A3(_elm_lang$core$Color$rgb, 231, 203, 148),
+												_1: {
+													ctor: '::',
+													_0: A3(_elm_lang$core$Color$rgb, 132, 60, 57),
+													_1: {
+														ctor: '::',
+														_0: A3(_elm_lang$core$Color$rgb, 173, 73, 74),
+														_1: {
+															ctor: '::',
+															_0: A3(_elm_lang$core$Color$rgb, 214, 97, 107),
+															_1: {
+																ctor: '::',
+																_0: A3(_elm_lang$core$Color$rgb, 231, 150, 156),
+																_1: {
+																	ctor: '::',
+																	_0: A3(_elm_lang$core$Color$rgb, 123, 65, 115),
+																	_1: {
+																		ctor: '::',
+																		_0: A3(_elm_lang$core$Color$rgb, 165, 81, 148),
+																		_1: {
+																			ctor: '::',
+																			_0: A3(_elm_lang$core$Color$rgb, 206, 109, 189),
+																			_1: {
+																				ctor: '::',
+																				_0: A3(_elm_lang$core$Color$rgb, 222, 158, 214),
+																				_1: {ctor: '[]'}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+};
+var _gampleman$elm_visualization$Visualization_Scale_Colors$cat20a = {
+	ctor: '::',
+	_0: A3(_elm_lang$core$Color$rgb, 31, 119, 180),
+	_1: {
+		ctor: '::',
+		_0: A3(_elm_lang$core$Color$rgb, 174, 199, 232),
+		_1: {
+			ctor: '::',
+			_0: A3(_elm_lang$core$Color$rgb, 255, 127, 14),
+			_1: {
+				ctor: '::',
+				_0: A3(_elm_lang$core$Color$rgb, 255, 187, 120),
+				_1: {
+					ctor: '::',
+					_0: A3(_elm_lang$core$Color$rgb, 44, 160, 44),
+					_1: {
+						ctor: '::',
+						_0: A3(_elm_lang$core$Color$rgb, 152, 223, 138),
+						_1: {
+							ctor: '::',
+							_0: A3(_elm_lang$core$Color$rgb, 214, 39, 40),
+							_1: {
+								ctor: '::',
+								_0: A3(_elm_lang$core$Color$rgb, 255, 152, 150),
+								_1: {
+									ctor: '::',
+									_0: A3(_elm_lang$core$Color$rgb, 148, 103, 189),
+									_1: {
+										ctor: '::',
+										_0: A3(_elm_lang$core$Color$rgb, 197, 176, 213),
+										_1: {
+											ctor: '::',
+											_0: A3(_elm_lang$core$Color$rgb, 140, 86, 75),
+											_1: {
+												ctor: '::',
+												_0: A3(_elm_lang$core$Color$rgb, 196, 156, 148),
+												_1: {
+													ctor: '::',
+													_0: A3(_elm_lang$core$Color$rgb, 227, 119, 194),
+													_1: {
+														ctor: '::',
+														_0: A3(_elm_lang$core$Color$rgb, 247, 182, 210),
+														_1: {
+															ctor: '::',
+															_0: A3(_elm_lang$core$Color$rgb, 127, 127, 127),
+															_1: {
+																ctor: '::',
+																_0: A3(_elm_lang$core$Color$rgb, 199, 199, 199),
+																_1: {
+																	ctor: '::',
+																	_0: A3(_elm_lang$core$Color$rgb, 188, 189, 34),
+																	_1: {
+																		ctor: '::',
+																		_0: A3(_elm_lang$core$Color$rgb, 219, 219, 141),
+																		_1: {
+																			ctor: '::',
+																			_0: A3(_elm_lang$core$Color$rgb, 23, 190, 207),
+																			_1: {
+																				ctor: '::',
+																				_0: A3(_elm_lang$core$Color$rgb, 158, 218, 229),
+																				_1: {ctor: '[]'}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+};
+var _gampleman$elm_visualization$Visualization_Scale_Colors$cat10 = {
+	ctor: '::',
+	_0: A3(_elm_lang$core$Color$rgb, 31, 119, 180),
+	_1: {
+		ctor: '::',
+		_0: A3(_elm_lang$core$Color$rgb, 255, 127, 14),
+		_1: {
+			ctor: '::',
+			_0: A3(_elm_lang$core$Color$rgb, 44, 160, 44),
+			_1: {
+				ctor: '::',
+				_0: A3(_elm_lang$core$Color$rgb, 214, 39, 40),
+				_1: {
+					ctor: '::',
+					_0: A3(_elm_lang$core$Color$rgb, 148, 103, 189),
+					_1: {
+						ctor: '::',
+						_0: A3(_elm_lang$core$Color$rgb, 140, 86, 75),
+						_1: {
+							ctor: '::',
+							_0: A3(_elm_lang$core$Color$rgb, 227, 119, 194),
+							_1: {
+								ctor: '::',
+								_0: A3(_elm_lang$core$Color$rgb, 127, 127, 127),
+								_1: {
+									ctor: '::',
+									_0: A3(_elm_lang$core$Color$rgb, 188, 189, 34),
+									_1: {
+										ctor: '::',
+										_0: A3(_elm_lang$core$Color$rgb, 23, 190, 207),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+};
+var _gampleman$elm_visualization$Visualization_Scale_Colors$mkInterpolator = function (range) {
+	var n = _elm_lang$core$Array$length(range);
+	return function (t) {
+		return A2(
+			_elm_lang$core$Maybe$withDefault,
+			_elm_lang$core$Color$black,
+			A2(
+				_elm_lang$core$Array$get,
+				A2(
+					_elm_lang$core$Basics$max,
+					0,
+					A2(
+						_elm_lang$core$Basics$min,
+						n - 1,
+						_elm_lang$core$Basics$floor(
+							t * _elm_lang$core$Basics$toFloat(n)))),
+				range));
+	};
+};
+var _gampleman$elm_visualization$Visualization_Scale_Colors$viridis = _gampleman$elm_visualization$Visualization_Scale_Colors$mkInterpolator(
+	_elm_lang$core$Array$fromList(
+		{
+			ctor: '::',
+			_0: A3(_elm_lang$core$Color$rgb, 68, 1, 84),
+			_1: {
+				ctor: '::',
+				_0: A3(_elm_lang$core$Color$rgb, 68, 2, 86),
+				_1: {
+					ctor: '::',
+					_0: A3(_elm_lang$core$Color$rgb, 69, 4, 87),
+					_1: {
+						ctor: '::',
+						_0: A3(_elm_lang$core$Color$rgb, 69, 5, 89),
+						_1: {
+							ctor: '::',
+							_0: A3(_elm_lang$core$Color$rgb, 70, 7, 90),
+							_1: {
+								ctor: '::',
+								_0: A3(_elm_lang$core$Color$rgb, 70, 8, 92),
+								_1: {
+									ctor: '::',
+									_0: A3(_elm_lang$core$Color$rgb, 70, 10, 93),
+									_1: {
+										ctor: '::',
+										_0: A3(_elm_lang$core$Color$rgb, 70, 11, 94),
+										_1: {
+											ctor: '::',
+											_0: A3(_elm_lang$core$Color$rgb, 71, 13, 96),
+											_1: {
+												ctor: '::',
+												_0: A3(_elm_lang$core$Color$rgb, 71, 14, 97),
+												_1: {
+													ctor: '::',
+													_0: A3(_elm_lang$core$Color$rgb, 71, 16, 99),
+													_1: {
+														ctor: '::',
+														_0: A3(_elm_lang$core$Color$rgb, 71, 17, 100),
+														_1: {
+															ctor: '::',
+															_0: A3(_elm_lang$core$Color$rgb, 71, 19, 101),
+															_1: {
+																ctor: '::',
+																_0: A3(_elm_lang$core$Color$rgb, 72, 20, 103),
+																_1: {
+																	ctor: '::',
+																	_0: A3(_elm_lang$core$Color$rgb, 72, 22, 104),
+																	_1: {
+																		ctor: '::',
+																		_0: A3(_elm_lang$core$Color$rgb, 72, 23, 105),
+																		_1: {
+																			ctor: '::',
+																			_0: A3(_elm_lang$core$Color$rgb, 72, 24, 106),
+																			_1: {
+																				ctor: '::',
+																				_0: A3(_elm_lang$core$Color$rgb, 72, 26, 108),
+																				_1: {
+																					ctor: '::',
+																					_0: A3(_elm_lang$core$Color$rgb, 72, 27, 109),
+																					_1: {
+																						ctor: '::',
+																						_0: A3(_elm_lang$core$Color$rgb, 72, 28, 110),
+																						_1: {
+																							ctor: '::',
+																							_0: A3(_elm_lang$core$Color$rgb, 72, 29, 111),
+																							_1: {
+																								ctor: '::',
+																								_0: A3(_elm_lang$core$Color$rgb, 72, 31, 112),
+																								_1: {
+																									ctor: '::',
+																									_0: A3(_elm_lang$core$Color$rgb, 72, 32, 113),
+																									_1: {
+																										ctor: '::',
+																										_0: A3(_elm_lang$core$Color$rgb, 72, 33, 115),
+																										_1: {
+																											ctor: '::',
+																											_0: A3(_elm_lang$core$Color$rgb, 72, 35, 116),
+																											_1: {
+																												ctor: '::',
+																												_0: A3(_elm_lang$core$Color$rgb, 72, 36, 117),
+																												_1: {
+																													ctor: '::',
+																													_0: A3(_elm_lang$core$Color$rgb, 72, 37, 118),
+																													_1: {
+																														ctor: '::',
+																														_0: A3(_elm_lang$core$Color$rgb, 72, 38, 119),
+																														_1: {
+																															ctor: '::',
+																															_0: A3(_elm_lang$core$Color$rgb, 72, 40, 120),
+																															_1: {
+																																ctor: '::',
+																																_0: A3(_elm_lang$core$Color$rgb, 72, 41, 121),
+																																_1: {
+																																	ctor: '::',
+																																	_0: A3(_elm_lang$core$Color$rgb, 71, 42, 122),
+																																	_1: {
+																																		ctor: '::',
+																																		_0: A3(_elm_lang$core$Color$rgb, 71, 44, 122),
+																																		_1: {
+																																			ctor: '::',
+																																			_0: A3(_elm_lang$core$Color$rgb, 71, 45, 123),
+																																			_1: {
+																																				ctor: '::',
+																																				_0: A3(_elm_lang$core$Color$rgb, 71, 46, 124),
+																																				_1: {
+																																					ctor: '::',
+																																					_0: A3(_elm_lang$core$Color$rgb, 71, 47, 125),
+																																					_1: {
+																																						ctor: '::',
+																																						_0: A3(_elm_lang$core$Color$rgb, 70, 48, 126),
+																																						_1: {
+																																							ctor: '::',
+																																							_0: A3(_elm_lang$core$Color$rgb, 70, 50, 126),
+																																							_1: {
+																																								ctor: '::',
+																																								_0: A3(_elm_lang$core$Color$rgb, 70, 51, 127),
+																																								_1: {
+																																									ctor: '::',
+																																									_0: A3(_elm_lang$core$Color$rgb, 70, 52, 128),
+																																									_1: {
+																																										ctor: '::',
+																																										_0: A3(_elm_lang$core$Color$rgb, 69, 53, 129),
+																																										_1: {
+																																											ctor: '::',
+																																											_0: A3(_elm_lang$core$Color$rgb, 69, 55, 129),
+																																											_1: {
+																																												ctor: '::',
+																																												_0: A3(_elm_lang$core$Color$rgb, 69, 56, 130),
+																																												_1: {
+																																													ctor: '::',
+																																													_0: A3(_elm_lang$core$Color$rgb, 68, 57, 131),
+																																													_1: {
+																																														ctor: '::',
+																																														_0: A3(_elm_lang$core$Color$rgb, 68, 58, 131),
+																																														_1: {
+																																															ctor: '::',
+																																															_0: A3(_elm_lang$core$Color$rgb, 68, 59, 132),
+																																															_1: {
+																																																ctor: '::',
+																																																_0: A3(_elm_lang$core$Color$rgb, 67, 61, 132),
+																																																_1: {
+																																																	ctor: '::',
+																																																	_0: A3(_elm_lang$core$Color$rgb, 67, 62, 133),
+																																																	_1: {
+																																																		ctor: '::',
+																																																		_0: A3(_elm_lang$core$Color$rgb, 66, 63, 133),
+																																																		_1: {
+																																																			ctor: '::',
+																																																			_0: A3(_elm_lang$core$Color$rgb, 66, 64, 134),
+																																																			_1: {
+																																																				ctor: '::',
+																																																				_0: A3(_elm_lang$core$Color$rgb, 66, 65, 134),
+																																																				_1: {
+																																																					ctor: '::',
+																																																					_0: A3(_elm_lang$core$Color$rgb, 65, 66, 135),
+																																																					_1: {
+																																																						ctor: '::',
+																																																						_0: A3(_elm_lang$core$Color$rgb, 65, 68, 135),
+																																																						_1: {
+																																																							ctor: '::',
+																																																							_0: A3(_elm_lang$core$Color$rgb, 64, 69, 136),
+																																																							_1: {
+																																																								ctor: '::',
+																																																								_0: A3(_elm_lang$core$Color$rgb, 64, 70, 136),
+																																																								_1: {
+																																																									ctor: '::',
+																																																									_0: A3(_elm_lang$core$Color$rgb, 63, 71, 136),
+																																																									_1: {
+																																																										ctor: '::',
+																																																										_0: A3(_elm_lang$core$Color$rgb, 63, 72, 137),
+																																																										_1: {
+																																																											ctor: '::',
+																																																											_0: A3(_elm_lang$core$Color$rgb, 62, 73, 137),
+																																																											_1: {
+																																																												ctor: '::',
+																																																												_0: A3(_elm_lang$core$Color$rgb, 62, 74, 137),
+																																																												_1: {
+																																																													ctor: '::',
+																																																													_0: A3(_elm_lang$core$Color$rgb, 62, 76, 138),
+																																																													_1: {
+																																																														ctor: '::',
+																																																														_0: A3(_elm_lang$core$Color$rgb, 61, 77, 138),
+																																																														_1: {
+																																																															ctor: '::',
+																																																															_0: A3(_elm_lang$core$Color$rgb, 61, 78, 138),
+																																																															_1: {
+																																																																ctor: '::',
+																																																																_0: A3(_elm_lang$core$Color$rgb, 60, 79, 138),
+																																																																_1: {
+																																																																	ctor: '::',
+																																																																	_0: A3(_elm_lang$core$Color$rgb, 60, 80, 139),
+																																																																	_1: {
+																																																																		ctor: '::',
+																																																																		_0: A3(_elm_lang$core$Color$rgb, 59, 81, 139),
+																																																																		_1: {
+																																																																			ctor: '::',
+																																																																			_0: A3(_elm_lang$core$Color$rgb, 59, 82, 139),
+																																																																			_1: {
+																																																																				ctor: '::',
+																																																																				_0: A3(_elm_lang$core$Color$rgb, 58, 83, 139),
+																																																																				_1: {
+																																																																					ctor: '::',
+																																																																					_0: A3(_elm_lang$core$Color$rgb, 58, 84, 140),
+																																																																					_1: {
+																																																																						ctor: '::',
+																																																																						_0: A3(_elm_lang$core$Color$rgb, 57, 85, 140),
+																																																																						_1: {
+																																																																							ctor: '::',
+																																																																							_0: A3(_elm_lang$core$Color$rgb, 57, 86, 140),
+																																																																							_1: {
+																																																																								ctor: '::',
+																																																																								_0: A3(_elm_lang$core$Color$rgb, 56, 88, 140),
+																																																																								_1: {
+																																																																									ctor: '::',
+																																																																									_0: A3(_elm_lang$core$Color$rgb, 56, 89, 140),
+																																																																									_1: {
+																																																																										ctor: '::',
+																																																																										_0: A3(_elm_lang$core$Color$rgb, 55, 90, 140),
+																																																																										_1: {
+																																																																											ctor: '::',
+																																																																											_0: A3(_elm_lang$core$Color$rgb, 55, 91, 141),
+																																																																											_1: {
+																																																																												ctor: '::',
+																																																																												_0: A3(_elm_lang$core$Color$rgb, 54, 92, 141),
+																																																																												_1: {
+																																																																													ctor: '::',
+																																																																													_0: A3(_elm_lang$core$Color$rgb, 54, 93, 141),
+																																																																													_1: {
+																																																																														ctor: '::',
+																																																																														_0: A3(_elm_lang$core$Color$rgb, 53, 94, 141),
+																																																																														_1: {
+																																																																															ctor: '::',
+																																																																															_0: A3(_elm_lang$core$Color$rgb, 53, 95, 141),
+																																																																															_1: {
+																																																																																ctor: '::',
+																																																																																_0: A3(_elm_lang$core$Color$rgb, 52, 96, 141),
+																																																																																_1: {
+																																																																																	ctor: '::',
+																																																																																	_0: A3(_elm_lang$core$Color$rgb, 52, 97, 141),
+																																																																																	_1: {
+																																																																																		ctor: '::',
+																																																																																		_0: A3(_elm_lang$core$Color$rgb, 51, 98, 141),
+																																																																																		_1: {
+																																																																																			ctor: '::',
+																																																																																			_0: A3(_elm_lang$core$Color$rgb, 51, 99, 141),
+																																																																																			_1: {
+																																																																																				ctor: '::',
+																																																																																				_0: A3(_elm_lang$core$Color$rgb, 50, 100, 142),
+																																																																																				_1: {
+																																																																																					ctor: '::',
+																																																																																					_0: A3(_elm_lang$core$Color$rgb, 50, 101, 142),
+																																																																																					_1: {
+																																																																																						ctor: '::',
+																																																																																						_0: A3(_elm_lang$core$Color$rgb, 49, 102, 142),
+																																																																																						_1: {
+																																																																																							ctor: '::',
+																																																																																							_0: A3(_elm_lang$core$Color$rgb, 49, 103, 142),
+																																																																																							_1: {
+																																																																																								ctor: '::',
+																																																																																								_0: A3(_elm_lang$core$Color$rgb, 49, 104, 142),
+																																																																																								_1: {
+																																																																																									ctor: '::',
+																																																																																									_0: A3(_elm_lang$core$Color$rgb, 48, 105, 142),
+																																																																																									_1: {
+																																																																																										ctor: '::',
+																																																																																										_0: A3(_elm_lang$core$Color$rgb, 48, 106, 142),
+																																																																																										_1: {
+																																																																																											ctor: '::',
+																																																																																											_0: A3(_elm_lang$core$Color$rgb, 47, 107, 142),
+																																																																																											_1: {
+																																																																																												ctor: '::',
+																																																																																												_0: A3(_elm_lang$core$Color$rgb, 47, 108, 142),
+																																																																																												_1: {
+																																																																																													ctor: '::',
+																																																																																													_0: A3(_elm_lang$core$Color$rgb, 46, 109, 142),
+																																																																																													_1: {
+																																																																																														ctor: '::',
+																																																																																														_0: A3(_elm_lang$core$Color$rgb, 46, 110, 142),
+																																																																																														_1: {
+																																																																																															ctor: '::',
+																																																																																															_0: A3(_elm_lang$core$Color$rgb, 46, 111, 142),
+																																																																																															_1: {
+																																																																																																ctor: '::',
+																																																																																																_0: A3(_elm_lang$core$Color$rgb, 45, 112, 142),
+																																																																																																_1: {
+																																																																																																	ctor: '::',
+																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 45, 113, 142),
+																																																																																																	_1: {
+																																																																																																		ctor: '::',
+																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 44, 113, 142),
+																																																																																																		_1: {
+																																																																																																			ctor: '::',
+																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 44, 114, 142),
+																																																																																																			_1: {
+																																																																																																				ctor: '::',
+																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 44, 115, 142),
+																																																																																																				_1: {
+																																																																																																					ctor: '::',
+																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 43, 116, 142),
+																																																																																																					_1: {
+																																																																																																						ctor: '::',
+																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 43, 117, 142),
+																																																																																																						_1: {
+																																																																																																							ctor: '::',
+																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 42, 118, 142),
+																																																																																																							_1: {
+																																																																																																								ctor: '::',
+																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 42, 119, 142),
+																																																																																																								_1: {
+																																																																																																									ctor: '::',
+																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 42, 120, 142),
+																																																																																																									_1: {
+																																																																																																										ctor: '::',
+																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 41, 121, 142),
+																																																																																																										_1: {
+																																																																																																											ctor: '::',
+																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 41, 122, 142),
+																																																																																																											_1: {
+																																																																																																												ctor: '::',
+																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 41, 123, 142),
+																																																																																																												_1: {
+																																																																																																													ctor: '::',
+																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 40, 124, 142),
+																																																																																																													_1: {
+																																																																																																														ctor: '::',
+																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 40, 125, 142),
+																																																																																																														_1: {
+																																																																																																															ctor: '::',
+																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 39, 126, 142),
+																																																																																																															_1: {
+																																																																																																																ctor: '::',
+																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 39, 127, 142),
+																																																																																																																_1: {
+																																																																																																																	ctor: '::',
+																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 39, 128, 142),
+																																																																																																																	_1: {
+																																																																																																																		ctor: '::',
+																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 38, 129, 142),
+																																																																																																																		_1: {
+																																																																																																																			ctor: '::',
+																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 38, 130, 142),
+																																																																																																																			_1: {
+																																																																																																																				ctor: '::',
+																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 38, 130, 142),
+																																																																																																																				_1: {
+																																																																																																																					ctor: '::',
+																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 37, 131, 142),
+																																																																																																																					_1: {
+																																																																																																																						ctor: '::',
+																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 37, 132, 142),
+																																																																																																																						_1: {
+																																																																																																																							ctor: '::',
+																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 37, 133, 142),
+																																																																																																																							_1: {
+																																																																																																																								ctor: '::',
+																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 36, 134, 142),
+																																																																																																																								_1: {
+																																																																																																																									ctor: '::',
+																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 36, 135, 142),
+																																																																																																																									_1: {
+																																																																																																																										ctor: '::',
+																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 35, 136, 142),
+																																																																																																																										_1: {
+																																																																																																																											ctor: '::',
+																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 35, 137, 142),
+																																																																																																																											_1: {
+																																																																																																																												ctor: '::',
+																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 35, 138, 141),
+																																																																																																																												_1: {
+																																																																																																																													ctor: '::',
+																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 34, 139, 141),
+																																																																																																																													_1: {
+																																																																																																																														ctor: '::',
+																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 34, 140, 141),
+																																																																																																																														_1: {
+																																																																																																																															ctor: '::',
+																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 34, 141, 141),
+																																																																																																																															_1: {
+																																																																																																																																ctor: '::',
+																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 33, 142, 141),
+																																																																																																																																_1: {
+																																																																																																																																	ctor: '::',
+																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 33, 143, 141),
+																																																																																																																																	_1: {
+																																																																																																																																		ctor: '::',
+																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 33, 144, 141),
+																																																																																																																																		_1: {
+																																																																																																																																			ctor: '::',
+																																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 33, 145, 140),
+																																																																																																																																			_1: {
+																																																																																																																																				ctor: '::',
+																																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 32, 146, 140),
+																																																																																																																																				_1: {
+																																																																																																																																					ctor: '::',
+																																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 32, 146, 140),
+																																																																																																																																					_1: {
+																																																																																																																																						ctor: '::',
+																																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 32, 147, 140),
+																																																																																																																																						_1: {
+																																																																																																																																							ctor: '::',
+																																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 31, 148, 140),
+																																																																																																																																							_1: {
+																																																																																																																																								ctor: '::',
+																																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 31, 149, 139),
+																																																																																																																																								_1: {
+																																																																																																																																									ctor: '::',
+																																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 31, 150, 139),
+																																																																																																																																									_1: {
+																																																																																																																																										ctor: '::',
+																																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 31, 151, 139),
+																																																																																																																																										_1: {
+																																																																																																																																											ctor: '::',
+																																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 31, 152, 139),
+																																																																																																																																											_1: {
+																																																																																																																																												ctor: '::',
+																																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 31, 153, 138),
+																																																																																																																																												_1: {
+																																																																																																																																													ctor: '::',
+																																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 31, 154, 138),
+																																																																																																																																													_1: {
+																																																																																																																																														ctor: '::',
+																																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 30, 155, 138),
+																																																																																																																																														_1: {
+																																																																																																																																															ctor: '::',
+																																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 30, 156, 137),
+																																																																																																																																															_1: {
+																																																																																																																																																ctor: '::',
+																																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 30, 157, 137),
+																																																																																																																																																_1: {
+																																																																																																																																																	ctor: '::',
+																																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 31, 158, 137),
+																																																																																																																																																	_1: {
+																																																																																																																																																		ctor: '::',
+																																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 31, 159, 136),
+																																																																																																																																																		_1: {
+																																																																																																																																																			ctor: '::',
+																																																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 31, 160, 136),
+																																																																																																																																																			_1: {
+																																																																																																																																																				ctor: '::',
+																																																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 31, 161, 136),
+																																																																																																																																																				_1: {
+																																																																																																																																																					ctor: '::',
+																																																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 31, 161, 135),
+																																																																																																																																																					_1: {
+																																																																																																																																																						ctor: '::',
+																																																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 31, 162, 135),
+																																																																																																																																																						_1: {
+																																																																																																																																																							ctor: '::',
+																																																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 32, 163, 134),
+																																																																																																																																																							_1: {
+																																																																																																																																																								ctor: '::',
+																																																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 32, 164, 134),
+																																																																																																																																																								_1: {
+																																																																																																																																																									ctor: '::',
+																																																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 33, 165, 133),
+																																																																																																																																																									_1: {
+																																																																																																																																																										ctor: '::',
+																																																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 33, 166, 133),
+																																																																																																																																																										_1: {
+																																																																																																																																																											ctor: '::',
+																																																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 34, 167, 133),
+																																																																																																																																																											_1: {
+																																																																																																																																																												ctor: '::',
+																																																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 34, 168, 132),
+																																																																																																																																																												_1: {
+																																																																																																																																																													ctor: '::',
+																																																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 35, 169, 131),
+																																																																																																																																																													_1: {
+																																																																																																																																																														ctor: '::',
+																																																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 36, 170, 131),
+																																																																																																																																																														_1: {
+																																																																																																																																																															ctor: '::',
+																																																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 37, 171, 130),
+																																																																																																																																																															_1: {
+																																																																																																																																																																ctor: '::',
+																																																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 37, 172, 130),
+																																																																																																																																																																_1: {
+																																																																																																																																																																	ctor: '::',
+																																																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 38, 173, 129),
+																																																																																																																																																																	_1: {
+																																																																																																																																																																		ctor: '::',
+																																																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 39, 173, 129),
+																																																																																																																																																																		_1: {
+																																																																																																																																																																			ctor: '::',
+																																																																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 40, 174, 128),
+																																																																																																																																																																			_1: {
+																																																																																																																																																																				ctor: '::',
+																																																																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 41, 175, 127),
+																																																																																																																																																																				_1: {
+																																																																																																																																																																					ctor: '::',
+																																																																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 42, 176, 127),
+																																																																																																																																																																					_1: {
+																																																																																																																																																																						ctor: '::',
+																																																																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 44, 177, 126),
+																																																																																																																																																																						_1: {
+																																																																																																																																																																							ctor: '::',
+																																																																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 45, 178, 125),
+																																																																																																																																																																							_1: {
+																																																																																																																																																																								ctor: '::',
+																																																																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 46, 179, 124),
+																																																																																																																																																																								_1: {
+																																																																																																																																																																									ctor: '::',
+																																																																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 47, 180, 124),
+																																																																																																																																																																									_1: {
+																																																																																																																																																																										ctor: '::',
+																																																																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 49, 181, 123),
+																																																																																																																																																																										_1: {
+																																																																																																																																																																											ctor: '::',
+																																																																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 50, 182, 122),
+																																																																																																																																																																											_1: {
+																																																																																																																																																																												ctor: '::',
+																																																																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 52, 182, 121),
+																																																																																																																																																																												_1: {
+																																																																																																																																																																													ctor: '::',
+																																																																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 53, 183, 121),
+																																																																																																																																																																													_1: {
+																																																																																																																																																																														ctor: '::',
+																																																																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 55, 184, 120),
+																																																																																																																																																																														_1: {
+																																																																																																																																																																															ctor: '::',
+																																																																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 56, 185, 119),
+																																																																																																																																																																															_1: {
+																																																																																																																																																																																ctor: '::',
+																																																																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 58, 186, 118),
+																																																																																																																																																																																_1: {
+																																																																																																																																																																																	ctor: '::',
+																																																																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 59, 187, 117),
+																																																																																																																																																																																	_1: {
+																																																																																																																																																																																		ctor: '::',
+																																																																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 61, 188, 116),
+																																																																																																																																																																																		_1: {
+																																																																																																																																																																																			ctor: '::',
+																																																																																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 63, 188, 115),
+																																																																																																																																																																																			_1: {
+																																																																																																																																																																																				ctor: '::',
+																																																																																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 64, 189, 114),
+																																																																																																																																																																																				_1: {
+																																																																																																																																																																																					ctor: '::',
+																																																																																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 66, 190, 113),
+																																																																																																																																																																																					_1: {
+																																																																																																																																																																																						ctor: '::',
+																																																																																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 68, 191, 112),
+																																																																																																																																																																																						_1: {
+																																																																																																																																																																																							ctor: '::',
+																																																																																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 70, 192, 111),
+																																																																																																																																																																																							_1: {
+																																																																																																																																																																																								ctor: '::',
+																																																																																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 72, 193, 110),
+																																																																																																																																																																																								_1: {
+																																																																																																																																																																																									ctor: '::',
+																																																																																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 74, 193, 109),
+																																																																																																																																																																																									_1: {
+																																																																																																																																																																																										ctor: '::',
+																																																																																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 76, 194, 108),
+																																																																																																																																																																																										_1: {
+																																																																																																																																																																																											ctor: '::',
+																																																																																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 78, 195, 107),
+																																																																																																																																																																																											_1: {
+																																																																																																																																																																																												ctor: '::',
+																																																																																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 80, 196, 106),
+																																																																																																																																																																																												_1: {
+																																																																																																																																																																																													ctor: '::',
+																																																																																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 82, 197, 105),
+																																																																																																																																																																																													_1: {
+																																																																																																																																																																																														ctor: '::',
+																																																																																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 84, 197, 104),
+																																																																																																																																																																																														_1: {
+																																																																																																																																																																																															ctor: '::',
+																																																																																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 86, 198, 103),
+																																																																																																																																																																																															_1: {
+																																																																																																																																																																																																ctor: '::',
+																																																																																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 88, 199, 101),
+																																																																																																																																																																																																_1: {
+																																																																																																																																																																																																	ctor: '::',
+																																																																																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 90, 200, 100),
+																																																																																																																																																																																																	_1: {
+																																																																																																																																																																																																		ctor: '::',
+																																																																																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 92, 200, 99),
+																																																																																																																																																																																																		_1: {
+																																																																																																																																																																																																			ctor: '::',
+																																																																																																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 94, 201, 98),
+																																																																																																																																																																																																			_1: {
+																																																																																																																																																																																																				ctor: '::',
+																																																																																																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 96, 202, 96),
+																																																																																																																																																																																																				_1: {
+																																																																																																																																																																																																					ctor: '::',
+																																																																																																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 99, 203, 95),
+																																																																																																																																																																																																					_1: {
+																																																																																																																																																																																																						ctor: '::',
+																																																																																																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 101, 203, 94),
+																																																																																																																																																																																																						_1: {
+																																																																																																																																																																																																							ctor: '::',
+																																																																																																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 103, 204, 92),
+																																																																																																																																																																																																							_1: {
+																																																																																																																																																																																																								ctor: '::',
+																																																																																																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 105, 205, 91),
+																																																																																																																																																																																																								_1: {
+																																																																																																																																																																																																									ctor: '::',
+																																																																																																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 108, 205, 90),
+																																																																																																																																																																																																									_1: {
+																																																																																																																																																																																																										ctor: '::',
+																																																																																																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 110, 206, 88),
+																																																																																																																																																																																																										_1: {
+																																																																																																																																																																																																											ctor: '::',
+																																																																																																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 112, 207, 87),
+																																																																																																																																																																																																											_1: {
+																																																																																																																																																																																																												ctor: '::',
+																																																																																																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 115, 208, 86),
+																																																																																																																																																																																																												_1: {
+																																																																																																																																																																																																													ctor: '::',
+																																																																																																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 117, 208, 84),
+																																																																																																																																																																																																													_1: {
+																																																																																																																																																																																																														ctor: '::',
+																																																																																																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 119, 209, 83),
+																																																																																																																																																																																																														_1: {
+																																																																																																																																																																																																															ctor: '::',
+																																																																																																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 122, 209, 81),
+																																																																																																																																																																																																															_1: {
+																																																																																																																																																																																																																ctor: '::',
+																																																																																																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 124, 210, 80),
+																																																																																																																																																																																																																_1: {
+																																																																																																																																																																																																																	ctor: '::',
+																																																																																																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 127, 211, 78),
+																																																																																																																																																																																																																	_1: {
+																																																																																																																																																																																																																		ctor: '::',
+																																																																																																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 129, 211, 77),
+																																																																																																																																																																																																																		_1: {
+																																																																																																																																																																																																																			ctor: '::',
+																																																																																																																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 132, 212, 75),
+																																																																																																																																																																																																																			_1: {
+																																																																																																																																																																																																																				ctor: '::',
+																																																																																																																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 134, 213, 73),
+																																																																																																																																																																																																																				_1: {
+																																																																																																																																																																																																																					ctor: '::',
+																																																																																																																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 137, 213, 72),
+																																																																																																																																																																																																																					_1: {
+																																																																																																																																																																																																																						ctor: '::',
+																																																																																																																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 139, 214, 70),
+																																																																																																																																																																																																																						_1: {
+																																																																																																																																																																																																																							ctor: '::',
+																																																																																																																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 142, 214, 69),
+																																																																																																																																																																																																																							_1: {
+																																																																																																																																																																																																																								ctor: '::',
+																																																																																																																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 144, 215, 67),
+																																																																																																																																																																																																																								_1: {
+																																																																																																																																																																																																																									ctor: '::',
+																																																																																																																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 147, 215, 65),
+																																																																																																																																																																																																																									_1: {
+																																																																																																																																																																																																																										ctor: '::',
+																																																																																																																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 149, 216, 64),
+																																																																																																																																																																																																																										_1: {
+																																																																																																																																																																																																																											ctor: '::',
+																																																																																																																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 152, 216, 62),
+																																																																																																																																																																																																																											_1: {
+																																																																																																																																																																																																																												ctor: '::',
+																																																																																																																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 155, 217, 60),
+																																																																																																																																																																																																																												_1: {
+																																																																																																																																																																																																																													ctor: '::',
+																																																																																																																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 157, 217, 59),
+																																																																																																																																																																																																																													_1: {
+																																																																																																																																																																																																																														ctor: '::',
+																																																																																																																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 160, 218, 57),
+																																																																																																																																																																																																																														_1: {
+																																																																																																																																																																																																																															ctor: '::',
+																																																																																																																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 162, 218, 55),
+																																																																																																																																																																																																																															_1: {
+																																																																																																																																																																																																																																ctor: '::',
+																																																																																																																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 165, 219, 54),
+																																																																																																																																																																																																																																_1: {
+																																																																																																																																																																																																																																	ctor: '::',
+																																																																																																																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 168, 219, 52),
+																																																																																																																																																																																																																																	_1: {
+																																																																																																																																																																																																																																		ctor: '::',
+																																																																																																																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 170, 220, 50),
+																																																																																																																																																																																																																																		_1: {
+																																																																																																																																																																																																																																			ctor: '::',
+																																																																																																																																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 173, 220, 48),
+																																																																																																																																																																																																																																			_1: {
+																																																																																																																																																																																																																																				ctor: '::',
+																																																																																																																																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 176, 221, 47),
+																																																																																																																																																																																																																																				_1: {
+																																																																																																																																																																																																																																					ctor: '::',
+																																																																																																																																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 178, 221, 45),
+																																																																																																																																																																																																																																					_1: {
+																																																																																																																																																																																																																																						ctor: '::',
+																																																																																																																																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 181, 222, 43),
+																																																																																																																																																																																																																																						_1: {
+																																																																																																																																																																																																																																							ctor: '::',
+																																																																																																																																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 184, 222, 41),
+																																																																																																																																																																																																																																							_1: {
+																																																																																																																																																																																																																																								ctor: '::',
+																																																																																																																																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 186, 222, 40),
+																																																																																																																																																																																																																																								_1: {
+																																																																																																																																																																																																																																									ctor: '::',
+																																																																																																																																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 189, 223, 38),
+																																																																																																																																																																																																																																									_1: {
+																																																																																																																																																																																																																																										ctor: '::',
+																																																																																																																																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 192, 223, 37),
+																																																																																																																																																																																																																																										_1: {
+																																																																																																																																																																																																																																											ctor: '::',
+																																																																																																																																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 194, 223, 35),
+																																																																																																																																																																																																																																											_1: {
+																																																																																																																																																																																																																																												ctor: '::',
+																																																																																																																																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 197, 224, 33),
+																																																																																																																																																																																																																																												_1: {
+																																																																																																																																																																																																																																													ctor: '::',
+																																																																																																																																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 200, 224, 32),
+																																																																																																																																																																																																																																													_1: {
+																																																																																																																																																																																																																																														ctor: '::',
+																																																																																																																																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 202, 225, 31),
+																																																																																																																																																																																																																																														_1: {
+																																																																																																																																																																																																																																															ctor: '::',
+																																																																																																																																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 205, 225, 29),
+																																																																																																																																																																																																																																															_1: {
+																																																																																																																																																																																																																																																ctor: '::',
+																																																																																																																																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 208, 225, 28),
+																																																																																																																																																																																																																																																_1: {
+																																																																																																																																																																																																																																																	ctor: '::',
+																																																																																																																																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 210, 226, 27),
+																																																																																																																																																																																																																																																	_1: {
+																																																																																																																																																																																																																																																		ctor: '::',
+																																																																																																																																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 213, 226, 26),
+																																																																																																																																																																																																																																																		_1: {
+																																																																																																																																																																																																																																																			ctor: '::',
+																																																																																																																																																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 216, 226, 25),
+																																																																																																																																																																																																																																																			_1: {
+																																																																																																																																																																																																																																																				ctor: '::',
+																																																																																																																																																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 218, 227, 25),
+																																																																																																																																																																																																																																																				_1: {
+																																																																																																																																																																																																																																																					ctor: '::',
+																																																																																																																																																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 221, 227, 24),
+																																																																																																																																																																																																																																																					_1: {
+																																																																																																																																																																																																																																																						ctor: '::',
+																																																																																																																																																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 223, 227, 24),
+																																																																																																																																																																																																																																																						_1: {
+																																																																																																																																																																																																																																																							ctor: '::',
+																																																																																																																																																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 226, 228, 24),
+																																																																																																																																																																																																																																																							_1: {
+																																																																																																																																																																																																																																																								ctor: '::',
+																																																																																																																																																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 229, 228, 25),
+																																																																																																																																																																																																																																																								_1: {
+																																																																																																																																																																																																																																																									ctor: '::',
+																																																																																																																																																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 231, 228, 25),
+																																																																																																																																																																																																																																																									_1: {
+																																																																																																																																																																																																																																																										ctor: '::',
+																																																																																																																																																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 234, 229, 26),
+																																																																																																																																																																																																																																																										_1: {
+																																																																																																																																																																																																																																																											ctor: '::',
+																																																																																																																																																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 236, 229, 27),
+																																																																																																																																																																																																																																																											_1: {
+																																																																																																																																																																																																																																																												ctor: '::',
+																																																																																																																																																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 239, 229, 28),
+																																																																																																																																																																																																																																																												_1: {
+																																																																																																																																																																																																																																																													ctor: '::',
+																																																																																																																																																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 241, 229, 29),
+																																																																																																																																																																																																																																																													_1: {
+																																																																																																																																																																																																																																																														ctor: '::',
+																																																																																																																																																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 244, 230, 30),
+																																																																																																																																																																																																																																																														_1: {
+																																																																																																																																																																																																																																																															ctor: '::',
+																																																																																																																																																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 246, 230, 32),
+																																																																																																																																																																																																																																																															_1: {
+																																																																																																																																																																																																																																																																ctor: '::',
+																																																																																																																																																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 248, 230, 33),
+																																																																																																																																																																																																																																																																_1: {
+																																																																																																																																																																																																																																																																	ctor: '::',
+																																																																																																																																																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 251, 231, 35),
+																																																																																																																																																																																																																																																																	_1: {
+																																																																																																																																																																																																																																																																		ctor: '::',
+																																																																																																																																																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 253, 231, 37),
+																																																																																																																																																																																																																																																																		_1: {ctor: '[]'}
+																																																																																																																																																																																																																																																																	}
+																																																																																																																																																																																																																																																																}
+																																																																																																																																																																																																																																																															}
+																																																																																																																																																																																																																																																														}
+																																																																																																																																																																																																																																																													}
+																																																																																																																																																																																																																																																												}
+																																																																																																																																																																																																																																																											}
+																																																																																																																																																																																																																																																										}
+																																																																																																																																																																																																																																																									}
+																																																																																																																																																																																																																																																								}
+																																																																																																																																																																																																																																																							}
+																																																																																																																																																																																																																																																						}
+																																																																																																																																																																																																																																																					}
+																																																																																																																																																																																																																																																				}
+																																																																																																																																																																																																																																																			}
+																																																																																																																																																																																																																																																		}
+																																																																																																																																																																																																																																																	}
+																																																																																																																																																																																																																																																}
+																																																																																																																																																																																																																																															}
+																																																																																																																																																																																																																																														}
+																																																																																																																																																																																																																																													}
+																																																																																																																																																																																																																																												}
+																																																																																																																																																																																																																																											}
+																																																																																																																																																																																																																																										}
+																																																																																																																																																																																																																																									}
+																																																																																																																																																																																																																																								}
+																																																																																																																																																																																																																																							}
+																																																																																																																																																																																																																																						}
+																																																																																																																																																																																																																																					}
+																																																																																																																																																																																																																																				}
+																																																																																																																																																																																																																																			}
+																																																																																																																																																																																																																																		}
+																																																																																																																																																																																																																																	}
+																																																																																																																																																																																																																																}
+																																																																																																																																																																																																																															}
+																																																																																																																																																																																																																														}
+																																																																																																																																																																																																																													}
+																																																																																																																																																																																																																												}
+																																																																																																																																																																																																																											}
+																																																																																																																																																																																																																										}
+																																																																																																																																																																																																																									}
+																																																																																																																																																																																																																								}
+																																																																																																																																																																																																																							}
+																																																																																																																																																																																																																						}
+																																																																																																																																																																																																																					}
+																																																																																																																																																																																																																				}
+																																																																																																																																																																																																																			}
+																																																																																																																																																																																																																		}
+																																																																																																																																																																																																																	}
+																																																																																																																																																																																																																}
+																																																																																																																																																																																																															}
+																																																																																																																																																																																																														}
+																																																																																																																																																																																																													}
+																																																																																																																																																																																																												}
+																																																																																																																																																																																																											}
+																																																																																																																																																																																																										}
+																																																																																																																																																																																																									}
+																																																																																																																																																																																																								}
+																																																																																																																																																																																																							}
+																																																																																																																																																																																																						}
+																																																																																																																																																																																																					}
+																																																																																																																																																																																																				}
+																																																																																																																																																																																																			}
+																																																																																																																																																																																																		}
+																																																																																																																																																																																																	}
+																																																																																																																																																																																																}
+																																																																																																																																																																																															}
+																																																																																																																																																																																														}
+																																																																																																																																																																																													}
+																																																																																																																																																																																												}
+																																																																																																																																																																																											}
+																																																																																																																																																																																										}
+																																																																																																																																																																																									}
+																																																																																																																																																																																								}
+																																																																																																																																																																																							}
+																																																																																																																																																																																						}
+																																																																																																																																																																																					}
+																																																																																																																																																																																				}
+																																																																																																																																																																																			}
+																																																																																																																																																																																		}
+																																																																																																																																																																																	}
+																																																																																																																																																																																}
+																																																																																																																																																																															}
+																																																																																																																																																																														}
+																																																																																																																																																																													}
+																																																																																																																																																																												}
+																																																																																																																																																																											}
+																																																																																																																																																																										}
+																																																																																																																																																																									}
+																																																																																																																																																																								}
+																																																																																																																																																																							}
+																																																																																																																																																																						}
+																																																																																																																																																																					}
+																																																																																																																																																																				}
+																																																																																																																																																																			}
+																																																																																																																																																																		}
+																																																																																																																																																																	}
+																																																																																																																																																																}
+																																																																																																																																																															}
+																																																																																																																																																														}
+																																																																																																																																																													}
+																																																																																																																																																												}
+																																																																																																																																																											}
+																																																																																																																																																										}
+																																																																																																																																																									}
+																																																																																																																																																								}
+																																																																																																																																																							}
+																																																																																																																																																						}
+																																																																																																																																																					}
+																																																																																																																																																				}
+																																																																																																																																																			}
+																																																																																																																																																		}
+																																																																																																																																																	}
+																																																																																																																																																}
+																																																																																																																																															}
+																																																																																																																																														}
+																																																																																																																																													}
+																																																																																																																																												}
+																																																																																																																																											}
+																																																																																																																																										}
+																																																																																																																																									}
+																																																																																																																																								}
+																																																																																																																																							}
+																																																																																																																																						}
+																																																																																																																																					}
+																																																																																																																																				}
+																																																																																																																																			}
+																																																																																																																																		}
+																																																																																																																																	}
+																																																																																																																																}
+																																																																																																																															}
+																																																																																																																														}
+																																																																																																																													}
+																																																																																																																												}
+																																																																																																																											}
+																																																																																																																										}
+																																																																																																																									}
+																																																																																																																								}
+																																																																																																																							}
+																																																																																																																						}
+																																																																																																																					}
+																																																																																																																				}
+																																																																																																																			}
+																																																																																																																		}
+																																																																																																																	}
+																																																																																																																}
+																																																																																																															}
+																																																																																																														}
+																																																																																																													}
+																																																																																																												}
+																																																																																																											}
+																																																																																																										}
+																																																																																																									}
+																																																																																																								}
+																																																																																																							}
+																																																																																																						}
+																																																																																																					}
+																																																																																																				}
+																																																																																																			}
+																																																																																																		}
+																																																																																																	}
+																																																																																																}
+																																																																																															}
+																																																																																														}
+																																																																																													}
+																																																																																												}
+																																																																																											}
+																																																																																										}
+																																																																																									}
+																																																																																								}
+																																																																																							}
+																																																																																						}
+																																																																																					}
+																																																																																				}
+																																																																																			}
+																																																																																		}
+																																																																																	}
+																																																																																}
+																																																																															}
+																																																																														}
+																																																																													}
+																																																																												}
+																																																																											}
+																																																																										}
+																																																																									}
+																																																																								}
+																																																																							}
+																																																																						}
+																																																																					}
+																																																																				}
+																																																																			}
+																																																																		}
+																																																																	}
+																																																																}
+																																																															}
+																																																														}
+																																																													}
+																																																												}
+																																																											}
+																																																										}
+																																																									}
+																																																								}
+																																																							}
+																																																						}
+																																																					}
+																																																				}
+																																																			}
+																																																		}
+																																																	}
+																																																}
+																																															}
+																																														}
+																																													}
+																																												}
+																																											}
+																																										}
+																																									}
+																																								}
+																																							}
+																																						}
+																																					}
+																																				}
+																																			}
+																																		}
+																																	}
+																																}
+																															}
+																														}
+																													}
+																												}
+																											}
+																										}
+																									}
+																								}
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}));
+var _gampleman$elm_visualization$Visualization_Scale_Colors$magma = _gampleman$elm_visualization$Visualization_Scale_Colors$mkInterpolator(
+	_elm_lang$core$Array$fromList(
+		{
+			ctor: '::',
+			_0: A3(_elm_lang$core$Color$rgb, 0, 0, 4),
+			_1: {
+				ctor: '::',
+				_0: A3(_elm_lang$core$Color$rgb, 1, 0, 5),
+				_1: {
+					ctor: '::',
+					_0: A3(_elm_lang$core$Color$rgb, 1, 1, 6),
+					_1: {
+						ctor: '::',
+						_0: A3(_elm_lang$core$Color$rgb, 1, 1, 8),
+						_1: {
+							ctor: '::',
+							_0: A3(_elm_lang$core$Color$rgb, 2, 1, 9),
+							_1: {
+								ctor: '::',
+								_0: A3(_elm_lang$core$Color$rgb, 2, 2, 11),
+								_1: {
+									ctor: '::',
+									_0: A3(_elm_lang$core$Color$rgb, 2, 2, 13),
+									_1: {
+										ctor: '::',
+										_0: A3(_elm_lang$core$Color$rgb, 3, 3, 15),
+										_1: {
+											ctor: '::',
+											_0: A3(_elm_lang$core$Color$rgb, 3, 3, 18),
+											_1: {
+												ctor: '::',
+												_0: A3(_elm_lang$core$Color$rgb, 4, 4, 20),
+												_1: {
+													ctor: '::',
+													_0: A3(_elm_lang$core$Color$rgb, 5, 4, 22),
+													_1: {
+														ctor: '::',
+														_0: A3(_elm_lang$core$Color$rgb, 6, 5, 24),
+														_1: {
+															ctor: '::',
+															_0: A3(_elm_lang$core$Color$rgb, 6, 5, 26),
+															_1: {
+																ctor: '::',
+																_0: A3(_elm_lang$core$Color$rgb, 7, 6, 28),
+																_1: {
+																	ctor: '::',
+																	_0: A3(_elm_lang$core$Color$rgb, 8, 7, 30),
+																	_1: {
+																		ctor: '::',
+																		_0: A3(_elm_lang$core$Color$rgb, 9, 7, 32),
+																		_1: {
+																			ctor: '::',
+																			_0: A3(_elm_lang$core$Color$rgb, 10, 8, 34),
+																			_1: {
+																				ctor: '::',
+																				_0: A3(_elm_lang$core$Color$rgb, 11, 9, 36),
+																				_1: {
+																					ctor: '::',
+																					_0: A3(_elm_lang$core$Color$rgb, 12, 9, 38),
+																					_1: {
+																						ctor: '::',
+																						_0: A3(_elm_lang$core$Color$rgb, 13, 10, 41),
+																						_1: {
+																							ctor: '::',
+																							_0: A3(_elm_lang$core$Color$rgb, 14, 11, 43),
+																							_1: {
+																								ctor: '::',
+																								_0: A3(_elm_lang$core$Color$rgb, 16, 11, 45),
+																								_1: {
+																									ctor: '::',
+																									_0: A3(_elm_lang$core$Color$rgb, 17, 12, 47),
+																									_1: {
+																										ctor: '::',
+																										_0: A3(_elm_lang$core$Color$rgb, 18, 13, 49),
+																										_1: {
+																											ctor: '::',
+																											_0: A3(_elm_lang$core$Color$rgb, 19, 13, 52),
+																											_1: {
+																												ctor: '::',
+																												_0: A3(_elm_lang$core$Color$rgb, 20, 14, 54),
+																												_1: {
+																													ctor: '::',
+																													_0: A3(_elm_lang$core$Color$rgb, 21, 14, 56),
+																													_1: {
+																														ctor: '::',
+																														_0: A3(_elm_lang$core$Color$rgb, 22, 15, 59),
+																														_1: {
+																															ctor: '::',
+																															_0: A3(_elm_lang$core$Color$rgb, 24, 15, 61),
+																															_1: {
+																																ctor: '::',
+																																_0: A3(_elm_lang$core$Color$rgb, 25, 16, 63),
+																																_1: {
+																																	ctor: '::',
+																																	_0: A3(_elm_lang$core$Color$rgb, 26, 16, 66),
+																																	_1: {
+																																		ctor: '::',
+																																		_0: A3(_elm_lang$core$Color$rgb, 28, 16, 68),
+																																		_1: {
+																																			ctor: '::',
+																																			_0: A3(_elm_lang$core$Color$rgb, 29, 17, 71),
+																																			_1: {
+																																				ctor: '::',
+																																				_0: A3(_elm_lang$core$Color$rgb, 30, 17, 73),
+																																				_1: {
+																																					ctor: '::',
+																																					_0: A3(_elm_lang$core$Color$rgb, 32, 17, 75),
+																																					_1: {
+																																						ctor: '::',
+																																						_0: A3(_elm_lang$core$Color$rgb, 33, 17, 78),
+																																						_1: {
+																																							ctor: '::',
+																																							_0: A3(_elm_lang$core$Color$rgb, 34, 17, 80),
+																																							_1: {
+																																								ctor: '::',
+																																								_0: A3(_elm_lang$core$Color$rgb, 36, 18, 83),
+																																								_1: {
+																																									ctor: '::',
+																																									_0: A3(_elm_lang$core$Color$rgb, 37, 18, 85),
+																																									_1: {
+																																										ctor: '::',
+																																										_0: A3(_elm_lang$core$Color$rgb, 39, 18, 88),
+																																										_1: {
+																																											ctor: '::',
+																																											_0: A3(_elm_lang$core$Color$rgb, 41, 17, 90),
+																																											_1: {
+																																												ctor: '::',
+																																												_0: A3(_elm_lang$core$Color$rgb, 42, 17, 92),
+																																												_1: {
+																																													ctor: '::',
+																																													_0: A3(_elm_lang$core$Color$rgb, 44, 17, 95),
+																																													_1: {
+																																														ctor: '::',
+																																														_0: A3(_elm_lang$core$Color$rgb, 45, 17, 97),
+																																														_1: {
+																																															ctor: '::',
+																																															_0: A3(_elm_lang$core$Color$rgb, 47, 17, 99),
+																																															_1: {
+																																																ctor: '::',
+																																																_0: A3(_elm_lang$core$Color$rgb, 49, 17, 101),
+																																																_1: {
+																																																	ctor: '::',
+																																																	_0: A3(_elm_lang$core$Color$rgb, 51, 16, 103),
+																																																	_1: {
+																																																		ctor: '::',
+																																																		_0: A3(_elm_lang$core$Color$rgb, 52, 16, 105),
+																																																		_1: {
+																																																			ctor: '::',
+																																																			_0: A3(_elm_lang$core$Color$rgb, 54, 16, 107),
+																																																			_1: {
+																																																				ctor: '::',
+																																																				_0: A3(_elm_lang$core$Color$rgb, 56, 16, 108),
+																																																				_1: {
+																																																					ctor: '::',
+																																																					_0: A3(_elm_lang$core$Color$rgb, 57, 15, 110),
+																																																					_1: {
+																																																						ctor: '::',
+																																																						_0: A3(_elm_lang$core$Color$rgb, 59, 15, 112),
+																																																						_1: {
+																																																							ctor: '::',
+																																																							_0: A3(_elm_lang$core$Color$rgb, 61, 15, 113),
+																																																							_1: {
+																																																								ctor: '::',
+																																																								_0: A3(_elm_lang$core$Color$rgb, 63, 15, 114),
+																																																								_1: {
+																																																									ctor: '::',
+																																																									_0: A3(_elm_lang$core$Color$rgb, 64, 15, 116),
+																																																									_1: {
+																																																										ctor: '::',
+																																																										_0: A3(_elm_lang$core$Color$rgb, 66, 15, 117),
+																																																										_1: {
+																																																											ctor: '::',
+																																																											_0: A3(_elm_lang$core$Color$rgb, 68, 15, 118),
+																																																											_1: {
+																																																												ctor: '::',
+																																																												_0: A3(_elm_lang$core$Color$rgb, 69, 16, 119),
+																																																												_1: {
+																																																													ctor: '::',
+																																																													_0: A3(_elm_lang$core$Color$rgb, 71, 16, 120),
+																																																													_1: {
+																																																														ctor: '::',
+																																																														_0: A3(_elm_lang$core$Color$rgb, 73, 16, 120),
+																																																														_1: {
+																																																															ctor: '::',
+																																																															_0: A3(_elm_lang$core$Color$rgb, 74, 16, 121),
+																																																															_1: {
+																																																																ctor: '::',
+																																																																_0: A3(_elm_lang$core$Color$rgb, 76, 17, 122),
+																																																																_1: {
+																																																																	ctor: '::',
+																																																																	_0: A3(_elm_lang$core$Color$rgb, 78, 17, 123),
+																																																																	_1: {
+																																																																		ctor: '::',
+																																																																		_0: A3(_elm_lang$core$Color$rgb, 79, 18, 123),
+																																																																		_1: {
+																																																																			ctor: '::',
+																																																																			_0: A3(_elm_lang$core$Color$rgb, 81, 18, 124),
+																																																																			_1: {
+																																																																				ctor: '::',
+																																																																				_0: A3(_elm_lang$core$Color$rgb, 82, 19, 124),
+																																																																				_1: {
+																																																																					ctor: '::',
+																																																																					_0: A3(_elm_lang$core$Color$rgb, 84, 19, 125),
+																																																																					_1: {
+																																																																						ctor: '::',
+																																																																						_0: A3(_elm_lang$core$Color$rgb, 86, 20, 125),
+																																																																						_1: {
+																																																																							ctor: '::',
+																																																																							_0: A3(_elm_lang$core$Color$rgb, 87, 21, 126),
+																																																																							_1: {
+																																																																								ctor: '::',
+																																																																								_0: A3(_elm_lang$core$Color$rgb, 89, 21, 126),
+																																																																								_1: {
+																																																																									ctor: '::',
+																																																																									_0: A3(_elm_lang$core$Color$rgb, 90, 22, 126),
+																																																																									_1: {
+																																																																										ctor: '::',
+																																																																										_0: A3(_elm_lang$core$Color$rgb, 92, 22, 127),
+																																																																										_1: {
+																																																																											ctor: '::',
+																																																																											_0: A3(_elm_lang$core$Color$rgb, 93, 23, 127),
+																																																																											_1: {
+																																																																												ctor: '::',
+																																																																												_0: A3(_elm_lang$core$Color$rgb, 95, 24, 127),
+																																																																												_1: {
+																																																																													ctor: '::',
+																																																																													_0: A3(_elm_lang$core$Color$rgb, 96, 24, 128),
+																																																																													_1: {
+																																																																														ctor: '::',
+																																																																														_0: A3(_elm_lang$core$Color$rgb, 98, 25, 128),
+																																																																														_1: {
+																																																																															ctor: '::',
+																																																																															_0: A3(_elm_lang$core$Color$rgb, 100, 26, 128),
+																																																																															_1: {
+																																																																																ctor: '::',
+																																																																																_0: A3(_elm_lang$core$Color$rgb, 101, 26, 128),
+																																																																																_1: {
+																																																																																	ctor: '::',
+																																																																																	_0: A3(_elm_lang$core$Color$rgb, 103, 27, 128),
+																																																																																	_1: {
+																																																																																		ctor: '::',
+																																																																																		_0: A3(_elm_lang$core$Color$rgb, 104, 28, 129),
+																																																																																		_1: {
+																																																																																			ctor: '::',
+																																																																																			_0: A3(_elm_lang$core$Color$rgb, 106, 28, 129),
+																																																																																			_1: {
+																																																																																				ctor: '::',
+																																																																																				_0: A3(_elm_lang$core$Color$rgb, 107, 29, 129),
+																																																																																				_1: {
+																																																																																					ctor: '::',
+																																																																																					_0: A3(_elm_lang$core$Color$rgb, 109, 29, 129),
+																																																																																					_1: {
+																																																																																						ctor: '::',
+																																																																																						_0: A3(_elm_lang$core$Color$rgb, 110, 30, 129),
+																																																																																						_1: {
+																																																																																							ctor: '::',
+																																																																																							_0: A3(_elm_lang$core$Color$rgb, 112, 31, 129),
+																																																																																							_1: {
+																																																																																								ctor: '::',
+																																																																																								_0: A3(_elm_lang$core$Color$rgb, 114, 31, 129),
+																																																																																								_1: {
+																																																																																									ctor: '::',
+																																																																																									_0: A3(_elm_lang$core$Color$rgb, 115, 32, 129),
+																																																																																									_1: {
+																																																																																										ctor: '::',
+																																																																																										_0: A3(_elm_lang$core$Color$rgb, 117, 33, 129),
+																																																																																										_1: {
+																																																																																											ctor: '::',
+																																																																																											_0: A3(_elm_lang$core$Color$rgb, 118, 33, 129),
+																																																																																											_1: {
+																																																																																												ctor: '::',
+																																																																																												_0: A3(_elm_lang$core$Color$rgb, 120, 34, 129),
+																																																																																												_1: {
+																																																																																													ctor: '::',
+																																																																																													_0: A3(_elm_lang$core$Color$rgb, 121, 34, 130),
+																																																																																													_1: {
+																																																																																														ctor: '::',
+																																																																																														_0: A3(_elm_lang$core$Color$rgb, 123, 35, 130),
+																																																																																														_1: {
+																																																																																															ctor: '::',
+																																																																																															_0: A3(_elm_lang$core$Color$rgb, 124, 35, 130),
+																																																																																															_1: {
+																																																																																																ctor: '::',
+																																																																																																_0: A3(_elm_lang$core$Color$rgb, 126, 36, 130),
+																																																																																																_1: {
+																																																																																																	ctor: '::',
+																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 128, 37, 130),
+																																																																																																	_1: {
+																																																																																																		ctor: '::',
+																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 129, 37, 129),
+																																																																																																		_1: {
+																																																																																																			ctor: '::',
+																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 131, 38, 129),
+																																																																																																			_1: {
+																																																																																																				ctor: '::',
+																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 132, 38, 129),
+																																																																																																				_1: {
+																																																																																																					ctor: '::',
+																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 134, 39, 129),
+																																																																																																					_1: {
+																																																																																																						ctor: '::',
+																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 136, 39, 129),
+																																																																																																						_1: {
+																																																																																																							ctor: '::',
+																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 137, 40, 129),
+																																																																																																							_1: {
+																																																																																																								ctor: '::',
+																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 139, 41, 129),
+																																																																																																								_1: {
+																																																																																																									ctor: '::',
+																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 140, 41, 129),
+																																																																																																									_1: {
+																																																																																																										ctor: '::',
+																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 142, 42, 129),
+																																																																																																										_1: {
+																																																																																																											ctor: '::',
+																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 144, 42, 129),
+																																																																																																											_1: {
+																																																																																																												ctor: '::',
+																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 145, 43, 129),
+																																																																																																												_1: {
+																																																																																																													ctor: '::',
+																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 147, 43, 128),
+																																																																																																													_1: {
+																																																																																																														ctor: '::',
+																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 148, 44, 128),
+																																																																																																														_1: {
+																																																																																																															ctor: '::',
+																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 150, 44, 128),
+																																																																																																															_1: {
+																																																																																																																ctor: '::',
+																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 152, 45, 128),
+																																																																																																																_1: {
+																																																																																																																	ctor: '::',
+																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 153, 45, 128),
+																																																																																																																	_1: {
+																																																																																																																		ctor: '::',
+																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 155, 46, 127),
+																																																																																																																		_1: {
+																																																																																																																			ctor: '::',
+																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 156, 46, 127),
+																																																																																																																			_1: {
+																																																																																																																				ctor: '::',
+																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 158, 47, 127),
+																																																																																																																				_1: {
+																																																																																																																					ctor: '::',
+																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 160, 47, 127),
+																																																																																																																					_1: {
+																																																																																																																						ctor: '::',
+																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 161, 48, 126),
+																																																																																																																						_1: {
+																																																																																																																							ctor: '::',
+																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 163, 48, 126),
+																																																																																																																							_1: {
+																																																																																																																								ctor: '::',
+																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 165, 49, 126),
+																																																																																																																								_1: {
+																																																																																																																									ctor: '::',
+																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 166, 49, 125),
+																																																																																																																									_1: {
+																																																																																																																										ctor: '::',
+																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 168, 50, 125),
+																																																																																																																										_1: {
+																																																																																																																											ctor: '::',
+																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 170, 51, 125),
+																																																																																																																											_1: {
+																																																																																																																												ctor: '::',
+																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 171, 51, 124),
+																																																																																																																												_1: {
+																																																																																																																													ctor: '::',
+																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 173, 52, 124),
+																																																																																																																													_1: {
+																																																																																																																														ctor: '::',
+																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 174, 52, 123),
+																																																																																																																														_1: {
+																																																																																																																															ctor: '::',
+																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 176, 53, 123),
+																																																																																																																															_1: {
+																																																																																																																																ctor: '::',
+																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 178, 53, 123),
+																																																																																																																																_1: {
+																																																																																																																																	ctor: '::',
+																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 179, 54, 122),
+																																																																																																																																	_1: {
+																																																																																																																																		ctor: '::',
+																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 181, 54, 122),
+																																																																																																																																		_1: {
+																																																																																																																																			ctor: '::',
+																																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 183, 55, 121),
+																																																																																																																																			_1: {
+																																																																																																																																				ctor: '::',
+																																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 184, 55, 121),
+																																																																																																																																				_1: {
+																																																																																																																																					ctor: '::',
+																																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 186, 56, 120),
+																																																																																																																																					_1: {
+																																																																																																																																						ctor: '::',
+																																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 188, 57, 120),
+																																																																																																																																						_1: {
+																																																																																																																																							ctor: '::',
+																																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 189, 57, 119),
+																																																																																																																																							_1: {
+																																																																																																																																								ctor: '::',
+																																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 191, 58, 119),
+																																																																																																																																								_1: {
+																																																																																																																																									ctor: '::',
+																																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 192, 58, 118),
+																																																																																																																																									_1: {
+																																																																																																																																										ctor: '::',
+																																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 194, 59, 117),
+																																																																																																																																										_1: {
+																																																																																																																																											ctor: '::',
+																																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 196, 60, 117),
+																																																																																																																																											_1: {
+																																																																																																																																												ctor: '::',
+																																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 197, 60, 116),
+																																																																																																																																												_1: {
+																																																																																																																																													ctor: '::',
+																																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 199, 61, 115),
+																																																																																																																																													_1: {
+																																																																																																																																														ctor: '::',
+																																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 200, 62, 115),
+																																																																																																																																														_1: {
+																																																																																																																																															ctor: '::',
+																																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 202, 62, 114),
+																																																																																																																																															_1: {
+																																																																																																																																																ctor: '::',
+																																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 204, 63, 113),
+																																																																																																																																																_1: {
+																																																																																																																																																	ctor: '::',
+																																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 205, 64, 113),
+																																																																																																																																																	_1: {
+																																																																																																																																																		ctor: '::',
+																																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 207, 64, 112),
+																																																																																																																																																		_1: {
+																																																																																																																																																			ctor: '::',
+																																																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 208, 65, 111),
+																																																																																																																																																			_1: {
+																																																																																																																																																				ctor: '::',
+																																																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 210, 66, 111),
+																																																																																																																																																				_1: {
+																																																																																																																																																					ctor: '::',
+																																																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 211, 67, 110),
+																																																																																																																																																					_1: {
+																																																																																																																																																						ctor: '::',
+																																																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 213, 68, 109),
+																																																																																																																																																						_1: {
+																																																																																																																																																							ctor: '::',
+																																																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 214, 69, 108),
+																																																																																																																																																							_1: {
+																																																																																																																																																								ctor: '::',
+																																																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 216, 69, 108),
+																																																																																																																																																								_1: {
+																																																																																																																																																									ctor: '::',
+																																																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 217, 70, 107),
+																																																																																																																																																									_1: {
+																																																																																																																																																										ctor: '::',
+																																																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 219, 71, 106),
+																																																																																																																																																										_1: {
+																																																																																																																																																											ctor: '::',
+																																																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 220, 72, 105),
+																																																																																																																																																											_1: {
+																																																																																																																																																												ctor: '::',
+																																																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 222, 73, 104),
+																																																																																																																																																												_1: {
+																																																																																																																																																													ctor: '::',
+																																																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 223, 74, 104),
+																																																																																																																																																													_1: {
+																																																																																																																																																														ctor: '::',
+																																																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 224, 76, 103),
+																																																																																																																																																														_1: {
+																																																																																																																																																															ctor: '::',
+																																																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 226, 77, 102),
+																																																																																																																																																															_1: {
+																																																																																																																																																																ctor: '::',
+																																																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 227, 78, 101),
+																																																																																																																																																																_1: {
+																																																																																																																																																																	ctor: '::',
+																																																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 228, 79, 100),
+																																																																																																																																																																	_1: {
+																																																																																																																																																																		ctor: '::',
+																																																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 229, 80, 100),
+																																																																																																																																																																		_1: {
+																																																																																																																																																																			ctor: '::',
+																																																																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 231, 82, 99),
+																																																																																																																																																																			_1: {
+																																																																																																																																																																				ctor: '::',
+																																																																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 232, 83, 98),
+																																																																																																																																																																				_1: {
+																																																																																																																																																																					ctor: '::',
+																																																																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 233, 84, 98),
+																																																																																																																																																																					_1: {
+																																																																																																																																																																						ctor: '::',
+																																																																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 234, 86, 97),
+																																																																																																																																																																						_1: {
+																																																																																																																																																																							ctor: '::',
+																																																																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 235, 87, 96),
+																																																																																																																																																																							_1: {
+																																																																																																																																																																								ctor: '::',
+																																																																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 236, 88, 96),
+																																																																																																																																																																								_1: {
+																																																																																																																																																																									ctor: '::',
+																																																																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 237, 90, 95),
+																																																																																																																																																																									_1: {
+																																																																																																																																																																										ctor: '::',
+																																																																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 238, 91, 94),
+																																																																																																																																																																										_1: {
+																																																																																																																																																																											ctor: '::',
+																																																																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 239, 93, 94),
+																																																																																																																																																																											_1: {
+																																																																																																																																																																												ctor: '::',
+																																																																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 240, 95, 94),
+																																																																																																																																																																												_1: {
+																																																																																																																																																																													ctor: '::',
+																																																																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 241, 96, 93),
+																																																																																																																																																																													_1: {
+																																																																																																																																																																														ctor: '::',
+																																																																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 242, 98, 93),
+																																																																																																																																																																														_1: {
+																																																																																																																																																																															ctor: '::',
+																																																																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 242, 100, 92),
+																																																																																																																																																																															_1: {
+																																																																																																																																																																																ctor: '::',
+																																																																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 243, 101, 92),
+																																																																																																																																																																																_1: {
+																																																																																																																																																																																	ctor: '::',
+																																																																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 244, 103, 92),
+																																																																																																																																																																																	_1: {
+																																																																																																																																																																																		ctor: '::',
+																																																																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 244, 105, 92),
+																																																																																																																																																																																		_1: {
+																																																																																																																																																																																			ctor: '::',
+																																																																																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 245, 107, 92),
+																																																																																																																																																																																			_1: {
+																																																																																																																																																																																				ctor: '::',
+																																																																																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 246, 108, 92),
+																																																																																																																																																																																				_1: {
+																																																																																																																																																																																					ctor: '::',
+																																																																																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 246, 110, 92),
+																																																																																																																																																																																					_1: {
+																																																																																																																																																																																						ctor: '::',
+																																																																																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 247, 112, 92),
+																																																																																																																																																																																						_1: {
+																																																																																																																																																																																							ctor: '::',
+																																																																																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 247, 114, 92),
+																																																																																																																																																																																							_1: {
+																																																																																																																																																																																								ctor: '::',
+																																																																																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 248, 116, 92),
+																																																																																																																																																																																								_1: {
+																																																																																																																																																																																									ctor: '::',
+																																																																																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 248, 118, 92),
+																																																																																																																																																																																									_1: {
+																																																																																																																																																																																										ctor: '::',
+																																																																																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 249, 120, 93),
+																																																																																																																																																																																										_1: {
+																																																																																																																																																																																											ctor: '::',
+																																																																																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 249, 121, 93),
+																																																																																																																																																																																											_1: {
+																																																																																																																																																																																												ctor: '::',
+																																																																																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 249, 123, 93),
+																																																																																																																																																																																												_1: {
+																																																																																																																																																																																													ctor: '::',
+																																																																																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 250, 125, 94),
+																																																																																																																																																																																													_1: {
+																																																																																																																																																																																														ctor: '::',
+																																																																																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 250, 127, 94),
+																																																																																																																																																																																														_1: {
+																																																																																																																																																																																															ctor: '::',
+																																																																																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 250, 129, 95),
+																																																																																																																																																																																															_1: {
+																																																																																																																																																																																																ctor: '::',
+																																																																																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 251, 131, 95),
+																																																																																																																																																																																																_1: {
+																																																																																																																																																																																																	ctor: '::',
+																																																																																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 251, 133, 96),
+																																																																																																																																																																																																	_1: {
+																																																																																																																																																																																																		ctor: '::',
+																																																																																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 251, 135, 97),
+																																																																																																																																																																																																		_1: {
+																																																																																																																																																																																																			ctor: '::',
+																																																																																																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 252, 137, 97),
+																																																																																																																																																																																																			_1: {
+																																																																																																																																																																																																				ctor: '::',
+																																																																																																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 252, 138, 98),
+																																																																																																																																																																																																				_1: {
+																																																																																																																																																																																																					ctor: '::',
+																																																																																																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 252, 140, 99),
+																																																																																																																																																																																																					_1: {
+																																																																																																																																																																																																						ctor: '::',
+																																																																																																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 252, 142, 100),
+																																																																																																																																																																																																						_1: {
+																																																																																																																																																																																																							ctor: '::',
+																																																																																																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 252, 144, 101),
+																																																																																																																																																																																																							_1: {
+																																																																																																																																																																																																								ctor: '::',
+																																																																																																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 253, 146, 102),
+																																																																																																																																																																																																								_1: {
+																																																																																																																																																																																																									ctor: '::',
+																																																																																																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 253, 148, 103),
+																																																																																																																																																																																																									_1: {
+																																																																																																																																																																																																										ctor: '::',
+																																																																																																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 253, 150, 104),
+																																																																																																																																																																																																										_1: {
+																																																																																																																																																																																																											ctor: '::',
+																																																																																																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 253, 152, 105),
+																																																																																																																																																																																																											_1: {
+																																																																																																																																																																																																												ctor: '::',
+																																																																																																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 253, 154, 106),
+																																																																																																																																																																																																												_1: {
+																																																																																																																																																																																																													ctor: '::',
+																																																																																																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 253, 155, 107),
+																																																																																																																																																																																																													_1: {
+																																																																																																																																																																																																														ctor: '::',
+																																																																																																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 254, 157, 108),
+																																																																																																																																																																																																														_1: {
+																																																																																																																																																																																																															ctor: '::',
+																																																																																																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 254, 159, 109),
+																																																																																																																																																																																																															_1: {
+																																																																																																																																																																																																																ctor: '::',
+																																																																																																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 254, 161, 110),
+																																																																																																																																																																																																																_1: {
+																																																																																																																																																																																																																	ctor: '::',
+																																																																																																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 254, 163, 111),
+																																																																																																																																																																																																																	_1: {
+																																																																																																																																																																																																																		ctor: '::',
+																																																																																																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 254, 165, 113),
+																																																																																																																																																																																																																		_1: {
+																																																																																																																																																																																																																			ctor: '::',
+																																																																																																																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 254, 167, 114),
+																																																																																																																																																																																																																			_1: {
+																																																																																																																																																																																																																				ctor: '::',
+																																																																																																																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 254, 169, 115),
+																																																																																																																																																																																																																				_1: {
+																																																																																																																																																																																																																					ctor: '::',
+																																																																																																																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 254, 170, 116),
+																																																																																																																																																																																																																					_1: {
+																																																																																																																																																																																																																						ctor: '::',
+																																																																																																																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 254, 172, 118),
+																																																																																																																																																																																																																						_1: {
+																																																																																																																																																																																																																							ctor: '::',
+																																																																																																																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 254, 174, 119),
+																																																																																																																																																																																																																							_1: {
+																																																																																																																																																																																																																								ctor: '::',
+																																																																																																																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 254, 176, 120),
+																																																																																																																																																																																																																								_1: {
+																																																																																																																																																																																																																									ctor: '::',
+																																																																																																																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 254, 178, 122),
+																																																																																																																																																																																																																									_1: {
+																																																																																																																																																																																																																										ctor: '::',
+																																																																																																																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 254, 180, 123),
+																																																																																																																																																																																																																										_1: {
+																																																																																																																																																																																																																											ctor: '::',
+																																																																																																																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 254, 182, 124),
+																																																																																																																																																																																																																											_1: {
+																																																																																																																																																																																																																												ctor: '::',
+																																																																																																																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 254, 183, 126),
+																																																																																																																																																																																																																												_1: {
+																																																																																																																																																																																																																													ctor: '::',
+																																																																																																																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 254, 185, 127),
+																																																																																																																																																																																																																													_1: {
+																																																																																																																																																																																																																														ctor: '::',
+																																																																																																																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 254, 187, 129),
+																																																																																																																																																																																																																														_1: {
+																																																																																																																																																																																																																															ctor: '::',
+																																																																																																																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 254, 189, 130),
+																																																																																																																																																																																																																															_1: {
+																																																																																																																																																																																																																																ctor: '::',
+																																																																																																																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 254, 191, 132),
+																																																																																																																																																																																																																																_1: {
+																																																																																																																																																																																																																																	ctor: '::',
+																																																																																																																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 254, 193, 133),
+																																																																																																																																																																																																																																	_1: {
+																																																																																																																																																																																																																																		ctor: '::',
+																																																																																																																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 254, 194, 135),
+																																																																																																																																																																																																																																		_1: {
+																																																																																																																																																																																																																																			ctor: '::',
+																																																																																																																																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 254, 196, 136),
+																																																																																																																																																																																																																																			_1: {
+																																																																																																																																																																																																																																				ctor: '::',
+																																																																																																																																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 254, 198, 138),
+																																																																																																																																																																																																																																				_1: {
+																																																																																																																																																																																																																																					ctor: '::',
+																																																																																																																																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 254, 200, 140),
+																																																																																																																																																																																																																																					_1: {
+																																																																																																																																																																																																																																						ctor: '::',
+																																																																																																																																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 254, 202, 141),
+																																																																																																																																																																																																																																						_1: {
+																																																																																																																																																																																																																																							ctor: '::',
+																																																																																																																																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 254, 204, 143),
+																																																																																																																																																																																																																																							_1: {
+																																																																																																																																																																																																																																								ctor: '::',
+																																																																																																																																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 254, 205, 144),
+																																																																																																																																																																																																																																								_1: {
+																																																																																																																																																																																																																																									ctor: '::',
+																																																																																																																																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 254, 207, 146),
+																																																																																																																																																																																																																																									_1: {
+																																																																																																																																																																																																																																										ctor: '::',
+																																																																																																																																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 254, 209, 148),
+																																																																																																																																																																																																																																										_1: {
+																																																																																																																																																																																																																																											ctor: '::',
+																																																																																																																																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 254, 211, 149),
+																																																																																																																																																																																																																																											_1: {
+																																																																																																																																																																																																																																												ctor: '::',
+																																																																																																																																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 254, 213, 151),
+																																																																																																																																																																																																																																												_1: {
+																																																																																																																																																																																																																																													ctor: '::',
+																																																																																																																																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 254, 215, 153),
+																																																																																																																																																																																																																																													_1: {
+																																																																																																																																																																																																																																														ctor: '::',
+																																																																																																																																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 254, 216, 154),
+																																																																																																																																																																																																																																														_1: {
+																																																																																																																																																																																																																																															ctor: '::',
+																																																																																																																																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 253, 218, 156),
+																																																																																																																																																																																																																																															_1: {
+																																																																																																																																																																																																																																																ctor: '::',
+																																																																																																																																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 253, 220, 158),
+																																																																																																																																																																																																																																																_1: {
+																																																																																																																																																																																																																																																	ctor: '::',
+																																																																																																																																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 253, 222, 160),
+																																																																																																																																																																																																																																																	_1: {
+																																																																																																																																																																																																																																																		ctor: '::',
+																																																																																																																																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 253, 224, 161),
+																																																																																																																																																																																																																																																		_1: {
+																																																																																																																																																																																																																																																			ctor: '::',
+																																																																																																																																																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 253, 226, 163),
+																																																																																																																																																																																																																																																			_1: {
+																																																																																																																																																																																																																																																				ctor: '::',
+																																																																																																																																																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 253, 227, 165),
+																																																																																																																																																																																																																																																				_1: {
+																																																																																																																																																																																																																																																					ctor: '::',
+																																																																																																																																																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 253, 229, 167),
+																																																																																																																																																																																																																																																					_1: {
+																																																																																																																																																																																																																																																						ctor: '::',
+																																																																																																																																																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 253, 231, 169),
+																																																																																																																																																																																																																																																						_1: {
+																																																																																																																																																																																																																																																							ctor: '::',
+																																																																																																																																																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 253, 233, 170),
+																																																																																																																																																																																																																																																							_1: {
+																																																																																																																																																																																																																																																								ctor: '::',
+																																																																																																																																																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 253, 235, 172),
+																																																																																																																																																																																																																																																								_1: {
+																																																																																																																																																																																																																																																									ctor: '::',
+																																																																																																																																																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 252, 236, 174),
+																																																																																																																																																																																																																																																									_1: {
+																																																																																																																																																																																																																																																										ctor: '::',
+																																																																																																																																																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 252, 238, 176),
+																																																																																																																																																																																																																																																										_1: {
+																																																																																																																																																																																																																																																											ctor: '::',
+																																																																																																																																																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 252, 240, 178),
+																																																																																																																																																																																																																																																											_1: {
+																																																																																																																																																																																																																																																												ctor: '::',
+																																																																																																																																																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 252, 242, 180),
+																																																																																																																																																																																																																																																												_1: {
+																																																																																																																																																																																																																																																													ctor: '::',
+																																																																																																																																																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 252, 244, 182),
+																																																																																																																																																																																																																																																													_1: {
+																																																																																																																																																																																																																																																														ctor: '::',
+																																																																																																																																																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 252, 246, 184),
+																																																																																																																																																																																																																																																														_1: {
+																																																																																																																																																																																																																																																															ctor: '::',
+																																																																																																																																																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 252, 247, 185),
+																																																																																																																																																																																																																																																															_1: {
+																																																																																																																																																																																																																																																																ctor: '::',
+																																																																																																																																																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 252, 249, 187),
+																																																																																																																																																																																																																																																																_1: {
+																																																																																																																																																																																																																																																																	ctor: '::',
+																																																																																																																																																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 252, 251, 189),
+																																																																																																																																																																																																																																																																	_1: {
+																																																																																																																																																																																																																																																																		ctor: '::',
+																																																																																																																																																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 252, 253, 191),
+																																																																																																																																																																																																																																																																		_1: {ctor: '[]'}
+																																																																																																																																																																																																																																																																	}
+																																																																																																																																																																																																																																																																}
+																																																																																																																																																																																																																																																															}
+																																																																																																																																																																																																																																																														}
+																																																																																																																																																																																																																																																													}
+																																																																																																																																																																																																																																																												}
+																																																																																																																																																																																																																																																											}
+																																																																																																																																																																																																																																																										}
+																																																																																																																																																																																																																																																									}
+																																																																																																																																																																																																																																																								}
+																																																																																																																																																																																																																																																							}
+																																																																																																																																																																																																																																																						}
+																																																																																																																																																																																																																																																					}
+																																																																																																																																																																																																																																																				}
+																																																																																																																																																																																																																																																			}
+																																																																																																																																																																																																																																																		}
+																																																																																																																																																																																																																																																	}
+																																																																																																																																																																																																																																																}
+																																																																																																																																																																																																																																															}
+																																																																																																																																																																																																																																														}
+																																																																																																																																																																																																																																													}
+																																																																																																																																																																																																																																												}
+																																																																																																																																																																																																																																											}
+																																																																																																																																																																																																																																										}
+																																																																																																																																																																																																																																									}
+																																																																																																																																																																																																																																								}
+																																																																																																																																																																																																																																							}
+																																																																																																																																																																																																																																						}
+																																																																																																																																																																																																																																					}
+																																																																																																																																																																																																																																				}
+																																																																																																																																																																																																																																			}
+																																																																																																																																																																																																																																		}
+																																																																																																																																																																																																																																	}
+																																																																																																																																																																																																																																}
+																																																																																																																																																																																																																															}
+																																																																																																																																																																																																																														}
+																																																																																																																																																																																																																													}
+																																																																																																																																																																																																																												}
+																																																																																																																																																																																																																											}
+																																																																																																																																																																																																																										}
+																																																																																																																																																																																																																									}
+																																																																																																																																																																																																																								}
+																																																																																																																																																																																																																							}
+																																																																																																																																																																																																																						}
+																																																																																																																																																																																																																					}
+																																																																																																																																																																																																																				}
+																																																																																																																																																																																																																			}
+																																																																																																																																																																																																																		}
+																																																																																																																																																																																																																	}
+																																																																																																																																																																																																																}
+																																																																																																																																																																																																															}
+																																																																																																																																																																																																														}
+																																																																																																																																																																																																													}
+																																																																																																																																																																																																												}
+																																																																																																																																																																																																											}
+																																																																																																																																																																																																										}
+																																																																																																																																																																																																									}
+																																																																																																																																																																																																								}
+																																																																																																																																																																																																							}
+																																																																																																																																																																																																						}
+																																																																																																																																																																																																					}
+																																																																																																																																																																																																				}
+																																																																																																																																																																																																			}
+																																																																																																																																																																																																		}
+																																																																																																																																																																																																	}
+																																																																																																																																																																																																}
+																																																																																																																																																																																															}
+																																																																																																																																																																																														}
+																																																																																																																																																																																													}
+																																																																																																																																																																																												}
+																																																																																																																																																																																											}
+																																																																																																																																																																																										}
+																																																																																																																																																																																									}
+																																																																																																																																																																																								}
+																																																																																																																																																																																							}
+																																																																																																																																																																																						}
+																																																																																																																																																																																					}
+																																																																																																																																																																																				}
+																																																																																																																																																																																			}
+																																																																																																																																																																																		}
+																																																																																																																																																																																	}
+																																																																																																																																																																																}
+																																																																																																																																																																															}
+																																																																																																																																																																														}
+																																																																																																																																																																													}
+																																																																																																																																																																												}
+																																																																																																																																																																											}
+																																																																																																																																																																										}
+																																																																																																																																																																									}
+																																																																																																																																																																								}
+																																																																																																																																																																							}
+																																																																																																																																																																						}
+																																																																																																																																																																					}
+																																																																																																																																																																				}
+																																																																																																																																																																			}
+																																																																																																																																																																		}
+																																																																																																																																																																	}
+																																																																																																																																																																}
+																																																																																																																																																															}
+																																																																																																																																																														}
+																																																																																																																																																													}
+																																																																																																																																																												}
+																																																																																																																																																											}
+																																																																																																																																																										}
+																																																																																																																																																									}
+																																																																																																																																																								}
+																																																																																																																																																							}
+																																																																																																																																																						}
+																																																																																																																																																					}
+																																																																																																																																																				}
+																																																																																																																																																			}
+																																																																																																																																																		}
+																																																																																																																																																	}
+																																																																																																																																																}
+																																																																																																																																															}
+																																																																																																																																														}
+																																																																																																																																													}
+																																																																																																																																												}
+																																																																																																																																											}
+																																																																																																																																										}
+																																																																																																																																									}
+																																																																																																																																								}
+																																																																																																																																							}
+																																																																																																																																						}
+																																																																																																																																					}
+																																																																																																																																				}
+																																																																																																																																			}
+																																																																																																																																		}
+																																																																																																																																	}
+																																																																																																																																}
+																																																																																																																															}
+																																																																																																																														}
+																																																																																																																													}
+																																																																																																																												}
+																																																																																																																											}
+																																																																																																																										}
+																																																																																																																									}
+																																																																																																																								}
+																																																																																																																							}
+																																																																																																																						}
+																																																																																																																					}
+																																																																																																																				}
+																																																																																																																			}
+																																																																																																																		}
+																																																																																																																	}
+																																																																																																																}
+																																																																																																															}
+																																																																																																														}
+																																																																																																													}
+																																																																																																												}
+																																																																																																											}
+																																																																																																										}
+																																																																																																									}
+																																																																																																								}
+																																																																																																							}
+																																																																																																						}
+																																																																																																					}
+																																																																																																				}
+																																																																																																			}
+																																																																																																		}
+																																																																																																	}
+																																																																																																}
+																																																																																															}
+																																																																																														}
+																																																																																													}
+																																																																																												}
+																																																																																											}
+																																																																																										}
+																																																																																									}
+																																																																																								}
+																																																																																							}
+																																																																																						}
+																																																																																					}
+																																																																																				}
+																																																																																			}
+																																																																																		}
+																																																																																	}
+																																																																																}
+																																																																															}
+																																																																														}
+																																																																													}
+																																																																												}
+																																																																											}
+																																																																										}
+																																																																									}
+																																																																								}
+																																																																							}
+																																																																						}
+																																																																					}
+																																																																				}
+																																																																			}
+																																																																		}
+																																																																	}
+																																																																}
+																																																															}
+																																																														}
+																																																													}
+																																																												}
+																																																											}
+																																																										}
+																																																									}
+																																																								}
+																																																							}
+																																																						}
+																																																					}
+																																																				}
+																																																			}
+																																																		}
+																																																	}
+																																																}
+																																															}
+																																														}
+																																													}
+																																												}
+																																											}
+																																										}
+																																									}
+																																								}
+																																							}
+																																						}
+																																					}
+																																				}
+																																			}
+																																		}
+																																	}
+																																}
+																															}
+																														}
+																													}
+																												}
+																											}
+																										}
+																									}
+																								}
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}));
+var _gampleman$elm_visualization$Visualization_Scale_Colors$inferno = _gampleman$elm_visualization$Visualization_Scale_Colors$mkInterpolator(
+	_elm_lang$core$Array$fromList(
+		{
+			ctor: '::',
+			_0: A3(_elm_lang$core$Color$rgb, 0, 0, 4),
+			_1: {
+				ctor: '::',
+				_0: A3(_elm_lang$core$Color$rgb, 1, 0, 5),
+				_1: {
+					ctor: '::',
+					_0: A3(_elm_lang$core$Color$rgb, 1, 1, 6),
+					_1: {
+						ctor: '::',
+						_0: A3(_elm_lang$core$Color$rgb, 1, 1, 8),
+						_1: {
+							ctor: '::',
+							_0: A3(_elm_lang$core$Color$rgb, 2, 1, 10),
+							_1: {
+								ctor: '::',
+								_0: A3(_elm_lang$core$Color$rgb, 2, 2, 12),
+								_1: {
+									ctor: '::',
+									_0: A3(_elm_lang$core$Color$rgb, 2, 2, 14),
+									_1: {
+										ctor: '::',
+										_0: A3(_elm_lang$core$Color$rgb, 3, 2, 16),
+										_1: {
+											ctor: '::',
+											_0: A3(_elm_lang$core$Color$rgb, 4, 3, 18),
+											_1: {
+												ctor: '::',
+												_0: A3(_elm_lang$core$Color$rgb, 4, 3, 20),
+												_1: {
+													ctor: '::',
+													_0: A3(_elm_lang$core$Color$rgb, 5, 4, 23),
+													_1: {
+														ctor: '::',
+														_0: A3(_elm_lang$core$Color$rgb, 6, 4, 25),
+														_1: {
+															ctor: '::',
+															_0: A3(_elm_lang$core$Color$rgb, 7, 5, 27),
+															_1: {
+																ctor: '::',
+																_0: A3(_elm_lang$core$Color$rgb, 8, 5, 29),
+																_1: {
+																	ctor: '::',
+																	_0: A3(_elm_lang$core$Color$rgb, 9, 6, 31),
+																	_1: {
+																		ctor: '::',
+																		_0: A3(_elm_lang$core$Color$rgb, 10, 7, 34),
+																		_1: {
+																			ctor: '::',
+																			_0: A3(_elm_lang$core$Color$rgb, 11, 7, 36),
+																			_1: {
+																				ctor: '::',
+																				_0: A3(_elm_lang$core$Color$rgb, 12, 8, 38),
+																				_1: {
+																					ctor: '::',
+																					_0: A3(_elm_lang$core$Color$rgb, 13, 8, 41),
+																					_1: {
+																						ctor: '::',
+																						_0: A3(_elm_lang$core$Color$rgb, 14, 9, 43),
+																						_1: {
+																							ctor: '::',
+																							_0: A3(_elm_lang$core$Color$rgb, 16, 9, 45),
+																							_1: {
+																								ctor: '::',
+																								_0: A3(_elm_lang$core$Color$rgb, 17, 10, 48),
+																								_1: {
+																									ctor: '::',
+																									_0: A3(_elm_lang$core$Color$rgb, 18, 10, 50),
+																									_1: {
+																										ctor: '::',
+																										_0: A3(_elm_lang$core$Color$rgb, 20, 11, 52),
+																										_1: {
+																											ctor: '::',
+																											_0: A3(_elm_lang$core$Color$rgb, 21, 11, 55),
+																											_1: {
+																												ctor: '::',
+																												_0: A3(_elm_lang$core$Color$rgb, 22, 11, 57),
+																												_1: {
+																													ctor: '::',
+																													_0: A3(_elm_lang$core$Color$rgb, 24, 12, 60),
+																													_1: {
+																														ctor: '::',
+																														_0: A3(_elm_lang$core$Color$rgb, 25, 12, 62),
+																														_1: {
+																															ctor: '::',
+																															_0: A3(_elm_lang$core$Color$rgb, 27, 12, 65),
+																															_1: {
+																																ctor: '::',
+																																_0: A3(_elm_lang$core$Color$rgb, 28, 12, 67),
+																																_1: {
+																																	ctor: '::',
+																																	_0: A3(_elm_lang$core$Color$rgb, 30, 12, 69),
+																																	_1: {
+																																		ctor: '::',
+																																		_0: A3(_elm_lang$core$Color$rgb, 31, 12, 72),
+																																		_1: {
+																																			ctor: '::',
+																																			_0: A3(_elm_lang$core$Color$rgb, 33, 12, 74),
+																																			_1: {
+																																				ctor: '::',
+																																				_0: A3(_elm_lang$core$Color$rgb, 35, 12, 76),
+																																				_1: {
+																																					ctor: '::',
+																																					_0: A3(_elm_lang$core$Color$rgb, 36, 12, 79),
+																																					_1: {
+																																						ctor: '::',
+																																						_0: A3(_elm_lang$core$Color$rgb, 38, 12, 81),
+																																						_1: {
+																																							ctor: '::',
+																																							_0: A3(_elm_lang$core$Color$rgb, 40, 11, 83),
+																																							_1: {
+																																								ctor: '::',
+																																								_0: A3(_elm_lang$core$Color$rgb, 41, 11, 85),
+																																								_1: {
+																																									ctor: '::',
+																																									_0: A3(_elm_lang$core$Color$rgb, 43, 11, 87),
+																																									_1: {
+																																										ctor: '::',
+																																										_0: A3(_elm_lang$core$Color$rgb, 45, 11, 89),
+																																										_1: {
+																																											ctor: '::',
+																																											_0: A3(_elm_lang$core$Color$rgb, 47, 10, 91),
+																																											_1: {
+																																												ctor: '::',
+																																												_0: A3(_elm_lang$core$Color$rgb, 49, 10, 92),
+																																												_1: {
+																																													ctor: '::',
+																																													_0: A3(_elm_lang$core$Color$rgb, 50, 10, 94),
+																																													_1: {
+																																														ctor: '::',
+																																														_0: A3(_elm_lang$core$Color$rgb, 52, 10, 95),
+																																														_1: {
+																																															ctor: '::',
+																																															_0: A3(_elm_lang$core$Color$rgb, 54, 9, 97),
+																																															_1: {
+																																																ctor: '::',
+																																																_0: A3(_elm_lang$core$Color$rgb, 56, 9, 98),
+																																																_1: {
+																																																	ctor: '::',
+																																																	_0: A3(_elm_lang$core$Color$rgb, 57, 9, 99),
+																																																	_1: {
+																																																		ctor: '::',
+																																																		_0: A3(_elm_lang$core$Color$rgb, 59, 9, 100),
+																																																		_1: {
+																																																			ctor: '::',
+																																																			_0: A3(_elm_lang$core$Color$rgb, 61, 9, 101),
+																																																			_1: {
+																																																				ctor: '::',
+																																																				_0: A3(_elm_lang$core$Color$rgb, 62, 9, 102),
+																																																				_1: {
+																																																					ctor: '::',
+																																																					_0: A3(_elm_lang$core$Color$rgb, 64, 10, 103),
+																																																					_1: {
+																																																						ctor: '::',
+																																																						_0: A3(_elm_lang$core$Color$rgb, 66, 10, 104),
+																																																						_1: {
+																																																							ctor: '::',
+																																																							_0: A3(_elm_lang$core$Color$rgb, 68, 10, 104),
+																																																							_1: {
+																																																								ctor: '::',
+																																																								_0: A3(_elm_lang$core$Color$rgb, 69, 10, 105),
+																																																								_1: {
+																																																									ctor: '::',
+																																																									_0: A3(_elm_lang$core$Color$rgb, 71, 11, 106),
+																																																									_1: {
+																																																										ctor: '::',
+																																																										_0: A3(_elm_lang$core$Color$rgb, 73, 11, 106),
+																																																										_1: {
+																																																											ctor: '::',
+																																																											_0: A3(_elm_lang$core$Color$rgb, 74, 12, 107),
+																																																											_1: {
+																																																												ctor: '::',
+																																																												_0: A3(_elm_lang$core$Color$rgb, 76, 12, 107),
+																																																												_1: {
+																																																													ctor: '::',
+																																																													_0: A3(_elm_lang$core$Color$rgb, 77, 13, 108),
+																																																													_1: {
+																																																														ctor: '::',
+																																																														_0: A3(_elm_lang$core$Color$rgb, 79, 13, 108),
+																																																														_1: {
+																																																															ctor: '::',
+																																																															_0: A3(_elm_lang$core$Color$rgb, 81, 14, 108),
+																																																															_1: {
+																																																																ctor: '::',
+																																																																_0: A3(_elm_lang$core$Color$rgb, 82, 14, 109),
+																																																																_1: {
+																																																																	ctor: '::',
+																																																																	_0: A3(_elm_lang$core$Color$rgb, 84, 15, 109),
+																																																																	_1: {
+																																																																		ctor: '::',
+																																																																		_0: A3(_elm_lang$core$Color$rgb, 85, 15, 109),
+																																																																		_1: {
+																																																																			ctor: '::',
+																																																																			_0: A3(_elm_lang$core$Color$rgb, 87, 16, 110),
+																																																																			_1: {
+																																																																				ctor: '::',
+																																																																				_0: A3(_elm_lang$core$Color$rgb, 89, 16, 110),
+																																																																				_1: {
+																																																																					ctor: '::',
+																																																																					_0: A3(_elm_lang$core$Color$rgb, 90, 17, 110),
+																																																																					_1: {
+																																																																						ctor: '::',
+																																																																						_0: A3(_elm_lang$core$Color$rgb, 92, 18, 110),
+																																																																						_1: {
+																																																																							ctor: '::',
+																																																																							_0: A3(_elm_lang$core$Color$rgb, 93, 18, 110),
+																																																																							_1: {
+																																																																								ctor: '::',
+																																																																								_0: A3(_elm_lang$core$Color$rgb, 95, 19, 110),
+																																																																								_1: {
+																																																																									ctor: '::',
+																																																																									_0: A3(_elm_lang$core$Color$rgb, 97, 19, 110),
+																																																																									_1: {
+																																																																										ctor: '::',
+																																																																										_0: A3(_elm_lang$core$Color$rgb, 98, 20, 110),
+																																																																										_1: {
+																																																																											ctor: '::',
+																																																																											_0: A3(_elm_lang$core$Color$rgb, 100, 21, 110),
+																																																																											_1: {
+																																																																												ctor: '::',
+																																																																												_0: A3(_elm_lang$core$Color$rgb, 101, 21, 110),
+																																																																												_1: {
+																																																																													ctor: '::',
+																																																																													_0: A3(_elm_lang$core$Color$rgb, 103, 22, 110),
+																																																																													_1: {
+																																																																														ctor: '::',
+																																																																														_0: A3(_elm_lang$core$Color$rgb, 105, 22, 110),
+																																																																														_1: {
+																																																																															ctor: '::',
+																																																																															_0: A3(_elm_lang$core$Color$rgb, 106, 23, 110),
+																																																																															_1: {
+																																																																																ctor: '::',
+																																																																																_0: A3(_elm_lang$core$Color$rgb, 108, 24, 110),
+																																																																																_1: {
+																																																																																	ctor: '::',
+																																																																																	_0: A3(_elm_lang$core$Color$rgb, 109, 24, 110),
+																																																																																	_1: {
+																																																																																		ctor: '::',
+																																																																																		_0: A3(_elm_lang$core$Color$rgb, 111, 25, 110),
+																																																																																		_1: {
+																																																																																			ctor: '::',
+																																																																																			_0: A3(_elm_lang$core$Color$rgb, 113, 25, 110),
+																																																																																			_1: {
+																																																																																				ctor: '::',
+																																																																																				_0: A3(_elm_lang$core$Color$rgb, 114, 26, 110),
+																																																																																				_1: {
+																																																																																					ctor: '::',
+																																																																																					_0: A3(_elm_lang$core$Color$rgb, 116, 26, 110),
+																																																																																					_1: {
+																																																																																						ctor: '::',
+																																																																																						_0: A3(_elm_lang$core$Color$rgb, 117, 27, 110),
+																																																																																						_1: {
+																																																																																							ctor: '::',
+																																																																																							_0: A3(_elm_lang$core$Color$rgb, 119, 28, 109),
+																																																																																							_1: {
+																																																																																								ctor: '::',
+																																																																																								_0: A3(_elm_lang$core$Color$rgb, 120, 28, 109),
+																																																																																								_1: {
+																																																																																									ctor: '::',
+																																																																																									_0: A3(_elm_lang$core$Color$rgb, 122, 29, 109),
+																																																																																									_1: {
+																																																																																										ctor: '::',
+																																																																																										_0: A3(_elm_lang$core$Color$rgb, 124, 29, 109),
+																																																																																										_1: {
+																																																																																											ctor: '::',
+																																																																																											_0: A3(_elm_lang$core$Color$rgb, 125, 30, 109),
+																																																																																											_1: {
+																																																																																												ctor: '::',
+																																																																																												_0: A3(_elm_lang$core$Color$rgb, 127, 30, 108),
+																																																																																												_1: {
+																																																																																													ctor: '::',
+																																																																																													_0: A3(_elm_lang$core$Color$rgb, 128, 31, 108),
+																																																																																													_1: {
+																																																																																														ctor: '::',
+																																																																																														_0: A3(_elm_lang$core$Color$rgb, 130, 32, 108),
+																																																																																														_1: {
+																																																																																															ctor: '::',
+																																																																																															_0: A3(_elm_lang$core$Color$rgb, 132, 32, 107),
+																																																																																															_1: {
+																																																																																																ctor: '::',
+																																																																																																_0: A3(_elm_lang$core$Color$rgb, 133, 33, 107),
+																																																																																																_1: {
+																																																																																																	ctor: '::',
+																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 135, 33, 107),
+																																																																																																	_1: {
+																																																																																																		ctor: '::',
+																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 136, 34, 106),
+																																																																																																		_1: {
+																																																																																																			ctor: '::',
+																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 138, 34, 106),
+																																																																																																			_1: {
+																																																																																																				ctor: '::',
+																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 140, 35, 105),
+																																																																																																				_1: {
+																																																																																																					ctor: '::',
+																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 141, 35, 105),
+																																																																																																					_1: {
+																																																																																																						ctor: '::',
+																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 143, 36, 105),
+																																																																																																						_1: {
+																																																																																																							ctor: '::',
+																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 144, 37, 104),
+																																																																																																							_1: {
+																																																																																																								ctor: '::',
+																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 146, 37, 104),
+																																																																																																								_1: {
+																																																																																																									ctor: '::',
+																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 147, 38, 103),
+																																																																																																									_1: {
+																																																																																																										ctor: '::',
+																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 149, 38, 103),
+																																																																																																										_1: {
+																																																																																																											ctor: '::',
+																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 151, 39, 102),
+																																																																																																											_1: {
+																																																																																																												ctor: '::',
+																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 152, 39, 102),
+																																																																																																												_1: {
+																																																																																																													ctor: '::',
+																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 154, 40, 101),
+																																																																																																													_1: {
+																																																																																																														ctor: '::',
+																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 155, 41, 100),
+																																																																																																														_1: {
+																																																																																																															ctor: '::',
+																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 157, 41, 100),
+																																																																																																															_1: {
+																																																																																																																ctor: '::',
+																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 159, 42, 99),
+																																																																																																																_1: {
+																																																																																																																	ctor: '::',
+																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 160, 42, 99),
+																																																																																																																	_1: {
+																																																																																																																		ctor: '::',
+																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 162, 43, 98),
+																																																																																																																		_1: {
+																																																																																																																			ctor: '::',
+																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 163, 44, 97),
+																																																																																																																			_1: {
+																																																																																																																				ctor: '::',
+																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 165, 44, 96),
+																																																																																																																				_1: {
+																																																																																																																					ctor: '::',
+																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 166, 45, 96),
+																																																																																																																					_1: {
+																																																																																																																						ctor: '::',
+																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 168, 46, 95),
+																																																																																																																						_1: {
+																																																																																																																							ctor: '::',
+																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 169, 46, 94),
+																																																																																																																							_1: {
+																																																																																																																								ctor: '::',
+																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 171, 47, 94),
+																																																																																																																								_1: {
+																																																																																																																									ctor: '::',
+																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 173, 48, 93),
+																																																																																																																									_1: {
+																																																																																																																										ctor: '::',
+																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 174, 48, 92),
+																																																																																																																										_1: {
+																																																																																																																											ctor: '::',
+																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 176, 49, 91),
+																																																																																																																											_1: {
+																																																																																																																												ctor: '::',
+																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 177, 50, 90),
+																																																																																																																												_1: {
+																																																																																																																													ctor: '::',
+																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 179, 50, 90),
+																																																																																																																													_1: {
+																																																																																																																														ctor: '::',
+																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 180, 51, 89),
+																																																																																																																														_1: {
+																																																																																																																															ctor: '::',
+																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 182, 52, 88),
+																																																																																																																															_1: {
+																																																																																																																																ctor: '::',
+																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 183, 53, 87),
+																																																																																																																																_1: {
+																																																																																																																																	ctor: '::',
+																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 185, 53, 86),
+																																																																																																																																	_1: {
+																																																																																																																																		ctor: '::',
+																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 186, 54, 85),
+																																																																																																																																		_1: {
+																																																																																																																																			ctor: '::',
+																																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 188, 55, 84),
+																																																																																																																																			_1: {
+																																																																																																																																				ctor: '::',
+																																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 189, 56, 83),
+																																																																																																																																				_1: {
+																																																																																																																																					ctor: '::',
+																																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 191, 57, 82),
+																																																																																																																																					_1: {
+																																																																																																																																						ctor: '::',
+																																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 192, 58, 81),
+																																																																																																																																						_1: {
+																																																																																																																																							ctor: '::',
+																																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 193, 58, 80),
+																																																																																																																																							_1: {
+																																																																																																																																								ctor: '::',
+																																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 195, 59, 79),
+																																																																																																																																								_1: {
+																																																																																																																																									ctor: '::',
+																																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 196, 60, 78),
+																																																																																																																																									_1: {
+																																																																																																																																										ctor: '::',
+																																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 198, 61, 77),
+																																																																																																																																										_1: {
+																																																																																																																																											ctor: '::',
+																																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 199, 62, 76),
+																																																																																																																																											_1: {
+																																																																																																																																												ctor: '::',
+																																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 200, 63, 75),
+																																																																																																																																												_1: {
+																																																																																																																																													ctor: '::',
+																																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 202, 64, 74),
+																																																																																																																																													_1: {
+																																																																																																																																														ctor: '::',
+																																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 203, 65, 73),
+																																																																																																																																														_1: {
+																																																																																																																																															ctor: '::',
+																																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 204, 66, 72),
+																																																																																																																																															_1: {
+																																																																																																																																																ctor: '::',
+																																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 206, 67, 71),
+																																																																																																																																																_1: {
+																																																																																																																																																	ctor: '::',
+																																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 207, 68, 70),
+																																																																																																																																																	_1: {
+																																																																																																																																																		ctor: '::',
+																																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 208, 69, 69),
+																																																																																																																																																		_1: {
+																																																																																																																																																			ctor: '::',
+																																																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 210, 70, 68),
+																																																																																																																																																			_1: {
+																																																																																																																																																				ctor: '::',
+																																																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 211, 71, 67),
+																																																																																																																																																				_1: {
+																																																																																																																																																					ctor: '::',
+																																																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 212, 72, 66),
+																																																																																																																																																					_1: {
+																																																																																																																																																						ctor: '::',
+																																																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 213, 74, 65),
+																																																																																																																																																						_1: {
+																																																																																																																																																							ctor: '::',
+																																																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 215, 75, 63),
+																																																																																																																																																							_1: {
+																																																																																																																																																								ctor: '::',
+																																																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 216, 76, 62),
+																																																																																																																																																								_1: {
+																																																																																																																																																									ctor: '::',
+																																																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 217, 77, 61),
+																																																																																																																																																									_1: {
+																																																																																																																																																										ctor: '::',
+																																																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 218, 78, 60),
+																																																																																																																																																										_1: {
+																																																																																																																																																											ctor: '::',
+																																																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 219, 80, 59),
+																																																																																																																																																											_1: {
+																																																																																																																																																												ctor: '::',
+																																																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 221, 81, 58),
+																																																																																																																																																												_1: {
+																																																																																																																																																													ctor: '::',
+																																																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 222, 82, 56),
+																																																																																																																																																													_1: {
+																																																																																																																																																														ctor: '::',
+																																																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 223, 83, 55),
+																																																																																																																																																														_1: {
+																																																																																																																																																															ctor: '::',
+																																																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 224, 85, 54),
+																																																																																																																																																															_1: {
+																																																																																																																																																																ctor: '::',
+																																																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 225, 86, 53),
+																																																																																																																																																																_1: {
+																																																																																																																																																																	ctor: '::',
+																																																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 226, 87, 52),
+																																																																																																																																																																	_1: {
+																																																																																																																																																																		ctor: '::',
+																																																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 227, 89, 51),
+																																																																																																																																																																		_1: {
+																																																																																																																																																																			ctor: '::',
+																																																																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 228, 90, 49),
+																																																																																																																																																																			_1: {
+																																																																																																																																																																				ctor: '::',
+																																																																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 229, 92, 48),
+																																																																																																																																																																				_1: {
+																																																																																																																																																																					ctor: '::',
+																																																																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 230, 93, 47),
+																																																																																																																																																																					_1: {
+																																																																																																																																																																						ctor: '::',
+																																																																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 231, 94, 46),
+																																																																																																																																																																						_1: {
+																																																																																																																																																																							ctor: '::',
+																																																																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 232, 96, 45),
+																																																																																																																																																																							_1: {
+																																																																																																																																																																								ctor: '::',
+																																																																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 233, 97, 43),
+																																																																																																																																																																								_1: {
+																																																																																																																																																																									ctor: '::',
+																																																																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 234, 99, 42),
+																																																																																																																																																																									_1: {
+																																																																																																																																																																										ctor: '::',
+																																																																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 235, 100, 41),
+																																																																																																																																																																										_1: {
+																																																																																																																																																																											ctor: '::',
+																																																																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 235, 102, 40),
+																																																																																																																																																																											_1: {
+																																																																																																																																																																												ctor: '::',
+																																																																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 236, 103, 38),
+																																																																																																																																																																												_1: {
+																																																																																																																																																																													ctor: '::',
+																																																																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 237, 105, 37),
+																																																																																																																																																																													_1: {
+																																																																																																																																																																														ctor: '::',
+																																																																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 238, 106, 36),
+																																																																																																																																																																														_1: {
+																																																																																																																																																																															ctor: '::',
+																																																																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 239, 108, 35),
+																																																																																																																																																																															_1: {
+																																																																																																																																																																																ctor: '::',
+																																																																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 239, 110, 33),
+																																																																																																																																																																																_1: {
+																																																																																																																																																																																	ctor: '::',
+																																																																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 240, 111, 32),
+																																																																																																																																																																																	_1: {
+																																																																																																																																																																																		ctor: '::',
+																																																																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 241, 113, 31),
+																																																																																																																																																																																		_1: {
+																																																																																																																																																																																			ctor: '::',
+																																																																																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 241, 115, 29),
+																																																																																																																																																																																			_1: {
+																																																																																																																																																																																				ctor: '::',
+																																																																																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 242, 116, 28),
+																																																																																																																																																																																				_1: {
+																																																																																																																																																																																					ctor: '::',
+																																																																																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 243, 118, 27),
+																																																																																																																																																																																					_1: {
+																																																																																																																																																																																						ctor: '::',
+																																																																																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 243, 120, 25),
+																																																																																																																																																																																						_1: {
+																																																																																																																																																																																							ctor: '::',
+																																																																																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 244, 121, 24),
+																																																																																																																																																																																							_1: {
+																																																																																																																																																																																								ctor: '::',
+																																																																																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 245, 123, 23),
+																																																																																																																																																																																								_1: {
+																																																																																																																																																																																									ctor: '::',
+																																																																																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 245, 125, 21),
+																																																																																																																																																																																									_1: {
+																																																																																																																																																																																										ctor: '::',
+																																																																																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 246, 126, 20),
+																																																																																																																																																																																										_1: {
+																																																																																																																																																																																											ctor: '::',
+																																																																																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 246, 128, 19),
+																																																																																																																																																																																											_1: {
+																																																																																																																																																																																												ctor: '::',
+																																																																																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 247, 130, 18),
+																																																																																																																																																																																												_1: {
+																																																																																																																																																																																													ctor: '::',
+																																																																																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 247, 132, 16),
+																																																																																																																																																																																													_1: {
+																																																																																																																																																																																														ctor: '::',
+																																																																																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 248, 133, 15),
+																																																																																																																																																																																														_1: {
+																																																																																																																																																																																															ctor: '::',
+																																																																																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 248, 135, 14),
+																																																																																																																																																																																															_1: {
+																																																																																																																																																																																																ctor: '::',
+																																																																																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 248, 137, 12),
+																																																																																																																																																																																																_1: {
+																																																																																																																																																																																																	ctor: '::',
+																																																																																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 249, 139, 11),
+																																																																																																																																																																																																	_1: {
+																																																																																																																																																																																																		ctor: '::',
+																																																																																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 249, 140, 10),
+																																																																																																																																																																																																		_1: {
+																																																																																																																																																																																																			ctor: '::',
+																																																																																																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 249, 142, 9),
+																																																																																																																																																																																																			_1: {
+																																																																																																																																																																																																				ctor: '::',
+																																																																																																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 250, 144, 8),
+																																																																																																																																																																																																				_1: {
+																																																																																																																																																																																																					ctor: '::',
+																																																																																																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 250, 146, 7),
+																																																																																																																																																																																																					_1: {
+																																																																																																																																																																																																						ctor: '::',
+																																																																																																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 250, 148, 7),
+																																																																																																																																																																																																						_1: {
+																																																																																																																																																																																																							ctor: '::',
+																																																																																																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 251, 150, 6),
+																																																																																																																																																																																																							_1: {
+																																																																																																																																																																																																								ctor: '::',
+																																																																																																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 251, 151, 6),
+																																																																																																																																																																																																								_1: {
+																																																																																																																																																																																																									ctor: '::',
+																																																																																																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 251, 153, 6),
+																																																																																																																																																																																																									_1: {
+																																																																																																																																																																																																										ctor: '::',
+																																																																																																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 251, 155, 6),
+																																																																																																																																																																																																										_1: {
+																																																																																																																																																																																																											ctor: '::',
+																																																																																																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 251, 157, 7),
+																																																																																																																																																																																																											_1: {
+																																																																																																																																																																																																												ctor: '::',
+																																																																																																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 252, 159, 7),
+																																																																																																																																																																																																												_1: {
+																																																																																																																																																																																																													ctor: '::',
+																																																																																																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 252, 161, 8),
+																																																																																																																																																																																																													_1: {
+																																																																																																																																																																																																														ctor: '::',
+																																																																																																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 252, 163, 9),
+																																																																																																																																																																																																														_1: {
+																																																																																																																																																																																																															ctor: '::',
+																																																																																																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 252, 165, 10),
+																																																																																																																																																																																																															_1: {
+																																																																																																																																																																																																																ctor: '::',
+																																																																																																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 252, 166, 12),
+																																																																																																																																																																																																																_1: {
+																																																																																																																																																																																																																	ctor: '::',
+																																																																																																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 252, 168, 13),
+																																																																																																																																																																																																																	_1: {
+																																																																																																																																																																																																																		ctor: '::',
+																																																																																																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 252, 170, 15),
+																																																																																																																																																																																																																		_1: {
+																																																																																																																																																																																																																			ctor: '::',
+																																																																																																																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 252, 172, 17),
+																																																																																																																																																																																																																			_1: {
+																																																																																																																																																																																																																				ctor: '::',
+																																																																																																																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 252, 174, 18),
+																																																																																																																																																																																																																				_1: {
+																																																																																																																																																																																																																					ctor: '::',
+																																																																																																																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 252, 176, 20),
+																																																																																																																																																																																																																					_1: {
+																																																																																																																																																																																																																						ctor: '::',
+																																																																																																																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 252, 178, 22),
+																																																																																																																																																																																																																						_1: {
+																																																																																																																																																																																																																							ctor: '::',
+																																																																																																																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 252, 180, 24),
+																																																																																																																																																																																																																							_1: {
+																																																																																																																																																																																																																								ctor: '::',
+																																																																																																																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 251, 182, 26),
+																																																																																																																																																																																																																								_1: {
+																																																																																																																																																																																																																									ctor: '::',
+																																																																																																																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 251, 184, 29),
+																																																																																																																																																																																																																									_1: {
+																																																																																																																																																																																																																										ctor: '::',
+																																																																																																																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 251, 186, 31),
+																																																																																																																																																																																																																										_1: {
+																																																																																																																																																																																																																											ctor: '::',
+																																																																																																																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 251, 188, 33),
+																																																																																																																																																																																																																											_1: {
+																																																																																																																																																																																																																												ctor: '::',
+																																																																																																																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 251, 190, 35),
+																																																																																																																																																																																																																												_1: {
+																																																																																																																																																																																																																													ctor: '::',
+																																																																																																																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 250, 192, 38),
+																																																																																																																																																																																																																													_1: {
+																																																																																																																																																																																																																														ctor: '::',
+																																																																																																																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 250, 194, 40),
+																																																																																																																																																																																																																														_1: {
+																																																																																																																																																																																																																															ctor: '::',
+																																																																																																																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 250, 196, 42),
+																																																																																																																																																																																																																															_1: {
+																																																																																																																																																																																																																																ctor: '::',
+																																																																																																																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 250, 198, 45),
+																																																																																																																																																																																																																																_1: {
+																																																																																																																																																																																																																																	ctor: '::',
+																																																																																																																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 249, 199, 47),
+																																																																																																																																																																																																																																	_1: {
+																																																																																																																																																																																																																																		ctor: '::',
+																																																																																																																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 249, 201, 50),
+																																																																																																																																																																																																																																		_1: {
+																																																																																																																																																																																																																																			ctor: '::',
+																																																																																																																																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 249, 203, 53),
+																																																																																																																																																																																																																																			_1: {
+																																																																																																																																																																																																																																				ctor: '::',
+																																																																																																																																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 248, 205, 55),
+																																																																																																																																																																																																																																				_1: {
+																																																																																																																																																																																																																																					ctor: '::',
+																																																																																																																																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 248, 207, 58),
+																																																																																																																																																																																																																																					_1: {
+																																																																																																																																																																																																																																						ctor: '::',
+																																																																																																																																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 247, 209, 61),
+																																																																																																																																																																																																																																						_1: {
+																																																																																																																																																																																																																																							ctor: '::',
+																																																																																																																																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 247, 211, 64),
+																																																																																																																																																																																																																																							_1: {
+																																																																																																																																																																																																																																								ctor: '::',
+																																																																																																																																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 246, 213, 67),
+																																																																																																																																																																																																																																								_1: {
+																																																																																																																																																																																																																																									ctor: '::',
+																																																																																																																																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 246, 215, 70),
+																																																																																																																																																																																																																																									_1: {
+																																																																																																																																																																																																																																										ctor: '::',
+																																																																																																																																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 245, 217, 73),
+																																																																																																																																																																																																																																										_1: {
+																																																																																																																																																																																																																																											ctor: '::',
+																																																																																																																																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 245, 219, 76),
+																																																																																																																																																																																																																																											_1: {
+																																																																																																																																																																																																																																												ctor: '::',
+																																																																																																																																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 244, 221, 79),
+																																																																																																																																																																																																																																												_1: {
+																																																																																																																																																																																																																																													ctor: '::',
+																																																																																																																																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 244, 223, 83),
+																																																																																																																																																																																																																																													_1: {
+																																																																																																																																																																																																																																														ctor: '::',
+																																																																																																																																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 244, 225, 86),
+																																																																																																																																																																																																																																														_1: {
+																																																																																																																																																																																																																																															ctor: '::',
+																																																																																																																																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 243, 227, 90),
+																																																																																																																																																																																																																																															_1: {
+																																																																																																																																																																																																																																																ctor: '::',
+																																																																																																																																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 243, 229, 93),
+																																																																																																																																																																																																																																																_1: {
+																																																																																																																																																																																																																																																	ctor: '::',
+																																																																																																																																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 242, 230, 97),
+																																																																																																																																																																																																																																																	_1: {
+																																																																																																																																																																																																																																																		ctor: '::',
+																																																																																																																																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 242, 232, 101),
+																																																																																																																																																																																																																																																		_1: {
+																																																																																																																																																																																																																																																			ctor: '::',
+																																																																																																																																																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 242, 234, 105),
+																																																																																																																																																																																																																																																			_1: {
+																																																																																																																																																																																																																																																				ctor: '::',
+																																																																																																																																																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 241, 236, 109),
+																																																																																																																																																																																																																																																				_1: {
+																																																																																																																																																																																																																																																					ctor: '::',
+																																																																																																																																																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 241, 237, 113),
+																																																																																																																																																																																																																																																					_1: {
+																																																																																																																																																																																																																																																						ctor: '::',
+																																																																																																																																																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 241, 239, 117),
+																																																																																																																																																																																																																																																						_1: {
+																																																																																																																																																																																																																																																							ctor: '::',
+																																																																																																																																																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 241, 241, 121),
+																																																																																																																																																																																																																																																							_1: {
+																																																																																																																																																																																																																																																								ctor: '::',
+																																																																																																																																																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 242, 242, 125),
+																																																																																																																																																																																																																																																								_1: {
+																																																																																																																																																																																																																																																									ctor: '::',
+																																																																																																																																																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 242, 244, 130),
+																																																																																																																																																																																																																																																									_1: {
+																																																																																																																																																																																																																																																										ctor: '::',
+																																																																																																																																																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 243, 245, 134),
+																																																																																																																																																																																																																																																										_1: {
+																																																																																																																																																																																																																																																											ctor: '::',
+																																																																																																																																																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 243, 246, 138),
+																																																																																																																																																																																																																																																											_1: {
+																																																																																																																																																																																																																																																												ctor: '::',
+																																																																																																																																																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 244, 248, 142),
+																																																																																																																																																																																																																																																												_1: {
+																																																																																																																																																																																																																																																													ctor: '::',
+																																																																																																																																																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 245, 249, 146),
+																																																																																																																																																																																																																																																													_1: {
+																																																																																																																																																																																																																																																														ctor: '::',
+																																																																																																																																																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 246, 250, 150),
+																																																																																																																																																																																																																																																														_1: {
+																																																																																																																																																																																																																																																															ctor: '::',
+																																																																																																																																																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 248, 251, 154),
+																																																																																																																																																																																																																																																															_1: {
+																																																																																																																																																																																																																																																																ctor: '::',
+																																																																																																																																																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 249, 252, 157),
+																																																																																																																																																																																																																																																																_1: {
+																																																																																																																																																																																																																																																																	ctor: '::',
+																																																																																																																																																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 250, 253, 161),
+																																																																																																																																																																																																																																																																	_1: {
+																																																																																																																																																																																																																																																																		ctor: '::',
+																																																																																																																																																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 252, 255, 164),
+																																																																																																																																																																																																																																																																		_1: {ctor: '[]'}
+																																																																																																																																																																																																																																																																	}
+																																																																																																																																																																																																																																																																}
+																																																																																																																																																																																																																																																															}
+																																																																																																																																																																																																																																																														}
+																																																																																																																																																																																																																																																													}
+																																																																																																																																																																																																																																																												}
+																																																																																																																																																																																																																																																											}
+																																																																																																																																																																																																																																																										}
+																																																																																																																																																																																																																																																									}
+																																																																																																																																																																																																																																																								}
+																																																																																																																																																																																																																																																							}
+																																																																																																																																																																																																																																																						}
+																																																																																																																																																																																																																																																					}
+																																																																																																																																																																																																																																																				}
+																																																																																																																																																																																																																																																			}
+																																																																																																																																																																																																																																																		}
+																																																																																																																																																																																																																																																	}
+																																																																																																																																																																																																																																																}
+																																																																																																																																																																																																																																															}
+																																																																																																																																																																																																																																														}
+																																																																																																																																																																																																																																													}
+																																																																																																																																																																																																																																												}
+																																																																																																																																																																																																																																											}
+																																																																																																																																																																																																																																										}
+																																																																																																																																																																																																																																									}
+																																																																																																																																																																																																																																								}
+																																																																																																																																																																																																																																							}
+																																																																																																																																																																																																																																						}
+																																																																																																																																																																																																																																					}
+																																																																																																																																																																																																																																				}
+																																																																																																																																																																																																																																			}
+																																																																																																																																																																																																																																		}
+																																																																																																																																																																																																																																	}
+																																																																																																																																																																																																																																}
+																																																																																																																																																																																																																															}
+																																																																																																																																																																																																																														}
+																																																																																																																																																																																																																													}
+																																																																																																																																																																																																																												}
+																																																																																																																																																																																																																											}
+																																																																																																																																																																																																																										}
+																																																																																																																																																																																																																									}
+																																																																																																																																																																																																																								}
+																																																																																																																																																																																																																							}
+																																																																																																																																																																																																																						}
+																																																																																																																																																																																																																					}
+																																																																																																																																																																																																																				}
+																																																																																																																																																																																																																			}
+																																																																																																																																																																																																																		}
+																																																																																																																																																																																																																	}
+																																																																																																																																																																																																																}
+																																																																																																																																																																																																															}
+																																																																																																																																																																																																														}
+																																																																																																																																																																																																													}
+																																																																																																																																																																																																												}
+																																																																																																																																																																																																											}
+																																																																																																																																																																																																										}
+																																																																																																																																																																																																									}
+																																																																																																																																																																																																								}
+																																																																																																																																																																																																							}
+																																																																																																																																																																																																						}
+																																																																																																																																																																																																					}
+																																																																																																																																																																																																				}
+																																																																																																																																																																																																			}
+																																																																																																																																																																																																		}
+																																																																																																																																																																																																	}
+																																																																																																																																																																																																}
+																																																																																																																																																																																															}
+																																																																																																																																																																																														}
+																																																																																																																																																																																													}
+																																																																																																																																																																																												}
+																																																																																																																																																																																											}
+																																																																																																																																																																																										}
+																																																																																																																																																																																									}
+																																																																																																																																																																																								}
+																																																																																																																																																																																							}
+																																																																																																																																																																																						}
+																																																																																																																																																																																					}
+																																																																																																																																																																																				}
+																																																																																																																																																																																			}
+																																																																																																																																																																																		}
+																																																																																																																																																																																	}
+																																																																																																																																																																																}
+																																																																																																																																																																															}
+																																																																																																																																																																														}
+																																																																																																																																																																													}
+																																																																																																																																																																												}
+																																																																																																																																																																											}
+																																																																																																																																																																										}
+																																																																																																																																																																									}
+																																																																																																																																																																								}
+																																																																																																																																																																							}
+																																																																																																																																																																						}
+																																																																																																																																																																					}
+																																																																																																																																																																				}
+																																																																																																																																																																			}
+																																																																																																																																																																		}
+																																																																																																																																																																	}
+																																																																																																																																																																}
+																																																																																																																																																															}
+																																																																																																																																																														}
+																																																																																																																																																													}
+																																																																																																																																																												}
+																																																																																																																																																											}
+																																																																																																																																																										}
+																																																																																																																																																									}
+																																																																																																																																																								}
+																																																																																																																																																							}
+																																																																																																																																																						}
+																																																																																																																																																					}
+																																																																																																																																																				}
+																																																																																																																																																			}
+																																																																																																																																																		}
+																																																																																																																																																	}
+																																																																																																																																																}
+																																																																																																																																															}
+																																																																																																																																														}
+																																																																																																																																													}
+																																																																																																																																												}
+																																																																																																																																											}
+																																																																																																																																										}
+																																																																																																																																									}
+																																																																																																																																								}
+																																																																																																																																							}
+																																																																																																																																						}
+																																																																																																																																					}
+																																																																																																																																				}
+																																																																																																																																			}
+																																																																																																																																		}
+																																																																																																																																	}
+																																																																																																																																}
+																																																																																																																															}
+																																																																																																																														}
+																																																																																																																													}
+																																																																																																																												}
+																																																																																																																											}
+																																																																																																																										}
+																																																																																																																									}
+																																																																																																																								}
+																																																																																																																							}
+																																																																																																																						}
+																																																																																																																					}
+																																																																																																																				}
+																																																																																																																			}
+																																																																																																																		}
+																																																																																																																	}
+																																																																																																																}
+																																																																																																															}
+																																																																																																														}
+																																																																																																													}
+																																																																																																												}
+																																																																																																											}
+																																																																																																										}
+																																																																																																									}
+																																																																																																								}
+																																																																																																							}
+																																																																																																						}
+																																																																																																					}
+																																																																																																				}
+																																																																																																			}
+																																																																																																		}
+																																																																																																	}
+																																																																																																}
+																																																																																															}
+																																																																																														}
+																																																																																													}
+																																																																																												}
+																																																																																											}
+																																																																																										}
+																																																																																									}
+																																																																																								}
+																																																																																							}
+																																																																																						}
+																																																																																					}
+																																																																																				}
+																																																																																			}
+																																																																																		}
+																																																																																	}
+																																																																																}
+																																																																															}
+																																																																														}
+																																																																													}
+																																																																												}
+																																																																											}
+																																																																										}
+																																																																									}
+																																																																								}
+																																																																							}
+																																																																						}
+																																																																					}
+																																																																				}
+																																																																			}
+																																																																		}
+																																																																	}
+																																																																}
+																																																															}
+																																																														}
+																																																													}
+																																																												}
+																																																											}
+																																																										}
+																																																									}
+																																																								}
+																																																							}
+																																																						}
+																																																					}
+																																																				}
+																																																			}
+																																																		}
+																																																	}
+																																																}
+																																															}
+																																														}
+																																													}
+																																												}
+																																											}
+																																										}
+																																									}
+																																								}
+																																							}
+																																						}
+																																					}
+																																				}
+																																			}
+																																		}
+																																	}
+																																}
+																															}
+																														}
+																													}
+																												}
+																											}
+																										}
+																									}
+																								}
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}));
+var _gampleman$elm_visualization$Visualization_Scale_Colors$plasma = _gampleman$elm_visualization$Visualization_Scale_Colors$mkInterpolator(
+	_elm_lang$core$Array$fromList(
+		{
+			ctor: '::',
+			_0: A3(_elm_lang$core$Color$rgb, 13, 8, 135),
+			_1: {
+				ctor: '::',
+				_0: A3(_elm_lang$core$Color$rgb, 16, 7, 136),
+				_1: {
+					ctor: '::',
+					_0: A3(_elm_lang$core$Color$rgb, 19, 7, 137),
+					_1: {
+						ctor: '::',
+						_0: A3(_elm_lang$core$Color$rgb, 22, 7, 138),
+						_1: {
+							ctor: '::',
+							_0: A3(_elm_lang$core$Color$rgb, 25, 6, 140),
+							_1: {
+								ctor: '::',
+								_0: A3(_elm_lang$core$Color$rgb, 27, 6, 141),
+								_1: {
+									ctor: '::',
+									_0: A3(_elm_lang$core$Color$rgb, 29, 6, 142),
+									_1: {
+										ctor: '::',
+										_0: A3(_elm_lang$core$Color$rgb, 32, 6, 143),
+										_1: {
+											ctor: '::',
+											_0: A3(_elm_lang$core$Color$rgb, 34, 6, 144),
+											_1: {
+												ctor: '::',
+												_0: A3(_elm_lang$core$Color$rgb, 36, 6, 145),
+												_1: {
+													ctor: '::',
+													_0: A3(_elm_lang$core$Color$rgb, 38, 5, 145),
+													_1: {
+														ctor: '::',
+														_0: A3(_elm_lang$core$Color$rgb, 40, 5, 146),
+														_1: {
+															ctor: '::',
+															_0: A3(_elm_lang$core$Color$rgb, 42, 5, 147),
+															_1: {
+																ctor: '::',
+																_0: A3(_elm_lang$core$Color$rgb, 44, 5, 148),
+																_1: {
+																	ctor: '::',
+																	_0: A3(_elm_lang$core$Color$rgb, 46, 5, 149),
+																	_1: {
+																		ctor: '::',
+																		_0: A3(_elm_lang$core$Color$rgb, 47, 5, 150),
+																		_1: {
+																			ctor: '::',
+																			_0: A3(_elm_lang$core$Color$rgb, 49, 5, 151),
+																			_1: {
+																				ctor: '::',
+																				_0: A3(_elm_lang$core$Color$rgb, 51, 5, 151),
+																				_1: {
+																					ctor: '::',
+																					_0: A3(_elm_lang$core$Color$rgb, 53, 4, 152),
+																					_1: {
+																						ctor: '::',
+																						_0: A3(_elm_lang$core$Color$rgb, 55, 4, 153),
+																						_1: {
+																							ctor: '::',
+																							_0: A3(_elm_lang$core$Color$rgb, 56, 4, 154),
+																							_1: {
+																								ctor: '::',
+																								_0: A3(_elm_lang$core$Color$rgb, 58, 4, 154),
+																								_1: {
+																									ctor: '::',
+																									_0: A3(_elm_lang$core$Color$rgb, 60, 4, 155),
+																									_1: {
+																										ctor: '::',
+																										_0: A3(_elm_lang$core$Color$rgb, 62, 4, 156),
+																										_1: {
+																											ctor: '::',
+																											_0: A3(_elm_lang$core$Color$rgb, 63, 4, 156),
+																											_1: {
+																												ctor: '::',
+																												_0: A3(_elm_lang$core$Color$rgb, 65, 4, 157),
+																												_1: {
+																													ctor: '::',
+																													_0: A3(_elm_lang$core$Color$rgb, 67, 3, 158),
+																													_1: {
+																														ctor: '::',
+																														_0: A3(_elm_lang$core$Color$rgb, 68, 3, 158),
+																														_1: {
+																															ctor: '::',
+																															_0: A3(_elm_lang$core$Color$rgb, 70, 3, 159),
+																															_1: {
+																																ctor: '::',
+																																_0: A3(_elm_lang$core$Color$rgb, 72, 3, 159),
+																																_1: {
+																																	ctor: '::',
+																																	_0: A3(_elm_lang$core$Color$rgb, 73, 3, 160),
+																																	_1: {
+																																		ctor: '::',
+																																		_0: A3(_elm_lang$core$Color$rgb, 75, 3, 161),
+																																		_1: {
+																																			ctor: '::',
+																																			_0: A3(_elm_lang$core$Color$rgb, 76, 2, 161),
+																																			_1: {
+																																				ctor: '::',
+																																				_0: A3(_elm_lang$core$Color$rgb, 78, 2, 162),
+																																				_1: {
+																																					ctor: '::',
+																																					_0: A3(_elm_lang$core$Color$rgb, 80, 2, 162),
+																																					_1: {
+																																						ctor: '::',
+																																						_0: A3(_elm_lang$core$Color$rgb, 81, 2, 163),
+																																						_1: {
+																																							ctor: '::',
+																																							_0: A3(_elm_lang$core$Color$rgb, 83, 2, 163),
+																																							_1: {
+																																								ctor: '::',
+																																								_0: A3(_elm_lang$core$Color$rgb, 85, 2, 164),
+																																								_1: {
+																																									ctor: '::',
+																																									_0: A3(_elm_lang$core$Color$rgb, 86, 1, 164),
+																																									_1: {
+																																										ctor: '::',
+																																										_0: A3(_elm_lang$core$Color$rgb, 88, 1, 164),
+																																										_1: {
+																																											ctor: '::',
+																																											_0: A3(_elm_lang$core$Color$rgb, 89, 1, 165),
+																																											_1: {
+																																												ctor: '::',
+																																												_0: A3(_elm_lang$core$Color$rgb, 91, 1, 165),
+																																												_1: {
+																																													ctor: '::',
+																																													_0: A3(_elm_lang$core$Color$rgb, 92, 1, 166),
+																																													_1: {
+																																														ctor: '::',
+																																														_0: A3(_elm_lang$core$Color$rgb, 94, 1, 166),
+																																														_1: {
+																																															ctor: '::',
+																																															_0: A3(_elm_lang$core$Color$rgb, 96, 1, 166),
+																																															_1: {
+																																																ctor: '::',
+																																																_0: A3(_elm_lang$core$Color$rgb, 97, 0, 167),
+																																																_1: {
+																																																	ctor: '::',
+																																																	_0: A3(_elm_lang$core$Color$rgb, 99, 0, 167),
+																																																	_1: {
+																																																		ctor: '::',
+																																																		_0: A3(_elm_lang$core$Color$rgb, 100, 0, 167),
+																																																		_1: {
+																																																			ctor: '::',
+																																																			_0: A3(_elm_lang$core$Color$rgb, 102, 0, 167),
+																																																			_1: {
+																																																				ctor: '::',
+																																																				_0: A3(_elm_lang$core$Color$rgb, 103, 0, 168),
+																																																				_1: {
+																																																					ctor: '::',
+																																																					_0: A3(_elm_lang$core$Color$rgb, 105, 0, 168),
+																																																					_1: {
+																																																						ctor: '::',
+																																																						_0: A3(_elm_lang$core$Color$rgb, 106, 0, 168),
+																																																						_1: {
+																																																							ctor: '::',
+																																																							_0: A3(_elm_lang$core$Color$rgb, 108, 0, 168),
+																																																							_1: {
+																																																								ctor: '::',
+																																																								_0: A3(_elm_lang$core$Color$rgb, 110, 0, 168),
+																																																								_1: {
+																																																									ctor: '::',
+																																																									_0: A3(_elm_lang$core$Color$rgb, 111, 0, 168),
+																																																									_1: {
+																																																										ctor: '::',
+																																																										_0: A3(_elm_lang$core$Color$rgb, 113, 0, 168),
+																																																										_1: {
+																																																											ctor: '::',
+																																																											_0: A3(_elm_lang$core$Color$rgb, 114, 1, 168),
+																																																											_1: {
+																																																												ctor: '::',
+																																																												_0: A3(_elm_lang$core$Color$rgb, 116, 1, 168),
+																																																												_1: {
+																																																													ctor: '::',
+																																																													_0: A3(_elm_lang$core$Color$rgb, 117, 1, 168),
+																																																													_1: {
+																																																														ctor: '::',
+																																																														_0: A3(_elm_lang$core$Color$rgb, 119, 1, 168),
+																																																														_1: {
+																																																															ctor: '::',
+																																																															_0: A3(_elm_lang$core$Color$rgb, 120, 1, 168),
+																																																															_1: {
+																																																																ctor: '::',
+																																																																_0: A3(_elm_lang$core$Color$rgb, 122, 2, 168),
+																																																																_1: {
+																																																																	ctor: '::',
+																																																																	_0: A3(_elm_lang$core$Color$rgb, 123, 2, 168),
+																																																																	_1: {
+																																																																		ctor: '::',
+																																																																		_0: A3(_elm_lang$core$Color$rgb, 125, 3, 168),
+																																																																		_1: {
+																																																																			ctor: '::',
+																																																																			_0: A3(_elm_lang$core$Color$rgb, 126, 3, 168),
+																																																																			_1: {
+																																																																				ctor: '::',
+																																																																				_0: A3(_elm_lang$core$Color$rgb, 128, 4, 168),
+																																																																				_1: {
+																																																																					ctor: '::',
+																																																																					_0: A3(_elm_lang$core$Color$rgb, 129, 4, 167),
+																																																																					_1: {
+																																																																						ctor: '::',
+																																																																						_0: A3(_elm_lang$core$Color$rgb, 131, 5, 167),
+																																																																						_1: {
+																																																																							ctor: '::',
+																																																																							_0: A3(_elm_lang$core$Color$rgb, 132, 5, 167),
+																																																																							_1: {
+																																																																								ctor: '::',
+																																																																								_0: A3(_elm_lang$core$Color$rgb, 134, 6, 166),
+																																																																								_1: {
+																																																																									ctor: '::',
+																																																																									_0: A3(_elm_lang$core$Color$rgb, 135, 7, 166),
+																																																																									_1: {
+																																																																										ctor: '::',
+																																																																										_0: A3(_elm_lang$core$Color$rgb, 136, 8, 166),
+																																																																										_1: {
+																																																																											ctor: '::',
+																																																																											_0: A3(_elm_lang$core$Color$rgb, 138, 9, 165),
+																																																																											_1: {
+																																																																												ctor: '::',
+																																																																												_0: A3(_elm_lang$core$Color$rgb, 139, 10, 165),
+																																																																												_1: {
+																																																																													ctor: '::',
+																																																																													_0: A3(_elm_lang$core$Color$rgb, 141, 11, 165),
+																																																																													_1: {
+																																																																														ctor: '::',
+																																																																														_0: A3(_elm_lang$core$Color$rgb, 142, 12, 164),
+																																																																														_1: {
+																																																																															ctor: '::',
+																																																																															_0: A3(_elm_lang$core$Color$rgb, 143, 13, 164),
+																																																																															_1: {
+																																																																																ctor: '::',
+																																																																																_0: A3(_elm_lang$core$Color$rgb, 145, 14, 163),
+																																																																																_1: {
+																																																																																	ctor: '::',
+																																																																																	_0: A3(_elm_lang$core$Color$rgb, 146, 15, 163),
+																																																																																	_1: {
+																																																																																		ctor: '::',
+																																																																																		_0: A3(_elm_lang$core$Color$rgb, 148, 16, 162),
+																																																																																		_1: {
+																																																																																			ctor: '::',
+																																																																																			_0: A3(_elm_lang$core$Color$rgb, 149, 17, 161),
+																																																																																			_1: {
+																																																																																				ctor: '::',
+																																																																																				_0: A3(_elm_lang$core$Color$rgb, 150, 19, 161),
+																																																																																				_1: {
+																																																																																					ctor: '::',
+																																																																																					_0: A3(_elm_lang$core$Color$rgb, 152, 20, 160),
+																																																																																					_1: {
+																																																																																						ctor: '::',
+																																																																																						_0: A3(_elm_lang$core$Color$rgb, 153, 21, 159),
+																																																																																						_1: {
+																																																																																							ctor: '::',
+																																																																																							_0: A3(_elm_lang$core$Color$rgb, 154, 22, 159),
+																																																																																							_1: {
+																																																																																								ctor: '::',
+																																																																																								_0: A3(_elm_lang$core$Color$rgb, 156, 23, 158),
+																																																																																								_1: {
+																																																																																									ctor: '::',
+																																																																																									_0: A3(_elm_lang$core$Color$rgb, 157, 24, 157),
+																																																																																									_1: {
+																																																																																										ctor: '::',
+																																																																																										_0: A3(_elm_lang$core$Color$rgb, 158, 25, 157),
+																																																																																										_1: {
+																																																																																											ctor: '::',
+																																																																																											_0: A3(_elm_lang$core$Color$rgb, 160, 26, 156),
+																																																																																											_1: {
+																																																																																												ctor: '::',
+																																																																																												_0: A3(_elm_lang$core$Color$rgb, 161, 27, 155),
+																																																																																												_1: {
+																																																																																													ctor: '::',
+																																																																																													_0: A3(_elm_lang$core$Color$rgb, 162, 29, 154),
+																																																																																													_1: {
+																																																																																														ctor: '::',
+																																																																																														_0: A3(_elm_lang$core$Color$rgb, 163, 30, 154),
+																																																																																														_1: {
+																																																																																															ctor: '::',
+																																																																																															_0: A3(_elm_lang$core$Color$rgb, 165, 31, 153),
+																																																																																															_1: {
+																																																																																																ctor: '::',
+																																																																																																_0: A3(_elm_lang$core$Color$rgb, 166, 32, 152),
+																																																																																																_1: {
+																																																																																																	ctor: '::',
+																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 167, 33, 151),
+																																																																																																	_1: {
+																																																																																																		ctor: '::',
+																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 168, 34, 150),
+																																																																																																		_1: {
+																																																																																																			ctor: '::',
+																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 170, 35, 149),
+																																																																																																			_1: {
+																																																																																																				ctor: '::',
+																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 171, 36, 148),
+																																																																																																				_1: {
+																																																																																																					ctor: '::',
+																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 172, 38, 148),
+																																																																																																					_1: {
+																																																																																																						ctor: '::',
+																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 173, 39, 147),
+																																																																																																						_1: {
+																																																																																																							ctor: '::',
+																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 174, 40, 146),
+																																																																																																							_1: {
+																																																																																																								ctor: '::',
+																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 176, 41, 145),
+																																																																																																								_1: {
+																																																																																																									ctor: '::',
+																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 177, 42, 144),
+																																																																																																									_1: {
+																																																																																																										ctor: '::',
+																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 178, 43, 143),
+																																																																																																										_1: {
+																																																																																																											ctor: '::',
+																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 179, 44, 142),
+																																																																																																											_1: {
+																																																																																																												ctor: '::',
+																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 180, 46, 141),
+																																																																																																												_1: {
+																																																																																																													ctor: '::',
+																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 181, 47, 140),
+																																																																																																													_1: {
+																																																																																																														ctor: '::',
+																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 182, 48, 139),
+																																																																																																														_1: {
+																																																																																																															ctor: '::',
+																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 183, 49, 138),
+																																																																																																															_1: {
+																																																																																																																ctor: '::',
+																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 184, 50, 137),
+																																																																																																																_1: {
+																																																																																																																	ctor: '::',
+																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 186, 51, 136),
+																																																																																																																	_1: {
+																																																																																																																		ctor: '::',
+																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 187, 52, 136),
+																																																																																																																		_1: {
+																																																																																																																			ctor: '::',
+																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 188, 53, 135),
+																																																																																																																			_1: {
+																																																																																																																				ctor: '::',
+																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 189, 55, 134),
+																																																																																																																				_1: {
+																																																																																																																					ctor: '::',
+																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 190, 56, 133),
+																																																																																																																					_1: {
+																																																																																																																						ctor: '::',
+																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 191, 57, 132),
+																																																																																																																						_1: {
+																																																																																																																							ctor: '::',
+																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 192, 58, 131),
+																																																																																																																							_1: {
+																																																																																																																								ctor: '::',
+																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 193, 59, 130),
+																																																																																																																								_1: {
+																																																																																																																									ctor: '::',
+																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 194, 60, 129),
+																																																																																																																									_1: {
+																																																																																																																										ctor: '::',
+																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 195, 61, 128),
+																																																																																																																										_1: {
+																																																																																																																											ctor: '::',
+																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 196, 62, 127),
+																																																																																																																											_1: {
+																																																																																																																												ctor: '::',
+																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 197, 64, 126),
+																																																																																																																												_1: {
+																																																																																																																													ctor: '::',
+																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 198, 65, 125),
+																																																																																																																													_1: {
+																																																																																																																														ctor: '::',
+																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 199, 66, 124),
+																																																																																																																														_1: {
+																																																																																																																															ctor: '::',
+																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 200, 67, 123),
+																																																																																																																															_1: {
+																																																																																																																																ctor: '::',
+																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 201, 68, 122),
+																																																																																																																																_1: {
+																																																																																																																																	ctor: '::',
+																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 202, 69, 122),
+																																																																																																																																	_1: {
+																																																																																																																																		ctor: '::',
+																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 203, 70, 121),
+																																																																																																																																		_1: {
+																																																																																																																																			ctor: '::',
+																																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 204, 71, 120),
+																																																																																																																																			_1: {
+																																																																																																																																				ctor: '::',
+																																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 204, 73, 119),
+																																																																																																																																				_1: {
+																																																																																																																																					ctor: '::',
+																																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 205, 74, 118),
+																																																																																																																																					_1: {
+																																																																																																																																						ctor: '::',
+																																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 206, 75, 117),
+																																																																																																																																						_1: {
+																																																																																																																																							ctor: '::',
+																																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 207, 76, 116),
+																																																																																																																																							_1: {
+																																																																																																																																								ctor: '::',
+																																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 208, 77, 115),
+																																																																																																																																								_1: {
+																																																																																																																																									ctor: '::',
+																																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 209, 78, 114),
+																																																																																																																																									_1: {
+																																																																																																																																										ctor: '::',
+																																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 210, 79, 113),
+																																																																																																																																										_1: {
+																																																																																																																																											ctor: '::',
+																																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 211, 81, 113),
+																																																																																																																																											_1: {
+																																																																																																																																												ctor: '::',
+																																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 212, 82, 112),
+																																																																																																																																												_1: {
+																																																																																																																																													ctor: '::',
+																																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 213, 83, 111),
+																																																																																																																																													_1: {
+																																																																																																																																														ctor: '::',
+																																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 213, 84, 110),
+																																																																																																																																														_1: {
+																																																																																																																																															ctor: '::',
+																																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 214, 85, 109),
+																																																																																																																																															_1: {
+																																																																																																																																																ctor: '::',
+																																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 215, 86, 108),
+																																																																																																																																																_1: {
+																																																																																																																																																	ctor: '::',
+																																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 216, 87, 107),
+																																																																																																																																																	_1: {
+																																																																																																																																																		ctor: '::',
+																																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 217, 88, 106),
+																																																																																																																																																		_1: {
+																																																																																																																																																			ctor: '::',
+																																																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 218, 90, 106),
+																																																																																																																																																			_1: {
+																																																																																																																																																				ctor: '::',
+																																																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 218, 91, 105),
+																																																																																																																																																				_1: {
+																																																																																																																																																					ctor: '::',
+																																																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 219, 92, 104),
+																																																																																																																																																					_1: {
+																																																																																																																																																						ctor: '::',
+																																																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 220, 93, 103),
+																																																																																																																																																						_1: {
+																																																																																																																																																							ctor: '::',
+																																																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 221, 94, 102),
+																																																																																																																																																							_1: {
+																																																																																																																																																								ctor: '::',
+																																																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 222, 95, 101),
+																																																																																																																																																								_1: {
+																																																																																																																																																									ctor: '::',
+																																																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 222, 97, 100),
+																																																																																																																																																									_1: {
+																																																																																																																																																										ctor: '::',
+																																																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 223, 98, 99),
+																																																																																																																																																										_1: {
+																																																																																																																																																											ctor: '::',
+																																																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 224, 99, 99),
+																																																																																																																																																											_1: {
+																																																																																																																																																												ctor: '::',
+																																																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 225, 100, 98),
+																																																																																																																																																												_1: {
+																																																																																																																																																													ctor: '::',
+																																																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 226, 101, 97),
+																																																																																																																																																													_1: {
+																																																																																																																																																														ctor: '::',
+																																																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 226, 102, 96),
+																																																																																																																																																														_1: {
+																																																																																																																																																															ctor: '::',
+																																																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 227, 104, 95),
+																																																																																																																																																															_1: {
+																																																																																																																																																																ctor: '::',
+																																																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 228, 105, 94),
+																																																																																																																																																																_1: {
+																																																																																																																																																																	ctor: '::',
+																																																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 229, 106, 93),
+																																																																																																																																																																	_1: {
+																																																																																																																																																																		ctor: '::',
+																																																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 229, 107, 93),
+																																																																																																																																																																		_1: {
+																																																																																																																																																																			ctor: '::',
+																																																																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 230, 108, 92),
+																																																																																																																																																																			_1: {
+																																																																																																																																																																				ctor: '::',
+																																																																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 231, 110, 91),
+																																																																																																																																																																				_1: {
+																																																																																																																																																																					ctor: '::',
+																																																																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 231, 111, 90),
+																																																																																																																																																																					_1: {
+																																																																																																																																																																						ctor: '::',
+																																																																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 232, 112, 89),
+																																																																																																																																																																						_1: {
+																																																																																																																																																																							ctor: '::',
+																																																																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 233, 113, 88),
+																																																																																																																																																																							_1: {
+																																																																																																																																																																								ctor: '::',
+																																																																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 233, 114, 87),
+																																																																																																																																																																								_1: {
+																																																																																																																																																																									ctor: '::',
+																																																																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 234, 116, 87),
+																																																																																																																																																																									_1: {
+																																																																																																																																																																										ctor: '::',
+																																																																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 235, 117, 86),
+																																																																																																																																																																										_1: {
+																																																																																																																																																																											ctor: '::',
+																																																																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 235, 118, 85),
+																																																																																																																																																																											_1: {
+																																																																																																																																																																												ctor: '::',
+																																																																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 236, 119, 84),
+																																																																																																																																																																												_1: {
+																																																																																																																																																																													ctor: '::',
+																																																																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 237, 121, 83),
+																																																																																																																																																																													_1: {
+																																																																																																																																																																														ctor: '::',
+																																																																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 237, 122, 82),
+																																																																																																																																																																														_1: {
+																																																																																																																																																																															ctor: '::',
+																																																																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 238, 123, 81),
+																																																																																																																																																																															_1: {
+																																																																																																																																																																																ctor: '::',
+																																																																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 239, 124, 81),
+																																																																																																																																																																																_1: {
+																																																																																																																																																																																	ctor: '::',
+																																																																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 239, 126, 80),
+																																																																																																																																																																																	_1: {
+																																																																																																																																																																																		ctor: '::',
+																																																																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 240, 127, 79),
+																																																																																																																																																																																		_1: {
+																																																																																																																																																																																			ctor: '::',
+																																																																																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 240, 128, 78),
+																																																																																																																																																																																			_1: {
+																																																																																																																																																																																				ctor: '::',
+																																																																																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 241, 129, 77),
+																																																																																																																																																																																				_1: {
+																																																																																																																																																																																					ctor: '::',
+																																																																																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 241, 131, 76),
+																																																																																																																																																																																					_1: {
+																																																																																																																																																																																						ctor: '::',
+																																																																																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 242, 132, 75),
+																																																																																																																																																																																						_1: {
+																																																																																																																																																																																							ctor: '::',
+																																																																																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 243, 133, 75),
+																																																																																																																																																																																							_1: {
+																																																																																																																																																																																								ctor: '::',
+																																																																																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 243, 135, 74),
+																																																																																																																																																																																								_1: {
+																																																																																																																																																																																									ctor: '::',
+																																																																																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 244, 136, 73),
+																																																																																																																																																																																									_1: {
+																																																																																																																																																																																										ctor: '::',
+																																																																																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 244, 137, 72),
+																																																																																																																																																																																										_1: {
+																																																																																																																																																																																											ctor: '::',
+																																																																																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 245, 139, 71),
+																																																																																																																																																																																											_1: {
+																																																																																																																																																																																												ctor: '::',
+																																																																																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 245, 140, 70),
+																																																																																																																																																																																												_1: {
+																																																																																																																																																																																													ctor: '::',
+																																																																																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 246, 141, 69),
+																																																																																																																																																																																													_1: {
+																																																																																																																																																																																														ctor: '::',
+																																																																																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 246, 143, 68),
+																																																																																																																																																																																														_1: {
+																																																																																																																																																																																															ctor: '::',
+																																																																																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 247, 144, 68),
+																																																																																																																																																																																															_1: {
+																																																																																																																																																																																																ctor: '::',
+																																																																																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 247, 145, 67),
+																																																																																																																																																																																																_1: {
+																																																																																																																																																																																																	ctor: '::',
+																																																																																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 247, 147, 66),
+																																																																																																																																																																																																	_1: {
+																																																																																																																																																																																																		ctor: '::',
+																																																																																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 248, 148, 65),
+																																																																																																																																																																																																		_1: {
+																																																																																																																																																																																																			ctor: '::',
+																																																																																																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 248, 149, 64),
+																																																																																																																																																																																																			_1: {
+																																																																																																																																																																																																				ctor: '::',
+																																																																																																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 249, 151, 63),
+																																																																																																																																																																																																				_1: {
+																																																																																																																																																																																																					ctor: '::',
+																																																																																																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 249, 152, 62),
+																																																																																																																																																																																																					_1: {
+																																																																																																																																																																																																						ctor: '::',
+																																																																																																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 249, 154, 62),
+																																																																																																																																																																																																						_1: {
+																																																																																																																																																																																																							ctor: '::',
+																																																																																																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 250, 155, 61),
+																																																																																																																																																																																																							_1: {
+																																																																																																																																																																																																								ctor: '::',
+																																																																																																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 250, 156, 60),
+																																																																																																																																																																																																								_1: {
+																																																																																																																																																																																																									ctor: '::',
+																																																																																																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 250, 158, 59),
+																																																																																																																																																																																																									_1: {
+																																																																																																																																																																																																										ctor: '::',
+																																																																																																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 251, 159, 58),
+																																																																																																																																																																																																										_1: {
+																																																																																																																																																																																																											ctor: '::',
+																																																																																																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 251, 161, 57),
+																																																																																																																																																																																																											_1: {
+																																																																																																																																																																																																												ctor: '::',
+																																																																																																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 251, 162, 56),
+																																																																																																																																																																																																												_1: {
+																																																																																																																																																																																																													ctor: '::',
+																																																																																																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 252, 163, 56),
+																																																																																																																																																																																																													_1: {
+																																																																																																																																																																																																														ctor: '::',
+																																																																																																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 252, 165, 55),
+																																																																																																																																																																																																														_1: {
+																																																																																																																																																																																																															ctor: '::',
+																																																																																																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 252, 166, 54),
+																																																																																																																																																																																																															_1: {
+																																																																																																																																																																																																																ctor: '::',
+																																																																																																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 252, 168, 53),
+																																																																																																																																																																																																																_1: {
+																																																																																																																																																																																																																	ctor: '::',
+																																																																																																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 252, 169, 52),
+																																																																																																																																																																																																																	_1: {
+																																																																																																																																																																																																																		ctor: '::',
+																																																																																																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 253, 171, 51),
+																																																																																																																																																																																																																		_1: {
+																																																																																																																																																																																																																			ctor: '::',
+																																																																																																																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 253, 172, 51),
+																																																																																																																																																																																																																			_1: {
+																																																																																																																																																																																																																				ctor: '::',
+																																																																																																																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 253, 174, 50),
+																																																																																																																																																																																																																				_1: {
+																																																																																																																																																																																																																					ctor: '::',
+																																																																																																																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 253, 175, 49),
+																																																																																																																																																																																																																					_1: {
+																																																																																																																																																																																																																						ctor: '::',
+																																																																																																																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 253, 177, 48),
+																																																																																																																																																																																																																						_1: {
+																																																																																																																																																																																																																							ctor: '::',
+																																																																																																																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 253, 178, 47),
+																																																																																																																																																																																																																							_1: {
+																																																																																																																																																																																																																								ctor: '::',
+																																																																																																																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 253, 180, 47),
+																																																																																																																																																																																																																								_1: {
+																																																																																																																																																																																																																									ctor: '::',
+																																																																																																																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 253, 181, 46),
+																																																																																																																																																																																																																									_1: {
+																																																																																																																																																																																																																										ctor: '::',
+																																																																																																																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 254, 183, 45),
+																																																																																																																																																																																																																										_1: {
+																																																																																																																																																																																																																											ctor: '::',
+																																																																																																																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 254, 184, 44),
+																																																																																																																																																																																																																											_1: {
+																																																																																																																																																																																																																												ctor: '::',
+																																																																																																																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 254, 186, 44),
+																																																																																																																																																																																																																												_1: {
+																																																																																																																																																																																																																													ctor: '::',
+																																																																																																																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 254, 187, 43),
+																																																																																																																																																																																																																													_1: {
+																																																																																																																																																																																																																														ctor: '::',
+																																																																																																																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 254, 189, 42),
+																																																																																																																																																																																																																														_1: {
+																																																																																																																																																																																																																															ctor: '::',
+																																																																																																																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 254, 190, 42),
+																																																																																																																																																																																																																															_1: {
+																																																																																																																																																																																																																																ctor: '::',
+																																																																																																																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 254, 192, 41),
+																																																																																																																																																																																																																																_1: {
+																																																																																																																																																																																																																																	ctor: '::',
+																																																																																																																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 253, 194, 41),
+																																																																																																																																																																																																																																	_1: {
+																																																																																																																																																																																																																																		ctor: '::',
+																																																																																																																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 253, 195, 40),
+																																																																																																																																																																																																																																		_1: {
+																																																																																																																																																																																																																																			ctor: '::',
+																																																																																																																																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 253, 197, 39),
+																																																																																																																																																																																																																																			_1: {
+																																																																																																																																																																																																																																				ctor: '::',
+																																																																																																																																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 253, 198, 39),
+																																																																																																																																																																																																																																				_1: {
+																																																																																																																																																																																																																																					ctor: '::',
+																																																																																																																																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 253, 200, 39),
+																																																																																																																																																																																																																																					_1: {
+																																																																																																																																																																																																																																						ctor: '::',
+																																																																																																																																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 253, 202, 38),
+																																																																																																																																																																																																																																						_1: {
+																																																																																																																																																																																																																																							ctor: '::',
+																																																																																																																																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 253, 203, 38),
+																																																																																																																																																																																																																																							_1: {
+																																																																																																																																																																																																																																								ctor: '::',
+																																																																																																																																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 252, 205, 37),
+																																																																																																																																																																																																																																								_1: {
+																																																																																																																																																																																																																																									ctor: '::',
+																																																																																																																																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 252, 206, 37),
+																																																																																																																																																																																																																																									_1: {
+																																																																																																																																																																																																																																										ctor: '::',
+																																																																																																																																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 252, 208, 37),
+																																																																																																																																																																																																																																										_1: {
+																																																																																																																																																																																																																																											ctor: '::',
+																																																																																																																																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 252, 210, 37),
+																																																																																																																																																																																																																																											_1: {
+																																																																																																																																																																																																																																												ctor: '::',
+																																																																																																																																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 251, 211, 36),
+																																																																																																																																																																																																																																												_1: {
+																																																																																																																																																																																																																																													ctor: '::',
+																																																																																																																																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 251, 213, 36),
+																																																																																																																																																																																																																																													_1: {
+																																																																																																																																																																																																																																														ctor: '::',
+																																																																																																																																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 251, 215, 36),
+																																																																																																																																																																																																																																														_1: {
+																																																																																																																																																																																																																																															ctor: '::',
+																																																																																																																																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 250, 216, 36),
+																																																																																																																																																																																																																																															_1: {
+																																																																																																																																																																																																																																																ctor: '::',
+																																																																																																																																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 250, 218, 36),
+																																																																																																																																																																																																																																																_1: {
+																																																																																																																																																																																																																																																	ctor: '::',
+																																																																																																																																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 249, 220, 36),
+																																																																																																																																																																																																																																																	_1: {
+																																																																																																																																																																																																																																																		ctor: '::',
+																																																																																																																																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 249, 221, 37),
+																																																																																																																																																																																																																																																		_1: {
+																																																																																																																																																																																																																																																			ctor: '::',
+																																																																																																																																																																																																																																																			_0: A3(_elm_lang$core$Color$rgb, 248, 223, 37),
+																																																																																																																																																																																																																																																			_1: {
+																																																																																																																																																																																																																																																				ctor: '::',
+																																																																																																																																																																																																																																																				_0: A3(_elm_lang$core$Color$rgb, 248, 225, 37),
+																																																																																																																																																																																																																																																				_1: {
+																																																																																																																																																																																																																																																					ctor: '::',
+																																																																																																																																																																																																																																																					_0: A3(_elm_lang$core$Color$rgb, 247, 226, 37),
+																																																																																																																																																																																																																																																					_1: {
+																																																																																																																																																																																																																																																						ctor: '::',
+																																																																																																																																																																																																																																																						_0: A3(_elm_lang$core$Color$rgb, 247, 228, 37),
+																																																																																																																																																																																																																																																						_1: {
+																																																																																																																																																																																																																																																							ctor: '::',
+																																																																																																																																																																																																																																																							_0: A3(_elm_lang$core$Color$rgb, 246, 230, 38),
+																																																																																																																																																																																																																																																							_1: {
+																																																																																																																																																																																																																																																								ctor: '::',
+																																																																																																																																																																																																																																																								_0: A3(_elm_lang$core$Color$rgb, 246, 232, 38),
+																																																																																																																																																																																																																																																								_1: {
+																																																																																																																																																																																																																																																									ctor: '::',
+																																																																																																																																																																																																																																																									_0: A3(_elm_lang$core$Color$rgb, 245, 233, 38),
+																																																																																																																																																																																																																																																									_1: {
+																																																																																																																																																																																																																																																										ctor: '::',
+																																																																																																																																																																																																																																																										_0: A3(_elm_lang$core$Color$rgb, 245, 235, 39),
+																																																																																																																																																																																																																																																										_1: {
+																																																																																																																																																																																																																																																											ctor: '::',
+																																																																																																																																																																																																																																																											_0: A3(_elm_lang$core$Color$rgb, 244, 237, 39),
+																																																																																																																																																																																																																																																											_1: {
+																																																																																																																																																																																																																																																												ctor: '::',
+																																																																																																																																																																																																																																																												_0: A3(_elm_lang$core$Color$rgb, 243, 238, 39),
+																																																																																																																																																																																																																																																												_1: {
+																																																																																																																																																																																																																																																													ctor: '::',
+																																																																																																																																																																																																																																																													_0: A3(_elm_lang$core$Color$rgb, 243, 240, 39),
+																																																																																																																																																																																																																																																													_1: {
+																																																																																																																																																																																																																																																														ctor: '::',
+																																																																																																																																																																																																																																																														_0: A3(_elm_lang$core$Color$rgb, 242, 242, 39),
+																																																																																																																																																																																																																																																														_1: {
+																																																																																																																																																																																																																																																															ctor: '::',
+																																																																																																																																																																																																																																																															_0: A3(_elm_lang$core$Color$rgb, 241, 244, 38),
+																																																																																																																																																																																																																																																															_1: {
+																																																																																																																																																																																																																																																																ctor: '::',
+																																																																																																																																																																																																																																																																_0: A3(_elm_lang$core$Color$rgb, 241, 245, 37),
+																																																																																																																																																																																																																																																																_1: {
+																																																																																																																																																																																																																																																																	ctor: '::',
+																																																																																																																																																																																																																																																																	_0: A3(_elm_lang$core$Color$rgb, 240, 247, 36),
+																																																																																																																																																																																																																																																																	_1: {
+																																																																																																																																																																																																																																																																		ctor: '::',
+																																																																																																																																																																																																																																																																		_0: A3(_elm_lang$core$Color$rgb, 240, 249, 33),
+																																																																																																																																																																																																																																																																		_1: {ctor: '[]'}
+																																																																																																																																																																																																																																																																	}
+																																																																																																																																																																																																																																																																}
+																																																																																																																																																																																																																																																															}
+																																																																																																																																																																																																																																																														}
+																																																																																																																																																																																																																																																													}
+																																																																																																																																																																																																																																																												}
+																																																																																																																																																																																																																																																											}
+																																																																																																																																																																																																																																																										}
+																																																																																																																																																																																																																																																									}
+																																																																																																																																																																																																																																																								}
+																																																																																																																																																																																																																																																							}
+																																																																																																																																																																																																																																																						}
+																																																																																																																																																																																																																																																					}
+																																																																																																																																																																																																																																																				}
+																																																																																																																																																																																																																																																			}
+																																																																																																																																																																																																																																																		}
+																																																																																																																																																																																																																																																	}
+																																																																																																																																																																																																																																																}
+																																																																																																																																																																																																																																															}
+																																																																																																																																																																																																																																														}
+																																																																																																																																																																																																																																													}
+																																																																																																																																																																																																																																												}
+																																																																																																																																																																																																																																											}
+																																																																																																																																																																																																																																										}
+																																																																																																																																																																																																																																									}
+																																																																																																																																																																																																																																								}
+																																																																																																																																																																																																																																							}
+																																																																																																																																																																																																																																						}
+																																																																																																																																																																																																																																					}
+																																																																																																																																																																																																																																				}
+																																																																																																																																																																																																																																			}
+																																																																																																																																																																																																																																		}
+																																																																																																																																																																																																																																	}
+																																																																																																																																																																																																																																}
+																																																																																																																																																																																																																															}
+																																																																																																																																																																																																																														}
+																																																																																																																																																																																																																													}
+																																																																																																																																																																																																																												}
+																																																																																																																																																																																																																											}
+																																																																																																																																																																																																																										}
+																																																																																																																																																																																																																									}
+																																																																																																																																																																																																																								}
+																																																																																																																																																																																																																							}
+																																																																																																																																																																																																																						}
+																																																																																																																																																																																																																					}
+																																																																																																																																																																																																																				}
+																																																																																																																																																																																																																			}
+																																																																																																																																																																																																																		}
+																																																																																																																																																																																																																	}
+																																																																																																																																																																																																																}
+																																																																																																																																																																																																															}
+																																																																																																																																																																																																														}
+																																																																																																																																																																																																													}
+																																																																																																																																																																																																												}
+																																																																																																																																																																																																											}
+																																																																																																																																																																																																										}
+																																																																																																																																																																																																									}
+																																																																																																																																																																																																								}
+																																																																																																																																																																																																							}
+																																																																																																																																																																																																						}
+																																																																																																																																																																																																					}
+																																																																																																																																																																																																				}
+																																																																																																																																																																																																			}
+																																																																																																																																																																																																		}
+																																																																																																																																																																																																	}
+																																																																																																																																																																																																}
+																																																																																																																																																																																															}
+																																																																																																																																																																																														}
+																																																																																																																																																																																													}
+																																																																																																																																																																																												}
+																																																																																																																																																																																											}
+																																																																																																																																																																																										}
+																																																																																																																																																																																									}
+																																																																																																																																																																																								}
+																																																																																																																																																																																							}
+																																																																																																																																																																																						}
+																																																																																																																																																																																					}
+																																																																																																																																																																																				}
+																																																																																																																																																																																			}
+																																																																																																																																																																																		}
+																																																																																																																																																																																	}
+																																																																																																																																																																																}
+																																																																																																																																																																															}
+																																																																																																																																																																														}
+																																																																																																																																																																													}
+																																																																																																																																																																												}
+																																																																																																																																																																											}
+																																																																																																																																																																										}
+																																																																																																																																																																									}
+																																																																																																																																																																								}
+																																																																																																																																																																							}
+																																																																																																																																																																						}
+																																																																																																																																																																					}
+																																																																																																																																																																				}
+																																																																																																																																																																			}
+																																																																																																																																																																		}
+																																																																																																																																																																	}
+																																																																																																																																																																}
+																																																																																																																																																															}
+																																																																																																																																																														}
+																																																																																																																																																													}
+																																																																																																																																																												}
+																																																																																																																																																											}
+																																																																																																																																																										}
+																																																																																																																																																									}
+																																																																																																																																																								}
+																																																																																																																																																							}
+																																																																																																																																																						}
+																																																																																																																																																					}
+																																																																																																																																																				}
+																																																																																																																																																			}
+																																																																																																																																																		}
+																																																																																																																																																	}
+																																																																																																																																																}
+																																																																																																																																															}
+																																																																																																																																														}
+																																																																																																																																													}
+																																																																																																																																												}
+																																																																																																																																											}
+																																																																																																																																										}
+																																																																																																																																									}
+																																																																																																																																								}
+																																																																																																																																							}
+																																																																																																																																						}
+																																																																																																																																					}
+																																																																																																																																				}
+																																																																																																																																			}
+																																																																																																																																		}
+																																																																																																																																	}
+																																																																																																																																}
+																																																																																																																															}
+																																																																																																																														}
+																																																																																																																													}
+																																																																																																																												}
+																																																																																																																											}
+																																																																																																																										}
+																																																																																																																									}
+																																																																																																																								}
+																																																																																																																							}
+																																																																																																																						}
+																																																																																																																					}
+																																																																																																																				}
+																																																																																																																			}
+																																																																																																																		}
+																																																																																																																	}
+																																																																																																																}
+																																																																																																															}
+																																																																																																														}
+																																																																																																													}
+																																																																																																												}
+																																																																																																											}
+																																																																																																										}
+																																																																																																									}
+																																																																																																								}
+																																																																																																							}
+																																																																																																						}
+																																																																																																					}
+																																																																																																				}
+																																																																																																			}
+																																																																																																		}
+																																																																																																	}
+																																																																																																}
+																																																																																															}
+																																																																																														}
+																																																																																													}
+																																																																																												}
+																																																																																											}
+																																																																																										}
+																																																																																									}
+																																																																																								}
+																																																																																							}
+																																																																																						}
+																																																																																					}
+																																																																																				}
+																																																																																			}
+																																																																																		}
+																																																																																	}
+																																																																																}
+																																																																															}
+																																																																														}
+																																																																													}
+																																																																												}
+																																																																											}
+																																																																										}
+																																																																									}
+																																																																								}
+																																																																							}
+																																																																						}
+																																																																					}
+																																																																				}
+																																																																			}
+																																																																		}
+																																																																	}
+																																																																}
+																																																															}
+																																																														}
+																																																													}
+																																																												}
+																																																											}
+																																																										}
+																																																									}
+																																																								}
+																																																							}
+																																																						}
+																																																					}
+																																																				}
+																																																			}
+																																																		}
+																																																	}
+																																																}
+																																															}
+																																														}
+																																													}
+																																												}
+																																											}
+																																										}
+																																									}
+																																								}
+																																							}
+																																						}
+																																					}
+																																				}
+																																			}
+																																		}
+																																	}
+																																}
+																															}
+																														}
+																													}
+																												}
+																											}
+																										}
+																									}
+																								}
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}));
+
+var _gampleman$elm_visualization$Visualization_List$extentWith = F2(
+	function (fn, list) {
+		var max = F2(
+			function (a, b) {
+				return (_elm_lang$core$Native_Utils.cmp(
+					fn(a),
+					fn(b)) > 0) ? a : b;
+			});
+		var min = F2(
+			function (a, b) {
+				return (_elm_lang$core$Native_Utils.cmp(
+					fn(a),
+					fn(b)) < 0) ? a : b;
+			});
+		var helper = F2(
+			function (list, _p0) {
+				helper:
+				while (true) {
+					var _p1 = _p0;
+					var _p5 = _p1._0;
+					var _p4 = _p1._1;
+					var _p2 = list;
+					if (_p2.ctor === '[]') {
+						return {ctor: '_Tuple2', _0: _p5, _1: _p4};
+					} else {
+						var _p3 = _p2._0;
+						var _v2 = _p2._1,
+							_v3 = {
+							ctor: '_Tuple2',
+							_0: A2(min, _p5, _p3),
+							_1: A2(max, _p4, _p3)
+						};
+						list = _v2;
+						_p0 = _v3;
+						continue helper;
+					}
+				}
+			});
+		var _p6 = list;
+		if (_p6.ctor === '[]') {
+			return _elm_lang$core$Maybe$Nothing;
+		} else {
+			var _p7 = _p6._0;
+			return _elm_lang$core$Maybe$Just(
+				A2(
+					helper,
+					_p6._1,
+					{ctor: '_Tuple2', _0: _p7, _1: _p7}));
+		}
+	});
+var _gampleman$elm_visualization$Visualization_List$extent = _gampleman$elm_visualization$Visualization_List$extentWith(_elm_lang$core$Basics$identity);
+var _gampleman$elm_visualization$Visualization_List$tickStep = F3(
+	function (start, stop, count) {
+		var step0 = _elm_lang$core$Basics$abs(stop - start) / A2(
+			_elm_lang$core$Basics$max,
+			0,
+			_elm_lang$core$Basics$toFloat(count));
+		var step1 = _elm_lang$core$Basics$toFloat(
+			Math.pow(
+				10,
+				_elm_lang$core$Basics$floor(
+					A2(_elm_lang$core$Basics$logBase, _elm_lang$core$Basics$e, step0) / A2(_elm_lang$core$Basics$logBase, _elm_lang$core$Basics$e, 10))));
+		var error = step0 / step1;
+		var step2 = (_elm_lang$core$Native_Utils.cmp(
+			error,
+			_elm_lang$core$Basics$sqrt(50)) > -1) ? (step1 * 10) : ((_elm_lang$core$Native_Utils.cmp(
+			error,
+			_elm_lang$core$Basics$sqrt(10)) > -1) ? (step1 * 5) : ((_elm_lang$core$Native_Utils.cmp(
+			error,
+			_elm_lang$core$Basics$sqrt(2)) > -1) ? (step1 * 2) : step1));
+		return (_elm_lang$core$Native_Utils.cmp(stop, start) < 0) ? (0 - step2) : step2;
+	});
+var _gampleman$elm_visualization$Visualization_List$gt = function (n) {
+	return _elm_lang$core$Native_Utils.cmp(n, 0) > 0;
+};
+var _gampleman$elm_visualization$Visualization_List$rangePositive = F3(
+	function (begin, stop, step) {
+		var helper = F2(
+			function (s, list) {
+				helper:
+				while (true) {
+					if (_elm_lang$core$Native_Utils.eq(s, stop)) {
+						return list;
+					} else {
+						if (_gampleman$elm_visualization$Visualization_List$gt((s + step) - stop)) {
+							return {ctor: '::', _0: s, _1: list};
+						} else {
+							var _v5 = s + step,
+								_v6 = {ctor: '::', _0: s, _1: list};
+							s = _v5;
+							list = _v6;
+							continue helper;
+						}
+					}
+				}
+			});
+		return _elm_lang$core$List$reverse(
+			A2(
+				helper,
+				begin,
+				{ctor: '[]'}));
+	});
+var _gampleman$elm_visualization$Visualization_List$rangeNegative = F3(
+	function (begin, stop, step) {
+		var helper = F2(
+			function (s, list) {
+				helper:
+				while (true) {
+					if (_elm_lang$core$Native_Utils.eq(s, stop)) {
+						return list;
+					} else {
+						if (_gampleman$elm_visualization$Visualization_List$gt(stop - (s + step))) {
+							return {ctor: '::', _0: s, _1: list};
+						} else {
+							var _v7 = s + step,
+								_v8 = {ctor: '::', _0: s, _1: list};
+							s = _v7;
+							list = _v8;
+							continue helper;
+						}
+					}
+				}
+			});
+		return _elm_lang$core$List$reverse(
+			A2(
+				helper,
+				begin,
+				{ctor: '[]'}));
+	});
+var _gampleman$elm_visualization$Visualization_List$range = F3(
+	function (begin, end, step) {
+		return (_gampleman$elm_visualization$Visualization_List$gt(end - begin) && _gampleman$elm_visualization$Visualization_List$gt(step)) ? A3(_gampleman$elm_visualization$Visualization_List$rangePositive, begin, end, step) : ((_gampleman$elm_visualization$Visualization_List$gt(begin - end) && _gampleman$elm_visualization$Visualization_List$gt(0 - step)) ? A3(_gampleman$elm_visualization$Visualization_List$rangeNegative, begin, end, step) : {ctor: '[]'});
+	});
+var _gampleman$elm_visualization$Visualization_List$ticks = F3(
+	function (start, stop, count) {
+		var step = A3(_gampleman$elm_visualization$Visualization_List$tickStep, start, stop, count);
+		var beg = _elm_lang$core$Basics$toFloat(
+			_elm_lang$core$Basics$ceiling(start / step)) * step;
+		var end = (_elm_lang$core$Basics$toFloat(
+			_elm_lang$core$Basics$floor(stop / step)) * step) + (step / 2);
+		return A3(_gampleman$elm_visualization$Visualization_List$range, beg, end, step);
+	});
+
+var _gampleman$elm_visualization$Visualization_Scale_Internal$toFixed = F2(
+	function (precision, value) {
+		var pad = function (num) {
+			var _p0 = num;
+			_v0_2:
+			do {
+				if (_p0.ctor === '::') {
+					if (_p0._1.ctor === '::') {
+						if (_p0._1._1.ctor === '[]') {
+							return {
+								ctor: '::',
+								_0: _p0._0,
+								_1: {
+									ctor: '::',
+									_0: A3(
+										_elm_lang$core$String$padRight,
+										precision,
+										_elm_lang$core$Native_Utils.chr('0'),
+										_p0._1._0),
+									_1: {ctor: '[]'}
+								}
+							};
+						} else {
+							break _v0_2;
+						}
+					} else {
+						var _p1 = _p0._0;
+						return (_elm_lang$core$Native_Utils.cmp(precision, 0) > 0) ? {
+							ctor: '::',
+							_0: _p1,
+							_1: {
+								ctor: '::',
+								_0: A3(
+									_elm_lang$core$String$padRight,
+									precision,
+									_elm_lang$core$Native_Utils.chr('0'),
+									''),
+								_1: {ctor: '[]'}
+							}
+						} : {
+							ctor: '::',
+							_0: _p1,
+							_1: {ctor: '[]'}
+						};
+					}
+				} else {
+					break _v0_2;
+				}
+			} while(false);
+			return _p0;
+		};
+		var power = Math.pow(
+			_elm_lang$core$Basics$toFloat(10),
+			_elm_lang$core$Basics$toFloat(precision));
+		return A2(
+			_elm_lang$core$String$join,
+			'.',
+			pad(
+				A2(
+					_elm_lang$core$String$split,
+					'.',
+					_elm_lang$core$Basics$toString(
+						_elm_lang$core$Basics$toFloat(
+							_elm_lang$core$Basics$round(value * power)) / power))));
+	});
+var _gampleman$elm_visualization$Visualization_Scale_Internal$interpolateFloat = F3(
+	function (from, to, time) {
+		return from + ((to - from) * time);
+	});
+var _gampleman$elm_visualization$Visualization_Scale_Internal$bimap = F4(
+	function (_p3, _p2, deinterpolate, reinterpolate) {
+		var _p4 = _p3;
+		var _p11 = _p4._1;
+		var _p10 = _p4._0;
+		var _p5 = _p2;
+		var _p9 = _p5._1;
+		var _p8 = _p5._0;
+		var _p6 = (_elm_lang$core$Native_Utils.cmp(_p11, _p10) < 0) ? {
+			ctor: '_Tuple2',
+			_0: A2(deinterpolate, _p11, _p10),
+			_1: A2(reinterpolate, _p9, _p8)
+		} : {
+			ctor: '_Tuple2',
+			_0: A2(deinterpolate, _p10, _p11),
+			_1: A2(reinterpolate, _p8, _p9)
+		};
+		var de = _p6._0;
+		var re = _p6._1;
+		return function (_p7) {
+			return re(
+				de(_p7));
+		};
+	});
+
+var _gampleman$elm_visualization$Visualization_Scale_Linear$interpolate = _gampleman$elm_visualization$Visualization_Scale_Internal$interpolateFloat;
+var _gampleman$elm_visualization$Visualization_Scale_Linear$ticks = F2(
+	function (_p0, count) {
+		var _p1 = _p0;
+		return A3(_gampleman$elm_visualization$Visualization_List$ticks, _p1._0, _p1._1, count);
+	});
+var _gampleman$elm_visualization$Visualization_Scale_Linear$deinterpolate = F3(
+	function (a, b, x) {
+		var normalizedB = b - a;
+		return _elm_lang$core$Native_Utils.eq(normalizedB, 0) ? 0 : ((x - a) / normalizedB);
+	});
+var _gampleman$elm_visualization$Visualization_Scale_Linear$invert = F2(
+	function (domain, range) {
+		return A4(_gampleman$elm_visualization$Visualization_Scale_Internal$bimap, range, domain, _gampleman$elm_visualization$Visualization_Scale_Linear$deinterpolate, _gampleman$elm_visualization$Visualization_Scale_Linear$interpolate);
+	});
+var _gampleman$elm_visualization$Visualization_Scale_Linear$convert = F2(
+	function (domain, range) {
+		return A4(_gampleman$elm_visualization$Visualization_Scale_Internal$bimap, domain, range, _gampleman$elm_visualization$Visualization_Scale_Linear$deinterpolate, _gampleman$elm_visualization$Visualization_Scale_Internal$interpolateFloat);
+	});
+var _gampleman$elm_visualization$Visualization_Scale_Linear$exponent = function (x) {
+	return _elm_lang$core$Native_Utils.eq(x, 0) ? 0 : ((_elm_lang$core$Native_Utils.cmp(x, 1) < 0) ? (1 + _gampleman$elm_visualization$Visualization_Scale_Linear$exponent(x * 10)) : 0);
+};
+var _gampleman$elm_visualization$Visualization_Scale_Linear$precisionFixed = function (step) {
+	return A2(
+		_elm_lang$core$Basics$max,
+		0,
+		_gampleman$elm_visualization$Visualization_Scale_Linear$exponent(
+			_elm_lang$core$Basics$abs(step)));
+};
+var _gampleman$elm_visualization$Visualization_Scale_Linear$tickFormat = F2(
+	function (_p2, count) {
+		var _p3 = _p2;
+		return _gampleman$elm_visualization$Visualization_Scale_Internal$toFixed(
+			_gampleman$elm_visualization$Visualization_Scale_Linear$precisionFixed(
+				A3(_gampleman$elm_visualization$Visualization_List$tickStep, _p3._0, _p3._1, count)));
+	});
+var _gampleman$elm_visualization$Visualization_Scale_Linear$nice = F2(
+	function (_p4, count) {
+		var _p5 = _p4;
+		var _p7 = _p5._1;
+		var _p6 = _p5._0;
+		var step0 = A3(_gampleman$elm_visualization$Visualization_List$tickStep, _p6, _p7, count);
+		var step1 = A3(
+			_gampleman$elm_visualization$Visualization_List$tickStep,
+			_elm_lang$core$Basics$toFloat(
+				_elm_lang$core$Basics$floor(_p6 / step0)) * step0,
+			_elm_lang$core$Basics$toFloat(
+				_elm_lang$core$Basics$ceiling(_p7 / step0)) * step0,
+			count);
+		return {
+			ctor: '_Tuple2',
+			_0: _elm_lang$core$Basics$toFloat(
+				_elm_lang$core$Basics$floor(_p6 / step1)) * step1,
+			_1: _elm_lang$core$Basics$toFloat(
+				_elm_lang$core$Basics$ceiling(_p7 / step1)) * step1
+		};
+	});
+var _gampleman$elm_visualization$Visualization_Scale_Linear$rangeExtent = F2(
+	function (d, r) {
+		return r;
+	});
+
+var _gampleman$elm_visualization$Visualization_Scale_Log$nice = F3(
+	function (base, _p1, _p0) {
+		var _p2 = _p1;
+		var c = function (_p3) {
+			return function (a) {
+				return Math.pow(a, base);
+			}(
+				_elm_lang$core$Basics$toFloat(
+					_elm_lang$core$Basics$ceiling(
+						A2(_elm_lang$core$Basics$logBase, base, _p3))));
+		};
+		var f = function (_p4) {
+			return function (a) {
+				return Math.pow(a, base);
+			}(
+				_elm_lang$core$Basics$toFloat(
+					_elm_lang$core$Basics$floor(
+						A2(_elm_lang$core$Basics$logBase, base, _p4))));
+		};
+		return {
+			ctor: '_Tuple2',
+			_0: f(_p2._0),
+			_1: c(_p2._1)
+		};
+	});
+var _gampleman$elm_visualization$Visualization_Scale_Log$tickFormat = F2(
+	function (_p6, _p5) {
+		return _elm_lang$core$Basics$toString;
+	});
+var _gampleman$elm_visualization$Visualization_Scale_Log$ticks = F3(
+	function (base, _p7, count) {
+		var _p8 = _p7;
+		var _p10 = _p8._0;
+		var _p9 = _p8._1;
+		var ticksHelper = F5(
+			function (inc, st, i, j, k) {
+				ticksHelper:
+				while (true) {
+					var p = Math.pow(i, base);
+					var t = p * k;
+					if (st(k)) {
+						if (_elm_lang$core$Native_Utils.cmp(t, _p10) < 0) {
+							var _v2 = inc,
+								_v3 = st,
+								_v4 = i,
+								_v5 = j,
+								_v6 = inc(k);
+							inc = _v2;
+							st = _v3;
+							i = _v4;
+							j = _v5;
+							k = _v6;
+							continue ticksHelper;
+						} else {
+							if (_elm_lang$core$Native_Utils.cmp(t, _p9) > 0) {
+								return {ctor: '[]'};
+							} else {
+								return A2(
+									_elm_lang$core$Basics_ops['++'],
+									A5(
+										ticksHelper,
+										inc,
+										st,
+										i,
+										j,
+										inc(k)),
+									{
+										ctor: '::',
+										_0: t,
+										_1: {ctor: '[]'}
+									});
+							}
+						}
+					} else {
+						return {ctor: '[]'};
+					}
+				}
+			});
+		var n = _elm_lang$core$Basics$toFloat(count);
+		var j = A2(_elm_lang$core$Basics$logBase, base, _p9);
+		var i = A2(_elm_lang$core$Basics$logBase, base, _p10);
+		return ((!_elm_lang$core$Native_Utils.eq(
+			_elm_lang$core$Basics$toFloat(
+				_elm_lang$core$Basics$round(base)),
+			base)) && (_elm_lang$core$Native_Utils.cmp(j - i, n) < 0)) ? ((_elm_lang$core$Native_Utils.cmp(_p10, 0) > 0) ? A5(
+			ticksHelper,
+			function (k) {
+				return k + 1;
+			},
+			function (k) {
+				return _elm_lang$core$Native_Utils.cmp(k, base) < 0;
+			},
+			_elm_lang$core$Basics$toFloat(
+				_elm_lang$core$Basics$round(i) - 1),
+			_elm_lang$core$Basics$toFloat(
+				_elm_lang$core$Basics$round(j) + 1),
+			1) : A5(
+			ticksHelper,
+			function (k) {
+				return k - 1;
+			},
+			function (k) {
+				return _elm_lang$core$Native_Utils.cmp(k, 1) > -1;
+			},
+			_elm_lang$core$Basics$toFloat(
+				_elm_lang$core$Basics$round(i) - 1),
+			_elm_lang$core$Basics$toFloat(
+				_elm_lang$core$Basics$round(j) + 1),
+			base - 1)) : A2(
+			_elm_lang$core$List$map,
+			function (a) {
+				return Math.pow(a, base);
+			},
+			A3(
+				_gampleman$elm_visualization$Visualization_List$ticks,
+				i,
+				j,
+				_elm_lang$core$Basics$round(
+					A2(_elm_lang$core$Basics$min, j - i, n))));
+	});
+var _gampleman$elm_visualization$Visualization_Scale_Log$interpolate = F3(
+	function (a, b, x) {
+		return (_elm_lang$core$Native_Utils.cmp(a, 0) < 0) ? (Math.pow(0 - b, x) * Math.pow(0 - a, 1 - x)) : (Math.pow(b, x) * Math.pow(a, 1 - x));
+	});
+var _gampleman$elm_visualization$Visualization_Scale_Log$log = _elm_lang$core$Basics$logBase(_elm_lang$core$Basics$e);
+var _gampleman$elm_visualization$Visualization_Scale_Log$deinterpolate = F3(
+	function (a, b, x) {
+		return _gampleman$elm_visualization$Visualization_Scale_Log$log(x / a) / _gampleman$elm_visualization$Visualization_Scale_Log$log(b / a);
+	});
+var _gampleman$elm_visualization$Visualization_Scale_Log$convert = F2(
+	function (domain, range) {
+		return A4(_gampleman$elm_visualization$Visualization_Scale_Internal$bimap, domain, range, _gampleman$elm_visualization$Visualization_Scale_Log$deinterpolate, _gampleman$elm_visualization$Visualization_Scale_Internal$interpolateFloat);
+	});
+var _gampleman$elm_visualization$Visualization_Scale_Log$invert = F2(
+	function (domain, range) {
+		return A4(_gampleman$elm_visualization$Visualization_Scale_Internal$bimap, range, domain, _gampleman$elm_visualization$Visualization_Scale_Log$deinterpolate, _gampleman$elm_visualization$Visualization_Scale_Log$interpolate);
+	});
+var _gampleman$elm_visualization$Visualization_Scale_Log$rangeExtent = F2(
+	function (d, r) {
+		return r;
+	});
+
+var _gampleman$elm_visualization$Visualization_Scale_Ordinal$convertHelp = F4(
+	function (d, r, used, needle) {
+		convertHelp:
+		while (true) {
+			var _p0 = {ctor: '_Tuple2', _0: d, _1: r};
+			if (_p0._0.ctor === '[]') {
+				return _elm_lang$core$Maybe$Nothing;
+			} else {
+				if (_p0._1.ctor === '[]') {
+					var _v1 = d,
+						_v2 = _elm_lang$core$List$reverse(used),
+						_v3 = {ctor: '[]'},
+						_v4 = needle;
+					d = _v1;
+					r = _v2;
+					used = _v3;
+					needle = _v4;
+					continue convertHelp;
+				} else {
+					var _p1 = _p0._1._0;
+					if (_elm_lang$core$Native_Utils.eq(_p0._0._0, needle)) {
+						return _elm_lang$core$Maybe$Just(_p1);
+					} else {
+						var _v5 = _p0._0._1,
+							_v6 = _p0._1._1,
+							_v7 = {ctor: '::', _0: _p1, _1: used},
+							_v8 = needle;
+						d = _v5;
+						r = _v6;
+						used = _v7;
+						needle = _v8;
+						continue convertHelp;
+					}
+				}
+			}
+		}
+	});
+var _gampleman$elm_visualization$Visualization_Scale_Ordinal$convert = F3(
+	function (domain, range, val) {
+		var _p2 = range;
+		if (_p2.ctor === '[]') {
+			return _elm_lang$core$Maybe$Nothing;
+		} else {
+			return A4(
+				_gampleman$elm_visualization$Visualization_Scale_Ordinal$convertHelp,
+				domain,
+				range,
+				{ctor: '[]'},
+				val);
+		}
+	});
+
+var _gampleman$elm_visualization$Visualization_Scale_Quantize$nice = _gampleman$elm_visualization$Visualization_Scale_Linear$nice;
+var _gampleman$elm_visualization$Visualization_Scale_Quantize$tickFormat = F3(
+	function (_p2, _p1, _p0) {
+		return _elm_lang$core$Basics$toString;
+	});
+var _gampleman$elm_visualization$Visualization_Scale_Quantize$ticks = F3(
+	function (_p3, domain, count) {
+		var _p4 = _p3;
+		return A3(_gampleman$elm_visualization$Visualization_List$ticks, _p4._0, _p4._1, count);
+	});
+var _gampleman$elm_visualization$Visualization_Scale_Quantize$computeDomain = F2(
+	function (_p5, tail) {
+		var _p6 = _p5;
+		var _p8 = _p6._0;
+		var _p7 = _p6._1;
+		var l = _elm_lang$core$List$length(tail);
+		var step = (_p7 - _p8) / _elm_lang$core$Basics$toFloat(l + 1);
+		return A2(
+			_elm_lang$core$Maybe$withDefault,
+			{
+				ctor: '::',
+				_0: 0,
+				_1: {ctor: '[]'}
+			},
+			_elm_lang$core$List$tail(
+				A3(_gampleman$elm_visualization$Visualization_List$range, _p8, _p7, step)));
+	});
+var _gampleman$elm_visualization$Visualization_Scale_Quantize$convert = F3(
+	function (domain, _p9, val) {
+		var _p10 = _p9;
+		var _p17 = _p10._1;
+		var _p16 = _p10._0;
+		var last = F2(
+			function (head, tail) {
+				last:
+				while (true) {
+					var _p11 = tail;
+					if (_p11.ctor === '[]') {
+						return head;
+					} else {
+						var _v4 = _p11._0,
+							_v5 = _p11._1;
+						head = _v4;
+						tail = _v5;
+						continue last;
+					}
+				}
+			});
+		var helper = F2(
+			function (dom, range) {
+				helper:
+				while (true) {
+					var _p12 = dom;
+					if (_p12.ctor === '[]') {
+						var _p13 = range;
+						if (_p13.ctor === '[]') {
+							return A2(last, _p16, _p17);
+						} else {
+							return _p13._0;
+						}
+					} else {
+						var _p14 = range;
+						if (_p14.ctor === '[]') {
+							return _elm_lang$core$Native_Utils.crashCase(
+								'Visualization.Scale.Quantize',
+								{
+									start: {line: 46, column: 21},
+									end: {line: 54, column: 34}
+								},
+								_p14)('Invariant breached: ran out of range');
+						} else {
+							if (_elm_lang$core$Native_Utils.cmp(val, _p12._0) > 0) {
+								var _v9 = _p12._1,
+									_v10 = _p14._1;
+								dom = _v9;
+								range = _v10;
+								continue helper;
+							} else {
+								return _p14._0;
+							}
+						}
+					}
+				}
+			});
+		return A2(
+			helper,
+			A2(_gampleman$elm_visualization$Visualization_Scale_Quantize$computeDomain, domain, _p17),
+			{ctor: '::', _0: _p16, _1: _p17});
+	});
+var _gampleman$elm_visualization$Visualization_Scale_Quantize$invertExtent = F3(
+	function (_p19, _p18, val) {
+		var _p20 = _p19;
+		var _p27 = _p20._0;
+		var _p26 = _p20._1;
+		var _p21 = _p18;
+		var _p25 = _p21._1;
+		var helper = F2(
+			function (domain, range) {
+				helper:
+				while (true) {
+					var _p22 = range;
+					if (_p22.ctor === '[]') {
+						return _elm_lang$core$Maybe$Nothing;
+					} else {
+						if (_elm_lang$core$Native_Utils.eq(_p22._0, val)) {
+							var _p23 = domain;
+							if ((_p23.ctor === '::') && (_p23._1.ctor === '::')) {
+								return _elm_lang$core$Maybe$Just(
+									{ctor: '_Tuple2', _0: _p23._0, _1: _p23._1._0});
+							} else {
+								return _elm_lang$core$Maybe$Nothing;
+							}
+						} else {
+							var _p24 = domain;
+							if (_p24.ctor === '[]') {
+								return _elm_lang$core$Maybe$Nothing;
+							} else {
+								var _v16 = _p24._1,
+									_v17 = _p22._1;
+								domain = _v16;
+								range = _v17;
+								continue helper;
+							}
+						}
+					}
+				}
+			});
+		var domain = A2(
+			_gampleman$elm_visualization$Visualization_Scale_Quantize$computeDomain,
+			{ctor: '_Tuple2', _0: _p27, _1: _p26},
+			_p25);
+		return A2(
+			helper,
+			{
+				ctor: '::',
+				_0: _p27,
+				_1: A2(
+					_elm_lang$core$Basics_ops['++'],
+					domain,
+					{
+						ctor: '::',
+						_0: _p26,
+						_1: {ctor: '[]'}
+					})
+			},
+			{ctor: '::', _0: _p21._0, _1: _p25});
+	});
+var _gampleman$elm_visualization$Visualization_Scale_Quantize$rangeExtent = F2(
+	function (_p28, range) {
+		var _p29 = _p28;
+		var _p31 = _p29._0;
+		var _p30 = _p29._1;
+		return {
+			ctor: '_Tuple2',
+			_0: A3(
+				_gampleman$elm_visualization$Visualization_Scale_Quantize$convert,
+				{ctor: '_Tuple2', _0: _p31, _1: _p30},
+				range,
+				_p31),
+			_1: A3(
+				_gampleman$elm_visualization$Visualization_Scale_Quantize$convert,
+				{ctor: '_Tuple2', _0: _p31, _1: _p30},
+				range,
+				_p30)
+		};
+	});
+
+var _gampleman$elm_visualization$Visualization_Scale_Sequential$convert = F3(
+	function (_p0, interpolator, x) {
+		var _p1 = _p0;
+		var _p2 = _p1._0;
+		return interpolator((x - _p2) / (_p1._1 - _p2));
+	});
+
+var _justinmimbs$elm_date_extra$Date_Extra_Facts$msPerSecond = 1000;
+var _justinmimbs$elm_date_extra$Date_Extra_Facts$msPerMinute = 60 * _justinmimbs$elm_date_extra$Date_Extra_Facts$msPerSecond;
+var _justinmimbs$elm_date_extra$Date_Extra_Facts$msPerHour = 60 * _justinmimbs$elm_date_extra$Date_Extra_Facts$msPerMinute;
+var _justinmimbs$elm_date_extra$Date_Extra_Facts$msPerDay = 24 * _justinmimbs$elm_date_extra$Date_Extra_Facts$msPerHour;
+var _justinmimbs$elm_date_extra$Date_Extra_Facts$dayOfWeekFromWeekdayNumber = function (n) {
+	var _p0 = n;
+	switch (_p0) {
+		case 1:
+			return _elm_lang$core$Date$Mon;
+		case 2:
+			return _elm_lang$core$Date$Tue;
+		case 3:
+			return _elm_lang$core$Date$Wed;
+		case 4:
+			return _elm_lang$core$Date$Thu;
+		case 5:
+			return _elm_lang$core$Date$Fri;
+		case 6:
+			return _elm_lang$core$Date$Sat;
+		default:
+			return _elm_lang$core$Date$Sun;
+	}
+};
+var _justinmimbs$elm_date_extra$Date_Extra_Facts$weekdayNumberFromDayOfWeek = function (d) {
+	var _p1 = d;
+	switch (_p1.ctor) {
+		case 'Mon':
+			return 1;
+		case 'Tue':
+			return 2;
+		case 'Wed':
+			return 3;
+		case 'Thu':
+			return 4;
+		case 'Fri':
+			return 5;
+		case 'Sat':
+			return 6;
+		default:
+			return 7;
+	}
+};
+var _justinmimbs$elm_date_extra$Date_Extra_Facts$monthFromMonthNumber = function (n) {
+	var _p2 = n;
+	switch (_p2) {
+		case 1:
+			return _elm_lang$core$Date$Jan;
+		case 2:
+			return _elm_lang$core$Date$Feb;
+		case 3:
+			return _elm_lang$core$Date$Mar;
+		case 4:
+			return _elm_lang$core$Date$Apr;
+		case 5:
+			return _elm_lang$core$Date$May;
+		case 6:
+			return _elm_lang$core$Date$Jun;
+		case 7:
+			return _elm_lang$core$Date$Jul;
+		case 8:
+			return _elm_lang$core$Date$Aug;
+		case 9:
+			return _elm_lang$core$Date$Sep;
+		case 10:
+			return _elm_lang$core$Date$Oct;
+		case 11:
+			return _elm_lang$core$Date$Nov;
+		default:
+			return _elm_lang$core$Date$Dec;
+	}
+};
+var _justinmimbs$elm_date_extra$Date_Extra_Facts$monthNumberFromMonth = function (m) {
+	var _p3 = m;
+	switch (_p3.ctor) {
+		case 'Jan':
+			return 1;
+		case 'Feb':
+			return 2;
+		case 'Mar':
+			return 3;
+		case 'Apr':
+			return 4;
+		case 'May':
+			return 5;
+		case 'Jun':
+			return 6;
+		case 'Jul':
+			return 7;
+		case 'Aug':
+			return 8;
+		case 'Sep':
+			return 9;
+		case 'Oct':
+			return 10;
+		case 'Nov':
+			return 11;
+		default:
+			return 12;
+	}
+};
+var _justinmimbs$elm_date_extra$Date_Extra_Facts$months = {
+	ctor: '::',
+	_0: _elm_lang$core$Date$Jan,
+	_1: {
+		ctor: '::',
+		_0: _elm_lang$core$Date$Feb,
+		_1: {
+			ctor: '::',
+			_0: _elm_lang$core$Date$Mar,
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$core$Date$Apr,
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$core$Date$May,
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$core$Date$Jun,
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$core$Date$Jul,
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$core$Date$Aug,
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$core$Date$Sep,
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$core$Date$Oct,
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$core$Date$Nov,
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$core$Date$Dec,
+												_1: {ctor: '[]'}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+};
+var _justinmimbs$elm_date_extra$Date_Extra_Facts$isLeapYear = function (y) {
+	return (_elm_lang$core$Native_Utils.eq(
+		A2(_elm_lang$core$Basics_ops['%'], y, 4),
+		0) && (!_elm_lang$core$Native_Utils.eq(
+		A2(_elm_lang$core$Basics_ops['%'], y, 100),
+		0))) || _elm_lang$core$Native_Utils.eq(
+		A2(_elm_lang$core$Basics_ops['%'], y, 400),
+		0);
+};
+var _justinmimbs$elm_date_extra$Date_Extra_Facts$daysInMonth = F2(
+	function (y, m) {
+		var _p4 = m;
+		switch (_p4.ctor) {
+			case 'Jan':
+				return 31;
+			case 'Feb':
+				return _justinmimbs$elm_date_extra$Date_Extra_Facts$isLeapYear(y) ? 29 : 28;
+			case 'Mar':
+				return 31;
+			case 'Apr':
+				return 30;
+			case 'May':
+				return 31;
+			case 'Jun':
+				return 30;
+			case 'Jul':
+				return 31;
+			case 'Aug':
+				return 31;
+			case 'Sep':
+				return 30;
+			case 'Oct':
+				return 31;
+			case 'Nov':
+				return 30;
+			default:
+				return 31;
+		}
+	});
+var _justinmimbs$elm_date_extra$Date_Extra_Facts$daysBeforeStartOfMonth = F2(
+	function (y, m) {
+		var _p5 = m;
+		switch (_p5.ctor) {
+			case 'Jan':
+				return 0;
+			case 'Feb':
+				return 31;
+			case 'Mar':
+				return _justinmimbs$elm_date_extra$Date_Extra_Facts$isLeapYear(y) ? 60 : 59;
+			case 'Apr':
+				return _justinmimbs$elm_date_extra$Date_Extra_Facts$isLeapYear(y) ? 91 : 90;
+			case 'May':
+				return _justinmimbs$elm_date_extra$Date_Extra_Facts$isLeapYear(y) ? 121 : 120;
+			case 'Jun':
+				return _justinmimbs$elm_date_extra$Date_Extra_Facts$isLeapYear(y) ? 152 : 151;
+			case 'Jul':
+				return _justinmimbs$elm_date_extra$Date_Extra_Facts$isLeapYear(y) ? 182 : 181;
+			case 'Aug':
+				return _justinmimbs$elm_date_extra$Date_Extra_Facts$isLeapYear(y) ? 213 : 212;
+			case 'Sep':
+				return _justinmimbs$elm_date_extra$Date_Extra_Facts$isLeapYear(y) ? 244 : 243;
+			case 'Oct':
+				return _justinmimbs$elm_date_extra$Date_Extra_Facts$isLeapYear(y) ? 274 : 273;
+			case 'Nov':
+				return _justinmimbs$elm_date_extra$Date_Extra_Facts$isLeapYear(y) ? 305 : 304;
+			default:
+				return _justinmimbs$elm_date_extra$Date_Extra_Facts$isLeapYear(y) ? 335 : 334;
+		}
+	});
+
+var _justinmimbs$elm_date_extra$Date_Internal_RataDie$toUnixTime = function (rd) {
+	return (rd - 719163) * _justinmimbs$elm_date_extra$Date_Extra_Facts$msPerDay;
+};
+var _justinmimbs$elm_date_extra$Date_Internal_RataDie$weekdayNumber = function (rd) {
+	var _p0 = A2(_elm_lang$core$Basics_ops['%'], rd, 7);
+	if (_p0 === 0) {
+		return 7;
+	} else {
+		return _p0;
+	}
+};
+var _justinmimbs$elm_date_extra$Date_Internal_RataDie$leapYearsInCommonEra = function (y) {
+	return (((y / 4) | 0) - ((y / 100) | 0)) + ((y / 400) | 0);
+};
+var _justinmimbs$elm_date_extra$Date_Internal_RataDie$rataDieBeforeStartOfYear = function (y) {
+	return (365 * (y - 1)) + _justinmimbs$elm_date_extra$Date_Internal_RataDie$leapYearsInCommonEra(y - 1);
+};
+var _justinmimbs$elm_date_extra$Date_Internal_RataDie$fromOrdinalDate = F2(
+	function (y, d) {
+		return _justinmimbs$elm_date_extra$Date_Internal_RataDie$rataDieBeforeStartOfYear(y) + d;
+	});
+var _justinmimbs$elm_date_extra$Date_Internal_RataDie$week1Day1OfWeekYear = function (y) {
+	var jan4RD = A2(_justinmimbs$elm_date_extra$Date_Internal_RataDie$fromOrdinalDate, y, 4);
+	return (jan4RD - _justinmimbs$elm_date_extra$Date_Internal_RataDie$weekdayNumber(jan4RD)) + 1;
+};
+var _justinmimbs$elm_date_extra$Date_Internal_RataDie$fromWeekDate = F3(
+	function (y, w, d) {
+		var week1Day0RD = _justinmimbs$elm_date_extra$Date_Internal_RataDie$week1Day1OfWeekYear(y) - 1;
+		return (week1Day0RD + ((w - 1) * 7)) + d;
+	});
+var _justinmimbs$elm_date_extra$Date_Internal_RataDie$fromCalendarDate = F3(
+	function (y, m, d) {
+		var md = A2(_justinmimbs$elm_date_extra$Date_Extra_Facts$daysBeforeStartOfMonth, y, m);
+		var yd = _justinmimbs$elm_date_extra$Date_Internal_RataDie$rataDieBeforeStartOfYear(y);
+		return (yd + md) + d;
+	});
+var _justinmimbs$elm_date_extra$Date_Internal_RataDie$divideInt = F2(
+	function (a, b) {
+		return {
+			ctor: '_Tuple2',
+			_0: (a / b) | 0,
+			_1: A2(_elm_lang$core$Basics$rem, a, b)
+		};
+	});
+var _justinmimbs$elm_date_extra$Date_Internal_RataDie$year = function (rd) {
+	var _p1 = A2(_justinmimbs$elm_date_extra$Date_Internal_RataDie$divideInt, rd, 146097);
+	var q400 = _p1._0;
+	var r400 = _p1._1;
+	var _p2 = A2(_justinmimbs$elm_date_extra$Date_Internal_RataDie$divideInt, r400, 36524);
+	var q100 = _p2._0;
+	var r100 = _p2._1;
+	var _p3 = A2(_justinmimbs$elm_date_extra$Date_Internal_RataDie$divideInt, r100, 1461);
+	var q4 = _p3._0;
+	var r4 = _p3._1;
+	var _p4 = A2(_justinmimbs$elm_date_extra$Date_Internal_RataDie$divideInt, r4, 365);
+	var q1 = _p4._0;
+	var r1 = _p4._1;
+	var n = _elm_lang$core$Native_Utils.eq(r1, 0) ? 0 : 1;
+	return ((((q400 * 400) + (q100 * 100)) + (q4 * 4)) + q1) + n;
+};
+var _justinmimbs$elm_date_extra$Date_Internal_RataDie$ordinalDay = function (rd) {
+	return rd - _justinmimbs$elm_date_extra$Date_Internal_RataDie$rataDieBeforeStartOfYear(
+		_justinmimbs$elm_date_extra$Date_Internal_RataDie$year(rd));
+};
+var _justinmimbs$elm_date_extra$Date_Internal_RataDie$weekYear = function (rd) {
+	var daysToThursday = 4 - _justinmimbs$elm_date_extra$Date_Internal_RataDie$weekdayNumber(rd);
+	return _justinmimbs$elm_date_extra$Date_Internal_RataDie$year(rd + daysToThursday);
+};
+var _justinmimbs$elm_date_extra$Date_Internal_RataDie$weekNumber = function (rd) {
+	var week1Day1RD = _justinmimbs$elm_date_extra$Date_Internal_RataDie$week1Day1OfWeekYear(
+		_justinmimbs$elm_date_extra$Date_Internal_RataDie$weekYear(rd));
+	return (((rd - week1Day1RD) / 7) | 0) + 1;
+};
+var _justinmimbs$elm_date_extra$Date_Internal_RataDie$find = F2(
+	function (pred, list) {
+		find:
+		while (true) {
+			var _p5 = list;
+			if (_p5.ctor === '[]') {
+				return _elm_lang$core$Maybe$Nothing;
+			} else {
+				var _p6 = _p5._0;
+				if (pred(_p6)) {
+					return _elm_lang$core$Maybe$Just(_p6);
+				} else {
+					var _v2 = pred,
+						_v3 = _p5._1;
+					pred = _v2;
+					list = _v3;
+					continue find;
+				}
+			}
+		}
+	});
+var _justinmimbs$elm_date_extra$Date_Internal_RataDie$month = function (rd) {
+	var od = _justinmimbs$elm_date_extra$Date_Internal_RataDie$ordinalDay(rd);
+	var y = _justinmimbs$elm_date_extra$Date_Internal_RataDie$year(rd);
+	return A2(
+		_elm_lang$core$Maybe$withDefault,
+		_elm_lang$core$Date$Jan,
+		A2(
+			_justinmimbs$elm_date_extra$Date_Internal_RataDie$find,
+			function (m) {
+				return _elm_lang$core$Native_Utils.cmp(
+					A2(_justinmimbs$elm_date_extra$Date_Extra_Facts$daysBeforeStartOfMonth, y, m),
+					od) < 0;
+			},
+			_elm_lang$core$List$reverse(_justinmimbs$elm_date_extra$Date_Extra_Facts$months)));
+};
+var _justinmimbs$elm_date_extra$Date_Internal_RataDie$day = function (rd) {
+	var od = _justinmimbs$elm_date_extra$Date_Internal_RataDie$ordinalDay(rd);
+	var m = _justinmimbs$elm_date_extra$Date_Internal_RataDie$month(rd);
+	var y = _justinmimbs$elm_date_extra$Date_Internal_RataDie$year(rd);
+	return od - A2(_justinmimbs$elm_date_extra$Date_Extra_Facts$daysBeforeStartOfMonth, y, m);
+};
+
+var _justinmimbs$elm_date_extra$Date_Internal_Core$weekNumberFromCalendarDate = F3(
+	function (y, m, d) {
+		return _justinmimbs$elm_date_extra$Date_Internal_RataDie$weekNumber(
+			A3(_justinmimbs$elm_date_extra$Date_Internal_RataDie$fromCalendarDate, y, m, d));
+	});
+var _justinmimbs$elm_date_extra$Date_Internal_Core$weekYearFromCalendarDate = F3(
+	function (y, m, d) {
+		return _justinmimbs$elm_date_extra$Date_Internal_RataDie$weekYear(
+			A3(_justinmimbs$elm_date_extra$Date_Internal_RataDie$fromCalendarDate, y, m, d));
+	});
+var _justinmimbs$elm_date_extra$Date_Internal_Core$unixTimeFromOrdinalDate = F2(
+	function (y, d) {
+		return _justinmimbs$elm_date_extra$Date_Internal_RataDie$toUnixTime(
+			A2(_justinmimbs$elm_date_extra$Date_Internal_RataDie$fromOrdinalDate, y, d));
+	});
+var _justinmimbs$elm_date_extra$Date_Internal_Core$unixTimeFromWeekDate = F3(
+	function (y, w, d) {
+		return _justinmimbs$elm_date_extra$Date_Internal_RataDie$toUnixTime(
+			A3(_justinmimbs$elm_date_extra$Date_Internal_RataDie$fromWeekDate, y, w, d));
+	});
+var _justinmimbs$elm_date_extra$Date_Internal_Core$unixTimeFromCalendarDate = F3(
+	function (y, m, d) {
+		return _justinmimbs$elm_date_extra$Date_Internal_RataDie$toUnixTime(
+			A3(_justinmimbs$elm_date_extra$Date_Internal_RataDie$fromCalendarDate, y, m, d));
+	});
+var _justinmimbs$elm_date_extra$Date_Internal_Core$msFromTimeParts = F4(
+	function (hh, mm, ss, ms) {
+		return ((ms + (_justinmimbs$elm_date_extra$Date_Extra_Facts$msPerSecond * ss)) + (_justinmimbs$elm_date_extra$Date_Extra_Facts$msPerMinute * mm)) + (_justinmimbs$elm_date_extra$Date_Extra_Facts$msPerHour * hh);
+	});
+var _justinmimbs$elm_date_extra$Date_Internal_Core$unixTimeFromParts = F7(
+	function (y, m, d, hh, mm, ss, ms) {
+		return _justinmimbs$elm_date_extra$Date_Internal_RataDie$toUnixTime(
+			A3(_justinmimbs$elm_date_extra$Date_Internal_RataDie$fromCalendarDate, y, m, d)) + A4(_justinmimbs$elm_date_extra$Date_Internal_Core$msFromTimeParts, hh, mm, ss, ms);
+	});
+
+var _justinmimbs$elm_date_extra$Date_Internal_Extract$msOffsetFromUtc = function (date) {
+	var utcTime = _elm_lang$core$Date$toTime(date);
+	var localTime = _elm_lang$core$Basics$toFloat(
+		A7(
+			_justinmimbs$elm_date_extra$Date_Internal_Core$unixTimeFromParts,
+			_elm_lang$core$Date$year(date),
+			_elm_lang$core$Date$month(date),
+			_elm_lang$core$Date$day(date),
+			_elm_lang$core$Date$hour(date),
+			_elm_lang$core$Date$minute(date),
+			_elm_lang$core$Date$second(date),
+			_elm_lang$core$Date$millisecond(date)));
+	return _elm_lang$core$Basics$floor(localTime - utcTime);
+};
+var _justinmimbs$elm_date_extra$Date_Internal_Extract$offsetFromUtc = function (date) {
+	return (_justinmimbs$elm_date_extra$Date_Internal_Extract$msOffsetFromUtc(date) / _justinmimbs$elm_date_extra$Date_Extra_Facts$msPerMinute) | 0;
+};
+var _justinmimbs$elm_date_extra$Date_Internal_Extract$weekYear = function (date) {
+	return A3(
+		_justinmimbs$elm_date_extra$Date_Internal_Core$weekYearFromCalendarDate,
+		_elm_lang$core$Date$year(date),
+		_elm_lang$core$Date$month(date),
+		_elm_lang$core$Date$day(date));
+};
+var _justinmimbs$elm_date_extra$Date_Internal_Extract$weekNumber = function (date) {
+	return A3(
+		_justinmimbs$elm_date_extra$Date_Internal_Core$weekNumberFromCalendarDate,
+		_elm_lang$core$Date$year(date),
+		_elm_lang$core$Date$month(date),
+		_elm_lang$core$Date$day(date));
+};
+var _justinmimbs$elm_date_extra$Date_Internal_Extract$weekdayNumber = function (_p0) {
+	return _justinmimbs$elm_date_extra$Date_Extra_Facts$weekdayNumberFromDayOfWeek(
+		_elm_lang$core$Date$dayOfWeek(_p0));
+};
+var _justinmimbs$elm_date_extra$Date_Internal_Extract$fractionalDay = function (date) {
+	var timeOfDayMS = A4(
+		_justinmimbs$elm_date_extra$Date_Internal_Core$msFromTimeParts,
+		_elm_lang$core$Date$hour(date),
+		_elm_lang$core$Date$minute(date),
+		_elm_lang$core$Date$second(date),
+		_elm_lang$core$Date$millisecond(date));
+	return _elm_lang$core$Basics$toFloat(timeOfDayMS) / _elm_lang$core$Basics$toFloat(_justinmimbs$elm_date_extra$Date_Extra_Facts$msPerDay);
+};
+var _justinmimbs$elm_date_extra$Date_Internal_Extract$ordinalDay = function (date) {
+	return A2(
+		_justinmimbs$elm_date_extra$Date_Extra_Facts$daysBeforeStartOfMonth,
+		_elm_lang$core$Date$year(date),
+		_elm_lang$core$Date$month(date)) + _elm_lang$core$Date$day(date);
+};
+var _justinmimbs$elm_date_extra$Date_Internal_Extract$monthNumber = function (_p1) {
+	return _justinmimbs$elm_date_extra$Date_Extra_Facts$monthNumberFromMonth(
+		_elm_lang$core$Date$month(_p1));
+};
+var _justinmimbs$elm_date_extra$Date_Internal_Extract$quarter = function (date) {
+	return _elm_lang$core$Basics$ceiling(
+		function (n) {
+			return n / 3;
+		}(
+			_elm_lang$core$Basics$toFloat(
+				_justinmimbs$elm_date_extra$Date_Internal_Extract$monthNumber(date))));
+};
+
+var _justinmimbs$elm_date_extra$Date_Internal_Format$toUtc = function (date) {
+	return _elm_lang$core$Date$fromTime(
+		_elm_lang$core$Date$toTime(date) - _elm_lang$core$Basics$toFloat(
+			_justinmimbs$elm_date_extra$Date_Internal_Extract$offsetFromUtc(date) * _justinmimbs$elm_date_extra$Date_Extra_Facts$msPerMinute));
+};
+var _justinmimbs$elm_date_extra$Date_Internal_Format$nameForm = function (length) {
+	var _p0 = length;
+	switch (_p0) {
+		case 1:
+			return 'abbreviated';
+		case 2:
+			return 'abbreviated';
+		case 3:
+			return 'abbreviated';
+		case 4:
+			return 'full';
+		case 5:
+			return 'narrow';
+		case 6:
+			return 'short';
+		default:
+			return 'invalid';
+	}
+};
+var _justinmimbs$elm_date_extra$Date_Internal_Format$patternMatches = _elm_lang$core$Regex$regex('([yYQMwdDEeabhHmsSXx])\\1*|\'(?:[^\']|\'\')*?\'(?!\')');
+var _justinmimbs$elm_date_extra$Date_Internal_Format$formatTimeOffset = F3(
+	function (separator, minutesOptional, offset) {
+		var mm = A3(
+			_elm_lang$core$String$padLeft,
+			2,
+			_elm_lang$core$Native_Utils.chr('0'),
+			_elm_lang$core$Basics$toString(
+				A2(
+					_elm_lang$core$Basics_ops['%'],
+					_elm_lang$core$Basics$abs(offset),
+					60)));
+		var hh = A3(
+			_elm_lang$core$String$padLeft,
+			2,
+			_elm_lang$core$Native_Utils.chr('0'),
+			_elm_lang$core$Basics$toString(
+				(_elm_lang$core$Basics$abs(offset) / 60) | 0));
+		var sign = (_elm_lang$core$Native_Utils.cmp(offset, 0) > -1) ? '+' : '-';
+		return (minutesOptional && _elm_lang$core$Native_Utils.eq(mm, '00')) ? A2(_elm_lang$core$Basics_ops['++'], sign, hh) : A2(
+			_elm_lang$core$Basics_ops['++'],
+			sign,
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				hh,
+				A2(_elm_lang$core$Basics_ops['++'], separator, mm)));
+	});
+var _justinmimbs$elm_date_extra$Date_Internal_Format$ordinalSuffix = function (n) {
+	var nn = A2(_elm_lang$core$Basics_ops['%'], n, 100);
+	var _p1 = A2(
+		_elm_lang$core$Basics$min,
+		(_elm_lang$core$Native_Utils.cmp(nn, 20) < 0) ? nn : A2(_elm_lang$core$Basics_ops['%'], nn, 10),
+		4);
+	switch (_p1) {
+		case 0:
+			return 'th';
+		case 1:
+			return 'st';
+		case 2:
+			return 'nd';
+		case 3:
+			return 'rd';
+		case 4:
+			return 'th';
+		default:
+			return '';
+	}
+};
+var _justinmimbs$elm_date_extra$Date_Internal_Format$withOrdinalSuffix = function (n) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		_elm_lang$core$Basics$toString(n),
+		_justinmimbs$elm_date_extra$Date_Internal_Format$ordinalSuffix(n));
+};
+var _justinmimbs$elm_date_extra$Date_Internal_Format$hour12 = function (date) {
+	var _p2 = A2(
+		_elm_lang$core$Basics_ops['%'],
+		_elm_lang$core$Date$hour(date),
+		12);
+	if (_p2 === 0) {
+		return 12;
+	} else {
+		return _p2;
+	}
+};
+var _justinmimbs$elm_date_extra$Date_Internal_Format$dayOfWeekName = function (d) {
+	var _p3 = d;
+	switch (_p3.ctor) {
+		case 'Mon':
+			return 'Monday';
+		case 'Tue':
+			return 'Tuesday';
+		case 'Wed':
+			return 'Wednesday';
+		case 'Thu':
+			return 'Thursday';
+		case 'Fri':
+			return 'Friday';
+		case 'Sat':
+			return 'Saturday';
+		default:
+			return 'Sunday';
+	}
+};
+var _justinmimbs$elm_date_extra$Date_Internal_Format$monthName = function (m) {
+	var _p4 = m;
+	switch (_p4.ctor) {
+		case 'Jan':
+			return 'January';
+		case 'Feb':
+			return 'February';
+		case 'Mar':
+			return 'March';
+		case 'Apr':
+			return 'April';
+		case 'May':
+			return 'May';
+		case 'Jun':
+			return 'June';
+		case 'Jul':
+			return 'July';
+		case 'Aug':
+			return 'August';
+		case 'Sep':
+			return 'September';
+		case 'Oct':
+			return 'October';
+		case 'Nov':
+			return 'November';
+		default:
+			return 'December';
+	}
+};
+var _justinmimbs$elm_date_extra$Date_Internal_Format$PM = {ctor: 'PM'};
+var _justinmimbs$elm_date_extra$Date_Internal_Format$Noon = {ctor: 'Noon'};
+var _justinmimbs$elm_date_extra$Date_Internal_Format$AM = {ctor: 'AM'};
+var _justinmimbs$elm_date_extra$Date_Internal_Format$Midnight = {ctor: 'Midnight'};
+var _justinmimbs$elm_date_extra$Date_Internal_Format$dayPeriod = function (date) {
+	var onTheHour = _elm_lang$core$Native_Utils.eq(
+		_elm_lang$core$Date$minute(date),
+		0) && (_elm_lang$core$Native_Utils.eq(
+		_elm_lang$core$Date$second(date),
+		0) && _elm_lang$core$Native_Utils.eq(
+		_elm_lang$core$Date$millisecond(date),
+		0));
+	var hh = _elm_lang$core$Date$hour(date);
+	return (_elm_lang$core$Native_Utils.eq(hh, 0) && onTheHour) ? _justinmimbs$elm_date_extra$Date_Internal_Format$Midnight : ((_elm_lang$core$Native_Utils.cmp(hh, 12) < 0) ? _justinmimbs$elm_date_extra$Date_Internal_Format$AM : ((_elm_lang$core$Native_Utils.eq(hh, 12) && onTheHour) ? _justinmimbs$elm_date_extra$Date_Internal_Format$Noon : _justinmimbs$elm_date_extra$Date_Internal_Format$PM));
+};
+var _justinmimbs$elm_date_extra$Date_Internal_Format$format = F3(
+	function (asUtc, date, match) {
+		format:
+		while (true) {
+			var length = _elm_lang$core$String$length(match);
+			var $char = A2(_elm_lang$core$String$left, 1, match);
+			var _p5 = $char;
+			switch (_p5) {
+				case 'y':
+					var _p6 = length;
+					if (_p6 === 2) {
+						return A2(
+							_elm_lang$core$String$right,
+							2,
+							A3(
+								_elm_lang$core$String$padLeft,
+								length,
+								_elm_lang$core$Native_Utils.chr('0'),
+								_elm_lang$core$Basics$toString(
+									_elm_lang$core$Date$year(date))));
+					} else {
+						return A3(
+							_elm_lang$core$String$padLeft,
+							length,
+							_elm_lang$core$Native_Utils.chr('0'),
+							_elm_lang$core$Basics$toString(
+								_elm_lang$core$Date$year(date)));
+					}
+				case 'Y':
+					var _p7 = length;
+					if (_p7 === 2) {
+						return A2(
+							_elm_lang$core$String$right,
+							2,
+							A3(
+								_elm_lang$core$String$padLeft,
+								length,
+								_elm_lang$core$Native_Utils.chr('0'),
+								_elm_lang$core$Basics$toString(
+									_justinmimbs$elm_date_extra$Date_Internal_Extract$weekYear(date))));
+					} else {
+						return A3(
+							_elm_lang$core$String$padLeft,
+							length,
+							_elm_lang$core$Native_Utils.chr('0'),
+							_elm_lang$core$Basics$toString(
+								_justinmimbs$elm_date_extra$Date_Internal_Extract$weekYear(date)));
+					}
+				case 'Q':
+					var _p8 = length;
+					switch (_p8) {
+						case 1:
+							return _elm_lang$core$Basics$toString(
+								_justinmimbs$elm_date_extra$Date_Internal_Extract$quarter(date));
+						case 2:
+							return _elm_lang$core$Basics$toString(
+								_justinmimbs$elm_date_extra$Date_Internal_Extract$quarter(date));
+						case 3:
+							return A2(
+								F2(
+									function (x, y) {
+										return A2(_elm_lang$core$Basics_ops['++'], x, y);
+									}),
+								'Q',
+								_elm_lang$core$Basics$toString(
+									_justinmimbs$elm_date_extra$Date_Internal_Extract$quarter(date)));
+						case 4:
+							return _justinmimbs$elm_date_extra$Date_Internal_Format$withOrdinalSuffix(
+								_justinmimbs$elm_date_extra$Date_Internal_Extract$quarter(date));
+						case 5:
+							return _elm_lang$core$Basics$toString(
+								_justinmimbs$elm_date_extra$Date_Internal_Extract$quarter(date));
+						default:
+							return '';
+					}
+				case 'M':
+					var _p9 = length;
+					switch (_p9) {
+						case 1:
+							return _elm_lang$core$Basics$toString(
+								_justinmimbs$elm_date_extra$Date_Internal_Extract$monthNumber(date));
+						case 2:
+							return A3(
+								_elm_lang$core$String$padLeft,
+								2,
+								_elm_lang$core$Native_Utils.chr('0'),
+								_elm_lang$core$Basics$toString(
+									_justinmimbs$elm_date_extra$Date_Internal_Extract$monthNumber(date)));
+						case 3:
+							return A2(
+								_elm_lang$core$String$left,
+								3,
+								_justinmimbs$elm_date_extra$Date_Internal_Format$monthName(
+									_elm_lang$core$Date$month(date)));
+						case 4:
+							return _justinmimbs$elm_date_extra$Date_Internal_Format$monthName(
+								_elm_lang$core$Date$month(date));
+						case 5:
+							return A2(
+								_elm_lang$core$String$left,
+								1,
+								_justinmimbs$elm_date_extra$Date_Internal_Format$monthName(
+									_elm_lang$core$Date$month(date)));
+						default:
+							return '';
+					}
+				case 'w':
+					var _p10 = length;
+					switch (_p10) {
+						case 1:
+							return _elm_lang$core$Basics$toString(
+								_justinmimbs$elm_date_extra$Date_Internal_Extract$weekNumber(date));
+						case 2:
+							return A3(
+								_elm_lang$core$String$padLeft,
+								2,
+								_elm_lang$core$Native_Utils.chr('0'),
+								_elm_lang$core$Basics$toString(
+									_justinmimbs$elm_date_extra$Date_Internal_Extract$weekNumber(date)));
+						default:
+							return '';
+					}
+				case 'd':
+					var _p11 = length;
+					switch (_p11) {
+						case 1:
+							return _elm_lang$core$Basics$toString(
+								_elm_lang$core$Date$day(date));
+						case 2:
+							return A3(
+								_elm_lang$core$String$padLeft,
+								2,
+								_elm_lang$core$Native_Utils.chr('0'),
+								_elm_lang$core$Basics$toString(
+									_elm_lang$core$Date$day(date)));
+						case 3:
+							return _justinmimbs$elm_date_extra$Date_Internal_Format$withOrdinalSuffix(
+								_elm_lang$core$Date$day(date));
+						default:
+							return '';
+					}
+				case 'D':
+					var _p12 = length;
+					switch (_p12) {
+						case 1:
+							return _elm_lang$core$Basics$toString(
+								_justinmimbs$elm_date_extra$Date_Internal_Extract$ordinalDay(date));
+						case 2:
+							return A3(
+								_elm_lang$core$String$padLeft,
+								2,
+								_elm_lang$core$Native_Utils.chr('0'),
+								_elm_lang$core$Basics$toString(
+									_justinmimbs$elm_date_extra$Date_Internal_Extract$ordinalDay(date)));
+						case 3:
+							return A3(
+								_elm_lang$core$String$padLeft,
+								3,
+								_elm_lang$core$Native_Utils.chr('0'),
+								_elm_lang$core$Basics$toString(
+									_justinmimbs$elm_date_extra$Date_Internal_Extract$ordinalDay(date)));
+						default:
+							return '';
+					}
+				case 'E':
+					var _p13 = _justinmimbs$elm_date_extra$Date_Internal_Format$nameForm(length);
+					switch (_p13) {
+						case 'abbreviated':
+							return A2(
+								_elm_lang$core$String$left,
+								3,
+								_justinmimbs$elm_date_extra$Date_Internal_Format$dayOfWeekName(
+									_elm_lang$core$Date$dayOfWeek(date)));
+						case 'full':
+							return _justinmimbs$elm_date_extra$Date_Internal_Format$dayOfWeekName(
+								_elm_lang$core$Date$dayOfWeek(date));
+						case 'narrow':
+							return A2(
+								_elm_lang$core$String$left,
+								1,
+								_justinmimbs$elm_date_extra$Date_Internal_Format$dayOfWeekName(
+									_elm_lang$core$Date$dayOfWeek(date)));
+						case 'short':
+							return A2(
+								_elm_lang$core$String$left,
+								2,
+								_justinmimbs$elm_date_extra$Date_Internal_Format$dayOfWeekName(
+									_elm_lang$core$Date$dayOfWeek(date)));
+						default:
+							return '';
+					}
+				case 'e':
+					var _p14 = length;
+					switch (_p14) {
+						case 1:
+							return _elm_lang$core$Basics$toString(
+								_justinmimbs$elm_date_extra$Date_Internal_Extract$weekdayNumber(date));
+						case 2:
+							return _elm_lang$core$Basics$toString(
+								_justinmimbs$elm_date_extra$Date_Internal_Extract$weekdayNumber(date));
+						default:
+							var _v15 = asUtc,
+								_v16 = date,
+								_v17 = _elm_lang$core$String$toUpper(match);
+							asUtc = _v15;
+							date = _v16;
+							match = _v17;
+							continue format;
+					}
+				case 'a':
+					var p = _justinmimbs$elm_date_extra$Date_Internal_Format$dayPeriod(date);
+					var m = (_elm_lang$core$Native_Utils.eq(p, _justinmimbs$elm_date_extra$Date_Internal_Format$Midnight) || _elm_lang$core$Native_Utils.eq(p, _justinmimbs$elm_date_extra$Date_Internal_Format$AM)) ? 'A' : 'P';
+					var _p15 = _justinmimbs$elm_date_extra$Date_Internal_Format$nameForm(length);
+					switch (_p15) {
+						case 'abbreviated':
+							return A2(_elm_lang$core$Basics_ops['++'], m, 'M');
+						case 'full':
+							return A2(_elm_lang$core$Basics_ops['++'], m, '.M.');
+						case 'narrow':
+							return m;
+						default:
+							return '';
+					}
+				case 'b':
+					var _p16 = _justinmimbs$elm_date_extra$Date_Internal_Format$nameForm(length);
+					switch (_p16) {
+						case 'abbreviated':
+							var _p17 = _justinmimbs$elm_date_extra$Date_Internal_Format$dayPeriod(date);
+							switch (_p17.ctor) {
+								case 'Midnight':
+									return 'mid.';
+								case 'AM':
+									return 'am';
+								case 'Noon':
+									return 'noon';
+								default:
+									return 'pm';
+							}
+						case 'full':
+							var _p18 = _justinmimbs$elm_date_extra$Date_Internal_Format$dayPeriod(date);
+							switch (_p18.ctor) {
+								case 'Midnight':
+									return 'midnight';
+								case 'AM':
+									return 'a.m.';
+								case 'Noon':
+									return 'noon';
+								default:
+									return 'p.m.';
+							}
+						case 'narrow':
+							var _p19 = _justinmimbs$elm_date_extra$Date_Internal_Format$dayPeriod(date);
+							switch (_p19.ctor) {
+								case 'Midnight':
+									return 'md';
+								case 'AM':
+									return 'a';
+								case 'Noon':
+									return 'nn';
+								default:
+									return 'p';
+							}
+						default:
+							return '';
+					}
+				case 'h':
+					var _p20 = length;
+					switch (_p20) {
+						case 1:
+							return _elm_lang$core$Basics$toString(
+								_justinmimbs$elm_date_extra$Date_Internal_Format$hour12(date));
+						case 2:
+							return A3(
+								_elm_lang$core$String$padLeft,
+								2,
+								_elm_lang$core$Native_Utils.chr('0'),
+								_elm_lang$core$Basics$toString(
+									_justinmimbs$elm_date_extra$Date_Internal_Format$hour12(date)));
+						default:
+							return '';
+					}
+				case 'H':
+					var _p21 = length;
+					switch (_p21) {
+						case 1:
+							return _elm_lang$core$Basics$toString(
+								_elm_lang$core$Date$hour(date));
+						case 2:
+							return A3(
+								_elm_lang$core$String$padLeft,
+								2,
+								_elm_lang$core$Native_Utils.chr('0'),
+								_elm_lang$core$Basics$toString(
+									_elm_lang$core$Date$hour(date)));
+						default:
+							return '';
+					}
+				case 'm':
+					var _p22 = length;
+					switch (_p22) {
+						case 1:
+							return _elm_lang$core$Basics$toString(
+								_elm_lang$core$Date$minute(date));
+						case 2:
+							return A3(
+								_elm_lang$core$String$padLeft,
+								2,
+								_elm_lang$core$Native_Utils.chr('0'),
+								_elm_lang$core$Basics$toString(
+									_elm_lang$core$Date$minute(date)));
+						default:
+							return '';
+					}
+				case 's':
+					var _p23 = length;
+					switch (_p23) {
+						case 1:
+							return _elm_lang$core$Basics$toString(
+								_elm_lang$core$Date$second(date));
+						case 2:
+							return A3(
+								_elm_lang$core$String$padLeft,
+								2,
+								_elm_lang$core$Native_Utils.chr('0'),
+								_elm_lang$core$Basics$toString(
+									_elm_lang$core$Date$second(date)));
+						default:
+							return '';
+					}
+				case 'S':
+					return A3(
+						_elm_lang$core$String$padRight,
+						length,
+						_elm_lang$core$Native_Utils.chr('0'),
+						A2(
+							_elm_lang$core$String$left,
+							length,
+							A3(
+								_elm_lang$core$String$padLeft,
+								3,
+								_elm_lang$core$Native_Utils.chr('0'),
+								_elm_lang$core$Basics$toString(
+									_elm_lang$core$Date$millisecond(date)))));
+				case 'X':
+					if ((_elm_lang$core$Native_Utils.cmp(length, 4) < 0) && (asUtc || _elm_lang$core$Native_Utils.eq(
+						_justinmimbs$elm_date_extra$Date_Internal_Extract$offsetFromUtc(date),
+						0))) {
+						return 'Z';
+					} else {
+						var _v27 = asUtc,
+							_v28 = date,
+							_v29 = _elm_lang$core$String$toLower(match);
+						asUtc = _v27;
+						date = _v28;
+						match = _v29;
+						continue format;
+					}
+				case 'x':
+					var offset = asUtc ? 0 : _justinmimbs$elm_date_extra$Date_Internal_Extract$offsetFromUtc(date);
+					var _p24 = length;
+					switch (_p24) {
+						case 1:
+							return A3(_justinmimbs$elm_date_extra$Date_Internal_Format$formatTimeOffset, '', true, offset);
+						case 2:
+							return A3(_justinmimbs$elm_date_extra$Date_Internal_Format$formatTimeOffset, '', false, offset);
+						case 3:
+							return A3(_justinmimbs$elm_date_extra$Date_Internal_Format$formatTimeOffset, ':', false, offset);
+						default:
+							return '';
+					}
+				case '\'':
+					return _elm_lang$core$Native_Utils.eq(match, '\'\'') ? '\'' : A4(
+						_elm_lang$core$Regex$replace,
+						_elm_lang$core$Regex$All,
+						_elm_lang$core$Regex$regex('\'\''),
+						function (_p25) {
+							return '\'';
+						},
+						A3(_elm_lang$core$String$slice, 1, -1, match));
+				default:
+					return '';
+			}
+		}
+	});
+var _justinmimbs$elm_date_extra$Date_Internal_Format$toFormattedString = F3(
+	function (asUtc, pattern, date) {
+		var date_ = asUtc ? _justinmimbs$elm_date_extra$Date_Internal_Format$toUtc(date) : date;
+		return A4(
+			_elm_lang$core$Regex$replace,
+			_elm_lang$core$Regex$All,
+			_justinmimbs$elm_date_extra$Date_Internal_Format$patternMatches,
+			function (_p26) {
+				return A3(
+					_justinmimbs$elm_date_extra$Date_Internal_Format$format,
+					asUtc,
+					date_,
+					function (_) {
+						return _.match;
+					}(_p26));
+			},
+			pattern);
+	});
+
+var _justinmimbs$elm_date_extra$Date_Internal_Parse$isoDateRegex = function () {
+	var time = 'T(\\d{2})(?:(\\:)?(\\d{2})(?:\\10(\\d{2}))?)?(\\.\\d+)?(?:(Z)|(?:([+\\-])(\\d{2})(?:\\:?(\\d{2}))?))?';
+	var ord = '\\-?(\\d{3})';
+	var week = '(\\-)?W(\\d{2})(?:\\5(\\d))?';
+	var cal = '(\\-)?(\\d{2})(?:\\2(\\d{2}))?';
+	var year = '(\\d{4})';
+	return _elm_lang$core$Regex$regex(
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			'^',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				year,
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					'(?:',
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						cal,
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							'|',
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								week,
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									'|',
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										ord,
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											')?',
+											A2(
+												_elm_lang$core$Basics_ops['++'],
+												'(?:',
+												A2(_elm_lang$core$Basics_ops['++'], time, ')?$'))))))))))));
+}();
+var _justinmimbs$elm_date_extra$Date_Internal_Parse$stringToFloat = function (_p0) {
+	return _elm_lang$core$Result$toMaybe(
+		_elm_lang$core$String$toFloat(_p0));
+};
+var _justinmimbs$elm_date_extra$Date_Internal_Parse$msFromMatches = F4(
+	function (timeHH, timeMM, timeSS, timeF) {
+		var fractional = A2(
+			_elm_lang$core$Maybe$withDefault,
+			0.0,
+			A2(_elm_lang$core$Maybe$andThen, _justinmimbs$elm_date_extra$Date_Internal_Parse$stringToFloat, timeF));
+		var _p1 = function () {
+			var _p2 = A2(
+				_elm_lang$core$List$map,
+				_elm_lang$core$Maybe$andThen(_justinmimbs$elm_date_extra$Date_Internal_Parse$stringToFloat),
+				{
+					ctor: '::',
+					_0: timeHH,
+					_1: {
+						ctor: '::',
+						_0: timeMM,
+						_1: {
+							ctor: '::',
+							_0: timeSS,
+							_1: {ctor: '[]'}
+						}
+					}
+				});
+			_v0_3:
+			do {
+				if (((_p2.ctor === '::') && (_p2._0.ctor === 'Just')) && (_p2._1.ctor === '::')) {
+					if (_p2._1._0.ctor === 'Just') {
+						if (_p2._1._1.ctor === '::') {
+							if (_p2._1._1._0.ctor === 'Just') {
+								if (_p2._1._1._1.ctor === '[]') {
+									return {ctor: '_Tuple3', _0: _p2._0._0, _1: _p2._1._0._0, _2: _p2._1._1._0._0 + fractional};
+								} else {
+									break _v0_3;
+								}
+							} else {
+								if (_p2._1._1._1.ctor === '[]') {
+									return {ctor: '_Tuple3', _0: _p2._0._0, _1: _p2._1._0._0 + fractional, _2: 0.0};
+								} else {
+									break _v0_3;
+								}
+							}
+						} else {
+							break _v0_3;
+						}
+					} else {
+						if (((_p2._1._1.ctor === '::') && (_p2._1._1._0.ctor === 'Nothing')) && (_p2._1._1._1.ctor === '[]')) {
+							return {ctor: '_Tuple3', _0: _p2._0._0 + fractional, _1: 0.0, _2: 0.0};
+						} else {
+							break _v0_3;
+						}
+					}
+				} else {
+					break _v0_3;
+				}
+			} while(false);
+			return {ctor: '_Tuple3', _0: 0.0, _1: 0.0, _2: 0.0};
+		}();
+		var hh = _p1._0;
+		var mm = _p1._1;
+		var ss = _p1._2;
+		return _elm_lang$core$Basics$round(
+			((hh * _elm_lang$core$Basics$toFloat(_justinmimbs$elm_date_extra$Date_Extra_Facts$msPerHour)) + (mm * _elm_lang$core$Basics$toFloat(_justinmimbs$elm_date_extra$Date_Extra_Facts$msPerMinute))) + (ss * _elm_lang$core$Basics$toFloat(_justinmimbs$elm_date_extra$Date_Extra_Facts$msPerSecond)));
+	});
+var _justinmimbs$elm_date_extra$Date_Internal_Parse$stringToInt = function (_p3) {
+	return _elm_lang$core$Result$toMaybe(
+		_elm_lang$core$String$toInt(_p3));
+};
+var _justinmimbs$elm_date_extra$Date_Internal_Parse$unixTimeFromMatches = F6(
+	function (yyyy, calMM, calDD, weekWW, weekD, ordDDD) {
+		var y = A2(
+			_elm_lang$core$Maybe$withDefault,
+			1,
+			_justinmimbs$elm_date_extra$Date_Internal_Parse$stringToInt(yyyy));
+		var _p4 = {ctor: '_Tuple2', _0: calMM, _1: weekWW};
+		_v1_2:
+		do {
+			if (_p4.ctor === '_Tuple2') {
+				if (_p4._0.ctor === 'Just') {
+					if (_p4._1.ctor === 'Nothing') {
+						return A3(
+							_justinmimbs$elm_date_extra$Date_Internal_Core$unixTimeFromCalendarDate,
+							y,
+							_justinmimbs$elm_date_extra$Date_Extra_Facts$monthFromMonthNumber(
+								A2(
+									_elm_lang$core$Maybe$withDefault,
+									1,
+									A2(_elm_lang$core$Maybe$andThen, _justinmimbs$elm_date_extra$Date_Internal_Parse$stringToInt, calMM))),
+							A2(
+								_elm_lang$core$Maybe$withDefault,
+								1,
+								A2(_elm_lang$core$Maybe$andThen, _justinmimbs$elm_date_extra$Date_Internal_Parse$stringToInt, calDD)));
+					} else {
+						break _v1_2;
+					}
+				} else {
+					if (_p4._1.ctor === 'Just') {
+						return A3(
+							_justinmimbs$elm_date_extra$Date_Internal_Core$unixTimeFromWeekDate,
+							y,
+							A2(
+								_elm_lang$core$Maybe$withDefault,
+								1,
+								A2(_elm_lang$core$Maybe$andThen, _justinmimbs$elm_date_extra$Date_Internal_Parse$stringToInt, weekWW)),
+							A2(
+								_elm_lang$core$Maybe$withDefault,
+								1,
+								A2(_elm_lang$core$Maybe$andThen, _justinmimbs$elm_date_extra$Date_Internal_Parse$stringToInt, weekD)));
+					} else {
+						break _v1_2;
+					}
+				}
+			} else {
+				break _v1_2;
+			}
+		} while(false);
+		return A2(
+			_justinmimbs$elm_date_extra$Date_Internal_Core$unixTimeFromOrdinalDate,
+			y,
+			A2(
+				_elm_lang$core$Maybe$withDefault,
+				1,
+				A2(_elm_lang$core$Maybe$andThen, _justinmimbs$elm_date_extra$Date_Internal_Parse$stringToInt, ordDDD)));
+	});
+var _justinmimbs$elm_date_extra$Date_Internal_Parse$offsetFromMatches = F4(
+	function (tzZ, tzSign, tzHH, tzMM) {
+		var _p5 = {ctor: '_Tuple2', _0: tzZ, _1: tzSign};
+		_v2_2:
+		do {
+			if (_p5.ctor === '_Tuple2') {
+				if (_p5._0.ctor === 'Just') {
+					if ((_p5._0._0 === 'Z') && (_p5._1.ctor === 'Nothing')) {
+						return _elm_lang$core$Maybe$Just(0);
+					} else {
+						break _v2_2;
+					}
+				} else {
+					if (_p5._1.ctor === 'Just') {
+						var mm = A2(
+							_elm_lang$core$Maybe$withDefault,
+							0,
+							A2(_elm_lang$core$Maybe$andThen, _justinmimbs$elm_date_extra$Date_Internal_Parse$stringToInt, tzMM));
+						var hh = A2(
+							_elm_lang$core$Maybe$withDefault,
+							0,
+							A2(_elm_lang$core$Maybe$andThen, _justinmimbs$elm_date_extra$Date_Internal_Parse$stringToInt, tzHH));
+						return _elm_lang$core$Maybe$Just(
+							(_elm_lang$core$Native_Utils.eq(_p5._1._0, '+') ? 1 : -1) * ((hh * 60) + mm));
+					} else {
+						break _v2_2;
+					}
+				}
+			} else {
+				break _v2_2;
+			}
+		} while(false);
+		return _elm_lang$core$Maybe$Nothing;
+	});
+var _justinmimbs$elm_date_extra$Date_Internal_Parse$offsetTimeFromMatches = function (matches) {
+	var _p6 = matches;
+	if (((((((((((((((((((_p6.ctor === '::') && (_p6._0.ctor === 'Just')) && (_p6._1.ctor === '::')) && (_p6._1._1.ctor === '::')) && (_p6._1._1._1.ctor === '::')) && (_p6._1._1._1._1.ctor === '::')) && (_p6._1._1._1._1._1.ctor === '::')) && (_p6._1._1._1._1._1._1.ctor === '::')) && (_p6._1._1._1._1._1._1._1.ctor === '::')) && (_p6._1._1._1._1._1._1._1._1.ctor === '::')) && (_p6._1._1._1._1._1._1._1._1._1.ctor === '::')) && (_p6._1._1._1._1._1._1._1._1._1._1.ctor === '::')) && (_p6._1._1._1._1._1._1._1._1._1._1._1.ctor === '::')) && (_p6._1._1._1._1._1._1._1._1._1._1._1._1.ctor === '::')) && (_p6._1._1._1._1._1._1._1._1._1._1._1._1._1.ctor === '::')) && (_p6._1._1._1._1._1._1._1._1._1._1._1._1._1._1.ctor === '::')) && (_p6._1._1._1._1._1._1._1._1._1._1._1._1._1._1._1.ctor === '::')) && (_p6._1._1._1._1._1._1._1._1._1._1._1._1._1._1._1._1.ctor === '::')) && (_p6._1._1._1._1._1._1._1._1._1._1._1._1._1._1._1._1._1.ctor === '[]')) {
+		var offset = A4(_justinmimbs$elm_date_extra$Date_Internal_Parse$offsetFromMatches, _p6._1._1._1._1._1._1._1._1._1._1._1._1._1._0, _p6._1._1._1._1._1._1._1._1._1._1._1._1._1._1._0, _p6._1._1._1._1._1._1._1._1._1._1._1._1._1._1._1._0, _p6._1._1._1._1._1._1._1._1._1._1._1._1._1._1._1._1._0);
+		var timeMS = A4(_justinmimbs$elm_date_extra$Date_Internal_Parse$msFromMatches, _p6._1._1._1._1._1._1._1._1._0, _p6._1._1._1._1._1._1._1._1._1._1._0, _p6._1._1._1._1._1._1._1._1._1._1._1._0, _p6._1._1._1._1._1._1._1._1._1._1._1._1._0);
+		var dateMS = A6(_justinmimbs$elm_date_extra$Date_Internal_Parse$unixTimeFromMatches, _p6._0._0, _p6._1._1._0, _p6._1._1._1._0, _p6._1._1._1._1._1._0, _p6._1._1._1._1._1._1._0, _p6._1._1._1._1._1._1._1._0);
+		return _elm_lang$core$Maybe$Just(
+			{ctor: '_Tuple2', _0: offset, _1: dateMS + timeMS});
+	} else {
+		return _elm_lang$core$Maybe$Nothing;
+	}
+};
+var _justinmimbs$elm_date_extra$Date_Internal_Parse$offsetTimeFromIsoString = function (s) {
+	return A2(
+		_elm_lang$core$Maybe$andThen,
+		_justinmimbs$elm_date_extra$Date_Internal_Parse$offsetTimeFromMatches,
+		A2(
+			_elm_lang$core$Maybe$map,
+			function (_) {
+				return _.submatches;
+			},
+			_elm_lang$core$List$head(
+				A3(
+					_elm_lang$core$Regex$find,
+					_elm_lang$core$Regex$AtMost(1),
+					_justinmimbs$elm_date_extra$Date_Internal_Parse$isoDateRegex,
+					s))));
+};
+
+var _justinmimbs$elm_date_extra$Date_Extra$toParts = function (date) {
+	return {
+		ctor: '_Tuple7',
+		_0: _elm_lang$core$Date$year(date),
+		_1: _elm_lang$core$Date$month(date),
+		_2: _elm_lang$core$Date$day(date),
+		_3: _elm_lang$core$Date$hour(date),
+		_4: _elm_lang$core$Date$minute(date),
+		_5: _elm_lang$core$Date$second(date),
+		_6: _elm_lang$core$Date$millisecond(date)
+	};
+};
+var _justinmimbs$elm_date_extra$Date_Extra$monthFromQuarter = function (q) {
+	var _p0 = q;
+	switch (_p0) {
+		case 1:
+			return _elm_lang$core$Date$Jan;
+		case 2:
+			return _elm_lang$core$Date$Apr;
+		case 3:
+			return _elm_lang$core$Date$Jul;
+		default:
+			return _elm_lang$core$Date$Oct;
+	}
+};
+var _justinmimbs$elm_date_extra$Date_Extra$clamp = F3(
+	function (min, max, date) {
+		return (_elm_lang$core$Native_Utils.cmp(
+			_elm_lang$core$Date$toTime(date),
+			_elm_lang$core$Date$toTime(min)) < 0) ? min : ((_elm_lang$core$Native_Utils.cmp(
+			_elm_lang$core$Date$toTime(date),
+			_elm_lang$core$Date$toTime(max)) > 0) ? max : date);
+	});
+var _justinmimbs$elm_date_extra$Date_Extra$comparableIsBetween = F3(
+	function (a, b, x) {
+		return ((_elm_lang$core$Native_Utils.cmp(a, x) < 1) && (_elm_lang$core$Native_Utils.cmp(x, b) < 1)) || ((_elm_lang$core$Native_Utils.cmp(b, x) < 1) && (_elm_lang$core$Native_Utils.cmp(x, a) < 1));
+	});
+var _justinmimbs$elm_date_extra$Date_Extra$isBetween = F3(
+	function (date1, date2, date) {
+		return A3(
+			_justinmimbs$elm_date_extra$Date_Extra$comparableIsBetween,
+			_elm_lang$core$Date$toTime(date1),
+			_elm_lang$core$Date$toTime(date2),
+			_elm_lang$core$Date$toTime(date));
+	});
+var _justinmimbs$elm_date_extra$Date_Extra$compare = F2(
+	function (a, b) {
+		return A2(
+			_elm_lang$core$Basics$compare,
+			_elm_lang$core$Date$toTime(a),
+			_elm_lang$core$Date$toTime(b));
+	});
+var _justinmimbs$elm_date_extra$Date_Extra$equal = F2(
+	function (a, b) {
+		return _elm_lang$core$Native_Utils.eq(
+			_elm_lang$core$Date$toTime(a),
+			_elm_lang$core$Date$toTime(b));
+	});
+var _justinmimbs$elm_date_extra$Date_Extra$offsetFromUtc = _justinmimbs$elm_date_extra$Date_Internal_Extract$offsetFromUtc;
+var _justinmimbs$elm_date_extra$Date_Extra$weekYear = _justinmimbs$elm_date_extra$Date_Internal_Extract$weekYear;
+var _justinmimbs$elm_date_extra$Date_Extra$weekNumber = _justinmimbs$elm_date_extra$Date_Internal_Extract$weekNumber;
+var _justinmimbs$elm_date_extra$Date_Extra$weekdayNumber = _justinmimbs$elm_date_extra$Date_Internal_Extract$weekdayNumber;
+var _justinmimbs$elm_date_extra$Date_Extra$daysToPreviousDayOfWeek = F2(
+	function (d, date) {
+		return _elm_lang$core$Basics$negate(
+			A2(
+				_elm_lang$core$Basics_ops['%'],
+				(_justinmimbs$elm_date_extra$Date_Extra$weekdayNumber(date) - _justinmimbs$elm_date_extra$Date_Extra_Facts$weekdayNumberFromDayOfWeek(d)) + 7,
+				7));
+	});
+var _justinmimbs$elm_date_extra$Date_Extra$fractionalDay = _justinmimbs$elm_date_extra$Date_Internal_Extract$fractionalDay;
+var _justinmimbs$elm_date_extra$Date_Extra$ordinalDay = _justinmimbs$elm_date_extra$Date_Internal_Extract$ordinalDay;
+var _justinmimbs$elm_date_extra$Date_Extra$quarter = _justinmimbs$elm_date_extra$Date_Internal_Extract$quarter;
+var _justinmimbs$elm_date_extra$Date_Extra$monthNumber = _justinmimbs$elm_date_extra$Date_Internal_Extract$monthNumber;
+var _justinmimbs$elm_date_extra$Date_Extra$ordinalMonth = function (date) {
+	return (_elm_lang$core$Date$year(date) * 12) + _justinmimbs$elm_date_extra$Date_Extra$monthNumber(date);
+};
+var _justinmimbs$elm_date_extra$Date_Extra$diffMonth = F2(
+	function (date1, date2) {
+		var fractionalMonth = function (date) {
+			return (_elm_lang$core$Basics$toFloat(
+				_elm_lang$core$Date$day(date) - 1) + _justinmimbs$elm_date_extra$Date_Extra$fractionalDay(date)) / 31;
+		};
+		var ordinalMonthFloat = function (date) {
+			return _elm_lang$core$Basics$toFloat(
+				_justinmimbs$elm_date_extra$Date_Extra$ordinalMonth(date)) + fractionalMonth(date);
+		};
+		return _elm_lang$core$Basics$truncate(
+			ordinalMonthFloat(date2) - ordinalMonthFloat(date1));
+	});
+var _justinmimbs$elm_date_extra$Date_Extra$toUtcFormattedString = _justinmimbs$elm_date_extra$Date_Internal_Format$toFormattedString(true);
+var _justinmimbs$elm_date_extra$Date_Extra$toUtcIsoString = _justinmimbs$elm_date_extra$Date_Extra$toUtcFormattedString('yyyy-MM-dd\'T\'HH:mm:ss.SSSXXX');
+var _justinmimbs$elm_date_extra$Date_Extra$toFormattedString = _justinmimbs$elm_date_extra$Date_Internal_Format$toFormattedString(false);
+var _justinmimbs$elm_date_extra$Date_Extra$toIsoString = _justinmimbs$elm_date_extra$Date_Extra$toFormattedString('yyyy-MM-dd\'T\'HH:mm:ss.SSSxxx');
+var _justinmimbs$elm_date_extra$Date_Extra$fromTime = function (_p1) {
+	return _elm_lang$core$Date$fromTime(
+		_elm_lang$core$Basics$toFloat(_p1));
+};
+var _justinmimbs$elm_date_extra$Date_Extra$fromOffsetTime = function (_p2) {
+	var _p3 = _p2;
+	var _p5 = _p3._1;
+	var _p4 = _p3._0;
+	if (_p4.ctor === 'Just') {
+		return _justinmimbs$elm_date_extra$Date_Extra$fromTime(_p5 - (_justinmimbs$elm_date_extra$Date_Extra_Facts$msPerMinute * _p4._0));
+	} else {
+		var offset0 = _justinmimbs$elm_date_extra$Date_Extra$offsetFromUtc(
+			_justinmimbs$elm_date_extra$Date_Extra$fromTime(_p5));
+		var date1 = _justinmimbs$elm_date_extra$Date_Extra$fromTime(_p5 - (_justinmimbs$elm_date_extra$Date_Extra_Facts$msPerMinute * offset0));
+		var offset1 = _justinmimbs$elm_date_extra$Date_Extra$offsetFromUtc(date1);
+		if (_elm_lang$core$Native_Utils.eq(offset0, offset1)) {
+			return date1;
+		} else {
+			var date2 = _justinmimbs$elm_date_extra$Date_Extra$fromTime(_p5 - (_justinmimbs$elm_date_extra$Date_Extra_Facts$msPerMinute * offset1));
+			var offset2 = _justinmimbs$elm_date_extra$Date_Extra$offsetFromUtc(date2);
+			return _elm_lang$core$Native_Utils.eq(offset1, offset2) ? date2 : date1;
+		}
+	}
+};
+var _justinmimbs$elm_date_extra$Date_Extra$fromParts = F7(
+	function (y, m, d, hh, mm, ss, ms) {
+		return _justinmimbs$elm_date_extra$Date_Extra$fromOffsetTime(
+			{
+				ctor: '_Tuple2',
+				_0: _elm_lang$core$Maybe$Nothing,
+				_1: A7(_justinmimbs$elm_date_extra$Date_Internal_Core$unixTimeFromParts, y, m, d, hh, mm, ss, ms)
+			});
+	});
+var _justinmimbs$elm_date_extra$Date_Extra$addMonths = F2(
+	function (n, date) {
+		var om = (_justinmimbs$elm_date_extra$Date_Extra$ordinalMonth(date) + n) + -1;
+		var y_ = (om / 12) | 0;
+		var m_ = _justinmimbs$elm_date_extra$Date_Extra_Facts$monthFromMonthNumber(
+			A2(_elm_lang$core$Basics_ops['%'], om, 12) + 1);
+		var _p6 = _justinmimbs$elm_date_extra$Date_Extra$toParts(date);
+		var y = _p6._0;
+		var m = _p6._1;
+		var d = _p6._2;
+		var hh = _p6._3;
+		var mm = _p6._4;
+		var ss = _p6._5;
+		var ms = _p6._6;
+		var d_ = A2(
+			_elm_lang$core$Basics$min,
+			d,
+			A2(_justinmimbs$elm_date_extra$Date_Extra_Facts$daysInMonth, y_, m_));
+		return A7(_justinmimbs$elm_date_extra$Date_Extra$fromParts, y_, m_, d_, hh, mm, ss, ms);
+	});
+var _justinmimbs$elm_date_extra$Date_Extra$add = F3(
+	function (interval, n, date) {
+		var _p7 = _justinmimbs$elm_date_extra$Date_Extra$toParts(date);
+		var y = _p7._0;
+		var m = _p7._1;
+		var d = _p7._2;
+		var hh = _p7._3;
+		var mm = _p7._4;
+		var ss = _p7._5;
+		var ms = _p7._6;
+		var _p8 = interval;
+		switch (_p8.ctor) {
+			case 'Millisecond':
+				return _elm_lang$core$Date$fromTime(
+					_elm_lang$core$Date$toTime(date) + _elm_lang$core$Basics$toFloat(n));
+			case 'Second':
+				return _elm_lang$core$Date$fromTime(
+					_elm_lang$core$Date$toTime(date) + _elm_lang$core$Basics$toFloat(n * _justinmimbs$elm_date_extra$Date_Extra_Facts$msPerSecond));
+			case 'Minute':
+				return _elm_lang$core$Date$fromTime(
+					_elm_lang$core$Date$toTime(date) + _elm_lang$core$Basics$toFloat(n * _justinmimbs$elm_date_extra$Date_Extra_Facts$msPerMinute));
+			case 'Hour':
+				return _elm_lang$core$Date$fromTime(
+					_elm_lang$core$Date$toTime(date) + _elm_lang$core$Basics$toFloat(n * _justinmimbs$elm_date_extra$Date_Extra_Facts$msPerHour));
+			case 'Day':
+				return A7(_justinmimbs$elm_date_extra$Date_Extra$fromParts, y, m, d + n, hh, mm, ss, ms);
+			case 'Month':
+				return A2(_justinmimbs$elm_date_extra$Date_Extra$addMonths, n, date);
+			case 'Year':
+				return A2(_justinmimbs$elm_date_extra$Date_Extra$addMonths, n * 12, date);
+			case 'Quarter':
+				return A2(_justinmimbs$elm_date_extra$Date_Extra$addMonths, n * 3, date);
+			case 'Week':
+				return A7(_justinmimbs$elm_date_extra$Date_Extra$fromParts, y, m, d + (n * 7), hh, mm, ss, ms);
+			default:
+				return A7(_justinmimbs$elm_date_extra$Date_Extra$fromParts, y, m, d + (n * 7), hh, mm, ss, ms);
+		}
+	});
+var _justinmimbs$elm_date_extra$Date_Extra$rangeHelp = F5(
+	function (result, interval, step, start, date) {
+		rangeHelp:
+		while (true) {
+			if (_elm_lang$core$Native_Utils.cmp(
+				_elm_lang$core$Date$toTime(date),
+				_elm_lang$core$Date$toTime(start)) < 0) {
+				return result;
+			} else {
+				var _v4 = {ctor: '::', _0: date, _1: result},
+					_v5 = interval,
+					_v6 = step,
+					_v7 = start,
+					_v8 = A3(_justinmimbs$elm_date_extra$Date_Extra$add, interval, step, date);
+				result = _v4;
+				interval = _v5;
+				step = _v6;
+				start = _v7;
+				date = _v8;
+				continue rangeHelp;
+			}
+		}
+	});
+var _justinmimbs$elm_date_extra$Date_Extra$fromCalendarDate = F3(
+	function (y, m, d) {
+		return _justinmimbs$elm_date_extra$Date_Extra$fromOffsetTime(
+			{
+				ctor: '_Tuple2',
+				_0: _elm_lang$core$Maybe$Nothing,
+				_1: A3(_justinmimbs$elm_date_extra$Date_Internal_Core$unixTimeFromCalendarDate, y, m, d)
+			});
+	});
+var _justinmimbs$elm_date_extra$Date_Extra$floor = F2(
+	function (interval, date) {
+		var _p9 = _justinmimbs$elm_date_extra$Date_Extra$toParts(date);
+		var y = _p9._0;
+		var m = _p9._1;
+		var d = _p9._2;
+		var hh = _p9._3;
+		var mm = _p9._4;
+		var ss = _p9._5;
+		var _p10 = interval;
+		switch (_p10.ctor) {
+			case 'Millisecond':
+				return date;
+			case 'Second':
+				return A7(_justinmimbs$elm_date_extra$Date_Extra$fromParts, y, m, d, hh, mm, ss, 0);
+			case 'Minute':
+				return A7(_justinmimbs$elm_date_extra$Date_Extra$fromParts, y, m, d, hh, mm, 0, 0);
+			case 'Hour':
+				return A7(_justinmimbs$elm_date_extra$Date_Extra$fromParts, y, m, d, hh, 0, 0, 0);
+			case 'Day':
+				return A3(_justinmimbs$elm_date_extra$Date_Extra$fromCalendarDate, y, m, d);
+			case 'Month':
+				return A3(_justinmimbs$elm_date_extra$Date_Extra$fromCalendarDate, y, m, 1);
+			case 'Year':
+				return A3(_justinmimbs$elm_date_extra$Date_Extra$fromCalendarDate, y, _elm_lang$core$Date$Jan, 1);
+			case 'Quarter':
+				return A3(
+					_justinmimbs$elm_date_extra$Date_Extra$fromCalendarDate,
+					y,
+					_justinmimbs$elm_date_extra$Date_Extra$monthFromQuarter(
+						_justinmimbs$elm_date_extra$Date_Extra$quarter(date)),
+					1);
+			case 'Week':
+				return A3(
+					_justinmimbs$elm_date_extra$Date_Extra$fromCalendarDate,
+					y,
+					m,
+					d + A2(_justinmimbs$elm_date_extra$Date_Extra$daysToPreviousDayOfWeek, _elm_lang$core$Date$Mon, date));
+			case 'Monday':
+				return A3(
+					_justinmimbs$elm_date_extra$Date_Extra$fromCalendarDate,
+					y,
+					m,
+					d + A2(_justinmimbs$elm_date_extra$Date_Extra$daysToPreviousDayOfWeek, _elm_lang$core$Date$Mon, date));
+			case 'Tuesday':
+				return A3(
+					_justinmimbs$elm_date_extra$Date_Extra$fromCalendarDate,
+					y,
+					m,
+					d + A2(_justinmimbs$elm_date_extra$Date_Extra$daysToPreviousDayOfWeek, _elm_lang$core$Date$Tue, date));
+			case 'Wednesday':
+				return A3(
+					_justinmimbs$elm_date_extra$Date_Extra$fromCalendarDate,
+					y,
+					m,
+					d + A2(_justinmimbs$elm_date_extra$Date_Extra$daysToPreviousDayOfWeek, _elm_lang$core$Date$Wed, date));
+			case 'Thursday':
+				return A3(
+					_justinmimbs$elm_date_extra$Date_Extra$fromCalendarDate,
+					y,
+					m,
+					d + A2(_justinmimbs$elm_date_extra$Date_Extra$daysToPreviousDayOfWeek, _elm_lang$core$Date$Thu, date));
+			case 'Friday':
+				return A3(
+					_justinmimbs$elm_date_extra$Date_Extra$fromCalendarDate,
+					y,
+					m,
+					d + A2(_justinmimbs$elm_date_extra$Date_Extra$daysToPreviousDayOfWeek, _elm_lang$core$Date$Fri, date));
+			case 'Saturday':
+				return A3(
+					_justinmimbs$elm_date_extra$Date_Extra$fromCalendarDate,
+					y,
+					m,
+					d + A2(_justinmimbs$elm_date_extra$Date_Extra$daysToPreviousDayOfWeek, _elm_lang$core$Date$Sat, date));
+			default:
+				return A3(
+					_justinmimbs$elm_date_extra$Date_Extra$fromCalendarDate,
+					y,
+					m,
+					d + A2(_justinmimbs$elm_date_extra$Date_Extra$daysToPreviousDayOfWeek, _elm_lang$core$Date$Sun, date));
+		}
+	});
+var _justinmimbs$elm_date_extra$Date_Extra$ceiling = F2(
+	function (interval, date) {
+		var floored = A2(_justinmimbs$elm_date_extra$Date_Extra$floor, interval, date);
+		return _elm_lang$core$Native_Utils.eq(
+			_elm_lang$core$Date$toTime(date),
+			_elm_lang$core$Date$toTime(floored)) ? date : A3(_justinmimbs$elm_date_extra$Date_Extra$add, interval, 1, floored);
+	});
+var _justinmimbs$elm_date_extra$Date_Extra$range = F4(
+	function (interval, step, start, end) {
+		var stepBack = _elm_lang$core$Basics$negate(
+			A2(_elm_lang$core$Basics$max, 1, step));
+		return A5(
+			_justinmimbs$elm_date_extra$Date_Extra$rangeHelp,
+			{ctor: '[]'},
+			interval,
+			stepBack,
+			start,
+			A2(
+				_justinmimbs$elm_date_extra$Date_Extra$ceiling,
+				interval,
+				A3(_justinmimbs$elm_date_extra$Date_Extra$add, interval, stepBack, end)));
+	});
+var _justinmimbs$elm_date_extra$Date_Extra$fromIsoString = function (_p11) {
+	return A2(
+		_elm_lang$core$Maybe$map,
+		_justinmimbs$elm_date_extra$Date_Extra$fromOffsetTime,
+		_justinmimbs$elm_date_extra$Date_Internal_Parse$offsetTimeFromIsoString(_p11));
+};
+var _justinmimbs$elm_date_extra$Date_Extra$fromSpec = F3(
+	function (_p14, _p13, _p12) {
+		var _p15 = _p14;
+		var _p16 = _p13;
+		var _p17 = _p12;
+		return _justinmimbs$elm_date_extra$Date_Extra$fromOffsetTime(
+			{ctor: '_Tuple2', _0: _p15._0, _1: _p17._0 + _p16._0});
+	});
+var _justinmimbs$elm_date_extra$Date_Extra$Offset = function (a) {
+	return {ctor: 'Offset', _0: a};
+};
+var _justinmimbs$elm_date_extra$Date_Extra$utc = _justinmimbs$elm_date_extra$Date_Extra$Offset(
+	_elm_lang$core$Maybe$Just(0));
+var _justinmimbs$elm_date_extra$Date_Extra$offset = function (minutes) {
+	return _justinmimbs$elm_date_extra$Date_Extra$Offset(
+		_elm_lang$core$Maybe$Just(minutes));
+};
+var _justinmimbs$elm_date_extra$Date_Extra$local = _justinmimbs$elm_date_extra$Date_Extra$Offset(_elm_lang$core$Maybe$Nothing);
+var _justinmimbs$elm_date_extra$Date_Extra$TimeMS = function (a) {
+	return {ctor: 'TimeMS', _0: a};
+};
+var _justinmimbs$elm_date_extra$Date_Extra$noTime = _justinmimbs$elm_date_extra$Date_Extra$TimeMS(0);
+var _justinmimbs$elm_date_extra$Date_Extra$atTime = F4(
+	function (hh, mm, ss, ms) {
+		return _justinmimbs$elm_date_extra$Date_Extra$TimeMS(
+			A4(_justinmimbs$elm_date_extra$Date_Internal_Core$msFromTimeParts, hh, mm, ss, ms));
+	});
+var _justinmimbs$elm_date_extra$Date_Extra$DateMS = function (a) {
+	return {ctor: 'DateMS', _0: a};
+};
+var _justinmimbs$elm_date_extra$Date_Extra$calendarDate = F3(
+	function (y, m, d) {
+		return _justinmimbs$elm_date_extra$Date_Extra$DateMS(
+			A3(_justinmimbs$elm_date_extra$Date_Internal_Core$unixTimeFromCalendarDate, y, m, d));
+	});
+var _justinmimbs$elm_date_extra$Date_Extra$ordinalDate = F2(
+	function (y, d) {
+		return _justinmimbs$elm_date_extra$Date_Extra$DateMS(
+			A2(_justinmimbs$elm_date_extra$Date_Internal_Core$unixTimeFromOrdinalDate, y, d));
+	});
+var _justinmimbs$elm_date_extra$Date_Extra$weekDate = F3(
+	function (y, w, d) {
+		return _justinmimbs$elm_date_extra$Date_Extra$DateMS(
+			A3(_justinmimbs$elm_date_extra$Date_Internal_Core$unixTimeFromWeekDate, y, w, d));
+	});
+var _justinmimbs$elm_date_extra$Date_Extra$Sunday = {ctor: 'Sunday'};
+var _justinmimbs$elm_date_extra$Date_Extra$Saturday = {ctor: 'Saturday'};
+var _justinmimbs$elm_date_extra$Date_Extra$Friday = {ctor: 'Friday'};
+var _justinmimbs$elm_date_extra$Date_Extra$Thursday = {ctor: 'Thursday'};
+var _justinmimbs$elm_date_extra$Date_Extra$Wednesday = {ctor: 'Wednesday'};
+var _justinmimbs$elm_date_extra$Date_Extra$Tuesday = {ctor: 'Tuesday'};
+var _justinmimbs$elm_date_extra$Date_Extra$Monday = {ctor: 'Monday'};
+var _justinmimbs$elm_date_extra$Date_Extra$Week = {ctor: 'Week'};
+var _justinmimbs$elm_date_extra$Date_Extra$Quarter = {ctor: 'Quarter'};
+var _justinmimbs$elm_date_extra$Date_Extra$Year = {ctor: 'Year'};
+var _justinmimbs$elm_date_extra$Date_Extra$Month = {ctor: 'Month'};
+var _justinmimbs$elm_date_extra$Date_Extra$Day = {ctor: 'Day'};
+var _justinmimbs$elm_date_extra$Date_Extra$diff = F3(
+	function (interval, date1, date2) {
+		var diffMS = _elm_lang$core$Basics$floor(
+			_elm_lang$core$Date$toTime(date2) - _elm_lang$core$Date$toTime(date1));
+		var _p18 = interval;
+		switch (_p18.ctor) {
+			case 'Millisecond':
+				return diffMS;
+			case 'Second':
+				return (diffMS / _justinmimbs$elm_date_extra$Date_Extra_Facts$msPerSecond) | 0;
+			case 'Minute':
+				return (diffMS / _justinmimbs$elm_date_extra$Date_Extra_Facts$msPerMinute) | 0;
+			case 'Hour':
+				return (diffMS / _justinmimbs$elm_date_extra$Date_Extra_Facts$msPerHour) | 0;
+			case 'Day':
+				return (diffMS / _justinmimbs$elm_date_extra$Date_Extra_Facts$msPerDay) | 0;
+			case 'Month':
+				return A2(_justinmimbs$elm_date_extra$Date_Extra$diffMonth, date1, date2);
+			case 'Year':
+				return (A2(_justinmimbs$elm_date_extra$Date_Extra$diffMonth, date1, date2) / 12) | 0;
+			case 'Quarter':
+				return (A2(_justinmimbs$elm_date_extra$Date_Extra$diffMonth, date1, date2) / 3) | 0;
+			case 'Week':
+				return (A3(_justinmimbs$elm_date_extra$Date_Extra$diff, _justinmimbs$elm_date_extra$Date_Extra$Day, date1, date2) / 7) | 0;
+			default:
+				var _p19 = _p18;
+				return (A3(
+					_justinmimbs$elm_date_extra$Date_Extra$diff,
+					_justinmimbs$elm_date_extra$Date_Extra$Day,
+					A2(_justinmimbs$elm_date_extra$Date_Extra$floor, _p19, date1),
+					A2(_justinmimbs$elm_date_extra$Date_Extra$floor, _p19, date2)) / 7) | 0;
+		}
+	});
+var _justinmimbs$elm_date_extra$Date_Extra$Hour = {ctor: 'Hour'};
+var _justinmimbs$elm_date_extra$Date_Extra$Minute = {ctor: 'Minute'};
+var _justinmimbs$elm_date_extra$Date_Extra$equalBy = F3(
+	function (interval, date1, date2) {
+		equalBy:
+		while (true) {
+			var _p20 = interval;
+			switch (_p20.ctor) {
+				case 'Millisecond':
+					return _elm_lang$core$Native_Utils.eq(
+						_elm_lang$core$Date$toTime(date1),
+						_elm_lang$core$Date$toTime(date2));
+				case 'Second':
+					return _elm_lang$core$Native_Utils.eq(
+						_elm_lang$core$Date$second(date1),
+						_elm_lang$core$Date$second(date2)) && A3(_justinmimbs$elm_date_extra$Date_Extra$equalBy, _justinmimbs$elm_date_extra$Date_Extra$Minute, date1, date2);
+				case 'Minute':
+					return _elm_lang$core$Native_Utils.eq(
+						_elm_lang$core$Date$minute(date1),
+						_elm_lang$core$Date$minute(date2)) && A3(_justinmimbs$elm_date_extra$Date_Extra$equalBy, _justinmimbs$elm_date_extra$Date_Extra$Hour, date1, date2);
+				case 'Hour':
+					return _elm_lang$core$Native_Utils.eq(
+						_elm_lang$core$Date$hour(date1),
+						_elm_lang$core$Date$hour(date2)) && A3(_justinmimbs$elm_date_extra$Date_Extra$equalBy, _justinmimbs$elm_date_extra$Date_Extra$Day, date1, date2);
+				case 'Day':
+					return _elm_lang$core$Native_Utils.eq(
+						_elm_lang$core$Date$day(date1),
+						_elm_lang$core$Date$day(date2)) && A3(_justinmimbs$elm_date_extra$Date_Extra$equalBy, _justinmimbs$elm_date_extra$Date_Extra$Month, date1, date2);
+				case 'Month':
+					return _elm_lang$core$Native_Utils.eq(
+						_elm_lang$core$Date$month(date1),
+						_elm_lang$core$Date$month(date2)) && A3(_justinmimbs$elm_date_extra$Date_Extra$equalBy, _justinmimbs$elm_date_extra$Date_Extra$Year, date1, date2);
+				case 'Year':
+					return _elm_lang$core$Native_Utils.eq(
+						_elm_lang$core$Date$year(date1),
+						_elm_lang$core$Date$year(date2));
+				case 'Quarter':
+					return _elm_lang$core$Native_Utils.eq(
+						_justinmimbs$elm_date_extra$Date_Extra$quarter(date1),
+						_justinmimbs$elm_date_extra$Date_Extra$quarter(date2)) && A3(_justinmimbs$elm_date_extra$Date_Extra$equalBy, _justinmimbs$elm_date_extra$Date_Extra$Year, date1, date2);
+				case 'Week':
+					return _elm_lang$core$Native_Utils.eq(
+						_justinmimbs$elm_date_extra$Date_Extra$weekNumber(date1),
+						_justinmimbs$elm_date_extra$Date_Extra$weekNumber(date2)) && _elm_lang$core$Native_Utils.eq(
+						_justinmimbs$elm_date_extra$Date_Extra$weekYear(date1),
+						_justinmimbs$elm_date_extra$Date_Extra$weekYear(date2));
+				default:
+					var _p21 = _p20;
+					var _v15 = _justinmimbs$elm_date_extra$Date_Extra$Day,
+						_v16 = A2(_justinmimbs$elm_date_extra$Date_Extra$floor, _p21, date1),
+						_v17 = A2(_justinmimbs$elm_date_extra$Date_Extra$floor, _p21, date2);
+					interval = _v15;
+					date1 = _v16;
+					date2 = _v17;
+					continue equalBy;
+			}
+		}
+	});
+var _justinmimbs$elm_date_extra$Date_Extra$Second = {ctor: 'Second'};
+var _justinmimbs$elm_date_extra$Date_Extra$Millisecond = {ctor: 'Millisecond'};
+
+var _gampleman$elm_visualization$Visualization_Scale_Time$tickFormat = F3(
+	function (_p1, _p0, date) {
+		var time = _elm_lang$core$Date$toTime(date);
+		var significant = function (interval) {
+			return _elm_lang$core$Native_Utils.cmp(
+				_elm_lang$core$Date$toTime(
+					A2(_justinmimbs$elm_date_extra$Date_Extra$floor, interval, date)),
+				time) < 0;
+		};
+		return significant(_justinmimbs$elm_date_extra$Date_Extra$Second) ? A2(_justinmimbs$elm_date_extra$Date_Extra$toFormattedString, '.SSS', date) : (significant(_justinmimbs$elm_date_extra$Date_Extra$Minute) ? A2(_justinmimbs$elm_date_extra$Date_Extra$toFormattedString, ':ss', date) : (significant(_justinmimbs$elm_date_extra$Date_Extra$Hour) ? A2(_justinmimbs$elm_date_extra$Date_Extra$toFormattedString, 'hh:mm', date) : (significant(_justinmimbs$elm_date_extra$Date_Extra$Day) ? A2(_justinmimbs$elm_date_extra$Date_Extra$toFormattedString, 'hh a', date) : (significant(_justinmimbs$elm_date_extra$Date_Extra$Month) ? A2(_justinmimbs$elm_date_extra$Date_Extra$toFormattedString, 'dd MMM', date) : (significant(_justinmimbs$elm_date_extra$Date_Extra$Year) ? A2(_justinmimbs$elm_date_extra$Date_Extra$toFormattedString, 'MMMM', date) : A2(_justinmimbs$elm_date_extra$Date_Extra$toFormattedString, 'yyyy', date))))));
+	});
+var _gampleman$elm_visualization$Visualization_Scale_Time$timeLength = function (interval) {
+	var _p2 = interval;
+	switch (_p2.ctor) {
+		case 'Millisecond':
+			return 1;
+		case 'Second':
+			return 1000;
+		case 'Minute':
+			return 60 * 1000;
+		case 'Hour':
+			return (60 * 60) * 1000;
+		case 'Day':
+			return ((24 * 60) * 60) * 1000;
+		case 'Month':
+			return (((30 * 24) * 60) * 60) * 1000;
+		case 'Year':
+			return ((((365 * 30) * 24) * 60) * 60) * 1000;
+		case 'Quarter':
+			return ((((4 * 30) * 24) * 60) * 60) * 1000;
+		case 'Week':
+			return (((7 * 24) * 60) * 60) * 1000;
+		default:
+			return 0;
+	}
+};
+var _gampleman$elm_visualization$Visualization_Scale_Time$findInterval = F2(
+	function (target, intervals) {
+		findInterval:
+		while (true) {
+			var _p3 = intervals;
+			if (_p3.ctor === '[]') {
+				return {ctor: '_Tuple2', _0: _justinmimbs$elm_date_extra$Date_Extra$Year, _1: 1};
+			} else {
+				if (((_p3._0.ctor === '_Tuple2') && (_p3._1.ctor === '::')) && (_p3._1._0.ctor === '_Tuple2')) {
+					var _p7 = _p3._1._0._1;
+					var _p6 = _p3._0._1;
+					var _p5 = _p3._1._0._0;
+					var _p4 = _p3._0._0;
+					var ratio_ = (_p7 * _gampleman$elm_visualization$Visualization_Scale_Time$timeLength(_p5)) / target;
+					var ratio = target / (_p6 * _gampleman$elm_visualization$Visualization_Scale_Time$timeLength(_p4));
+					if (_elm_lang$core$Native_Utils.cmp(ratio, ratio_) < 0) {
+						return {ctor: '_Tuple2', _0: _p4, _1: _p6};
+					} else {
+						var _v2 = target,
+							_v3 = {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: _p5, _1: _p7},
+							_1: _p3._1._1
+						};
+						target = _v2;
+						intervals = _v3;
+						continue findInterval;
+					}
+				} else {
+					return _p3._0;
+				}
+			}
+		}
+	});
+var _gampleman$elm_visualization$Visualization_Scale_Time$tickIntervals = {
+	ctor: '::',
+	_0: {ctor: '_Tuple2', _0: _justinmimbs$elm_date_extra$Date_Extra$Second, _1: 1},
+	_1: {
+		ctor: '::',
+		_0: {ctor: '_Tuple2', _0: _justinmimbs$elm_date_extra$Date_Extra$Second, _1: 5},
+		_1: {
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: _justinmimbs$elm_date_extra$Date_Extra$Second, _1: 15},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: _justinmimbs$elm_date_extra$Date_Extra$Second, _1: 30},
+				_1: {
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: _justinmimbs$elm_date_extra$Date_Extra$Minute, _1: 1},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: _justinmimbs$elm_date_extra$Date_Extra$Minute, _1: 5},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: _justinmimbs$elm_date_extra$Date_Extra$Minute, _1: 15},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: _justinmimbs$elm_date_extra$Date_Extra$Minute, _1: 30},
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: _justinmimbs$elm_date_extra$Date_Extra$Hour, _1: 1},
+									_1: {
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: _justinmimbs$elm_date_extra$Date_Extra$Hour, _1: 3},
+										_1: {
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: _justinmimbs$elm_date_extra$Date_Extra$Hour, _1: 6},
+											_1: {
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: _justinmimbs$elm_date_extra$Date_Extra$Hour, _1: 12},
+												_1: {
+													ctor: '::',
+													_0: {ctor: '_Tuple2', _0: _justinmimbs$elm_date_extra$Date_Extra$Day, _1: 1},
+													_1: {
+														ctor: '::',
+														_0: {ctor: '_Tuple2', _0: _justinmimbs$elm_date_extra$Date_Extra$Day, _1: 2},
+														_1: {
+															ctor: '::',
+															_0: {ctor: '_Tuple2', _0: _justinmimbs$elm_date_extra$Date_Extra$Week, _1: 1},
+															_1: {
+																ctor: '::',
+																_0: {ctor: '_Tuple2', _0: _justinmimbs$elm_date_extra$Date_Extra$Month, _1: 1},
+																_1: {
+																	ctor: '::',
+																	_0: {ctor: '_Tuple2', _0: _justinmimbs$elm_date_extra$Date_Extra$Month, _1: 3},
+																	_1: {
+																		ctor: '::',
+																		_0: {ctor: '_Tuple2', _0: _justinmimbs$elm_date_extra$Date_Extra$Year, _1: 1},
+																		_1: {ctor: '[]'}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+};
+var _gampleman$elm_visualization$Visualization_Scale_Time$interpolate = F2(
+	function (a, b) {
+		return A2(_gampleman$elm_visualization$Visualization_Scale_Internal$interpolateFloat, a, b);
+	});
+var _gampleman$elm_visualization$Visualization_Scale_Time$deinterpolate = _gampleman$elm_visualization$Visualization_Scale_Linear$deinterpolate;
+var _gampleman$elm_visualization$Visualization_Scale_Time$rangeExtent = F2(
+	function (d, r) {
+		return r;
+	});
+var _gampleman$elm_visualization$Visualization_Scale_Time$toTime = function (_p8) {
+	var _p9 = _p8;
+	return {
+		ctor: '_Tuple2',
+		_0: _elm_lang$core$Date$toTime(_p9._0),
+		_1: _elm_lang$core$Date$toTime(_p9._1)
+	};
+};
+var _gampleman$elm_visualization$Visualization_Scale_Time$convert = F2(
+	function (domain, range) {
+		return A4(
+			_gampleman$elm_visualization$Visualization_Scale_Internal$bimap,
+			_gampleman$elm_visualization$Visualization_Scale_Time$toTime(domain),
+			range,
+			F3(
+				function (d, r, v) {
+					return A3(
+						_gampleman$elm_visualization$Visualization_Scale_Time$deinterpolate,
+						d,
+						r,
+						_elm_lang$core$Date$toTime(v));
+				}),
+			_gampleman$elm_visualization$Visualization_Scale_Internal$interpolateFloat);
+	});
+var _gampleman$elm_visualization$Visualization_Scale_Time$invert = F2(
+	function (domain, range) {
+		return A4(
+			_gampleman$elm_visualization$Visualization_Scale_Internal$bimap,
+			range,
+			_gampleman$elm_visualization$Visualization_Scale_Time$toTime(domain),
+			_gampleman$elm_visualization$Visualization_Scale_Time$deinterpolate,
+			F3(
+				function (d, r, v) {
+					return _elm_lang$core$Date$fromTime(
+						A3(_gampleman$elm_visualization$Visualization_Scale_Time$interpolate, d, r, v));
+				}));
+	});
+var _gampleman$elm_visualization$Visualization_Scale_Time$ticks = F2(
+	function (domain, count) {
+		var _p10 = _gampleman$elm_visualization$Visualization_Scale_Time$toTime(domain);
+		var start = _p10._0;
+		var end = _p10._1;
+		var target = _elm_lang$core$Basics$abs(start - end) / _elm_lang$core$Basics$toFloat(count);
+		var _p11 = A2(_gampleman$elm_visualization$Visualization_Scale_Time$findInterval, target, _gampleman$elm_visualization$Visualization_Scale_Time$tickIntervals);
+		var interval = _p11._0;
+		var step = _p11._1;
+		return A4(
+			_justinmimbs$elm_date_extra$Date_Extra$range,
+			interval,
+			_elm_lang$core$Basics$round(step),
+			_elm_lang$core$Date$fromTime(start),
+			_elm_lang$core$Date$fromTime(end));
+	});
+var _gampleman$elm_visualization$Visualization_Scale_Time$nice = F2(
+	function (domain, count) {
+		var _p12 = _gampleman$elm_visualization$Visualization_Scale_Time$toTime(domain);
+		var start = _p12._0;
+		var end = _p12._1;
+		var target = _elm_lang$core$Basics$abs(start - end) / _elm_lang$core$Basics$toFloat(count);
+		var _p13 = A2(_gampleman$elm_visualization$Visualization_Scale_Time$findInterval, target, _gampleman$elm_visualization$Visualization_Scale_Time$tickIntervals);
+		var interval = _p13._0;
+		return {
+			ctor: '_Tuple2',
+			_0: A2(
+				_justinmimbs$elm_date_extra$Date_Extra$floor,
+				interval,
+				_elm_lang$core$Date$fromTime(start)),
+			_1: A2(
+				_justinmimbs$elm_date_extra$Date_Extra$ceiling,
+				interval,
+				_elm_lang$core$Date$fromTime(end))
+		};
+	});
+
+var _gampleman$elm_visualization$Visualization_Scale$category20c = _gampleman$elm_visualization$Visualization_Scale_Colors$cat20c;
+var _gampleman$elm_visualization$Visualization_Scale$category20b = _gampleman$elm_visualization$Visualization_Scale_Colors$cat20b;
+var _gampleman$elm_visualization$Visualization_Scale$category20a = _gampleman$elm_visualization$Visualization_Scale_Colors$cat20a;
+var _gampleman$elm_visualization$Visualization_Scale$category10 = _gampleman$elm_visualization$Visualization_Scale_Colors$cat10;
+var _gampleman$elm_visualization$Visualization_Scale$tickFormat = function (_p0) {
+	var _p1 = _p0;
+	var _p2 = _p1._0;
+	return _p2.tickFormat(_p2.domain);
+};
+var _gampleman$elm_visualization$Visualization_Scale$ticks = F2(
+	function (_p3, count) {
+		var _p4 = _p3;
+		var _p5 = _p4._0;
+		return A2(_p5.ticks, _p5.domain, count);
+	});
+var _gampleman$elm_visualization$Visualization_Scale$rangeExtent = function (_p6) {
+	var _p7 = _p6;
+	var _p8 = _p7._0;
+	return A2(_p8.rangeExtent, _p8.domain, _p8.range);
+};
+var _gampleman$elm_visualization$Visualization_Scale$range = function (_p9) {
+	var _p10 = _p9;
+	return _p10._0.range;
+};
+var _gampleman$elm_visualization$Visualization_Scale$domain = function (_p11) {
+	var _p12 = _p11;
+	return _p12._0.domain;
+};
+var _gampleman$elm_visualization$Visualization_Scale$invertExtent = F2(
+	function (_p13, value) {
+		var _p14 = _p13;
+		var _p15 = _p14._0;
+		return A3(_p15.invertExtent, _p15.domain, _p15.range, value);
+	});
+var _gampleman$elm_visualization$Visualization_Scale$invert = F2(
+	function (_p16, value) {
+		var _p17 = _p16;
+		var _p18 = _p17._0;
+		return A3(_p18.invert, _p18.domain, _p18.range, value);
+	});
+var _gampleman$elm_visualization$Visualization_Scale$convert = F2(
+	function (_p19, value) {
+		var _p20 = _p19;
+		var _p21 = _p20._0;
+		return A3(_p21.convert, _p21.domain, _p21.range, value);
+	});
+var _gampleman$elm_visualization$Visualization_Scale$bandwidth = function (_p22) {
+	var _p23 = _p22;
+	return _p23._0.bandwidth;
+};
+var _gampleman$elm_visualization$Visualization_Scale$defaultBandConfig = {paddingInner: 0.0, paddingOuter: 0.0, align: 0.5};
+var _gampleman$elm_visualization$Visualization_Scale$plasmaInterpolator = _gampleman$elm_visualization$Visualization_Scale_Colors$plasma;
+var _gampleman$elm_visualization$Visualization_Scale$magmaInterpolator = _gampleman$elm_visualization$Visualization_Scale_Colors$magma;
+var _gampleman$elm_visualization$Visualization_Scale$infernoInterpolator = _gampleman$elm_visualization$Visualization_Scale_Colors$inferno;
+var _gampleman$elm_visualization$Visualization_Scale$viridisInterpolator = _gampleman$elm_visualization$Visualization_Scale_Colors$viridis;
+var _gampleman$elm_visualization$Visualization_Scale$BandConfig = F3(
+	function (a, b, c) {
+		return {paddingInner: a, paddingOuter: b, align: c};
+	});
+var _gampleman$elm_visualization$Visualization_Scale$Scale = function (a) {
+	return {ctor: 'Scale', _0: a};
+};
+var _gampleman$elm_visualization$Visualization_Scale$linear = F2(
+	function (domain, range) {
+		return _gampleman$elm_visualization$Visualization_Scale$Scale(
+			{domain: domain, range: range, convert: _gampleman$elm_visualization$Visualization_Scale_Linear$convert, invert: _gampleman$elm_visualization$Visualization_Scale_Linear$invert, ticks: _gampleman$elm_visualization$Visualization_Scale_Linear$ticks, tickFormat: _gampleman$elm_visualization$Visualization_Scale_Linear$tickFormat, nice: _gampleman$elm_visualization$Visualization_Scale_Linear$nice, rangeExtent: _gampleman$elm_visualization$Visualization_Scale_Linear$rangeExtent});
+	});
+var _gampleman$elm_visualization$Visualization_Scale$identity = A2(
+	_gampleman$elm_visualization$Visualization_Scale$linear,
+	{ctor: '_Tuple2', _0: 0, _1: 1},
+	{ctor: '_Tuple2', _0: 0, _1: 1});
+var _gampleman$elm_visualization$Visualization_Scale$log = F3(
+	function (base, domain, range) {
+		return _gampleman$elm_visualization$Visualization_Scale$Scale(
+			{
+				domain: domain,
+				range: range,
+				convert: _gampleman$elm_visualization$Visualization_Scale_Log$convert,
+				invert: _gampleman$elm_visualization$Visualization_Scale_Log$invert,
+				ticks: _gampleman$elm_visualization$Visualization_Scale_Log$ticks(base),
+				tickFormat: _gampleman$elm_visualization$Visualization_Scale_Log$tickFormat,
+				nice: _gampleman$elm_visualization$Visualization_Scale_Log$nice(base),
+				rangeExtent: _gampleman$elm_visualization$Visualization_Scale_Log$rangeExtent
+			});
+	});
+var _gampleman$elm_visualization$Visualization_Scale$time = F2(
+	function (domain, range) {
+		return _gampleman$elm_visualization$Visualization_Scale$Scale(
+			{domain: domain, range: range, convert: _gampleman$elm_visualization$Visualization_Scale_Time$convert, invert: _gampleman$elm_visualization$Visualization_Scale_Time$invert, ticks: _gampleman$elm_visualization$Visualization_Scale_Time$ticks, tickFormat: _gampleman$elm_visualization$Visualization_Scale_Time$tickFormat, nice: _gampleman$elm_visualization$Visualization_Scale_Time$nice, rangeExtent: _gampleman$elm_visualization$Visualization_Scale_Time$rangeExtent});
+	});
+var _gampleman$elm_visualization$Visualization_Scale$sequential = F2(
+	function (domain, interpolator) {
+		return _gampleman$elm_visualization$Visualization_Scale$Scale(
+			{domain: domain, range: interpolator, convert: _gampleman$elm_visualization$Visualization_Scale_Sequential$convert});
+	});
+var _gampleman$elm_visualization$Visualization_Scale$quantize = F2(
+	function (domain, range) {
+		return _gampleman$elm_visualization$Visualization_Scale$Scale(
+			{domain: domain, range: range, convert: _gampleman$elm_visualization$Visualization_Scale_Quantize$convert, invertExtent: _gampleman$elm_visualization$Visualization_Scale_Quantize$invertExtent, ticks: _gampleman$elm_visualization$Visualization_Scale_Quantize$ticks, tickFormat: _gampleman$elm_visualization$Visualization_Scale_Quantize$tickFormat, nice: _gampleman$elm_visualization$Visualization_Scale_Quantize$nice, rangeExtent: _gampleman$elm_visualization$Visualization_Scale_Quantize$rangeExtent});
+	});
+var _gampleman$elm_visualization$Visualization_Scale$ordinalImplicit = F2(
+	function (domain, range) {
+		return _gampleman$elm_visualization$Visualization_Scale$Scale(
+			{
+				domain: domain,
+				range: range,
+				convert: function (a) {
+					return _elm_lang$core$Native_Utils.crash(
+						'Visualization.Scale',
+						{
+							start: {line: 497, column: 27},
+							end: {line: 497, column: 38}
+						})('not implemented');
+				}
+			});
+	});
+var _gampleman$elm_visualization$Visualization_Scale$ordinal = F2(
+	function (domain, range) {
+		return _gampleman$elm_visualization$Visualization_Scale$Scale(
+			{domain: domain, range: range, convert: _gampleman$elm_visualization$Visualization_Scale_Ordinal$convert});
+	});
+var _gampleman$elm_visualization$Visualization_Scale$band = F3(
+	function (config, domain, range) {
+		return _gampleman$elm_visualization$Visualization_Scale$Scale(
+			{
+				domain: domain,
+				range: range,
+				convert: _gampleman$elm_visualization$Visualization_Scale_Band$convert(config),
+				bandwidth: A3(_gampleman$elm_visualization$Visualization_Scale_Band$bandwidth, config, domain, range)
+			});
+	});
+var _gampleman$elm_visualization$Visualization_Scale$toRenderable = function (_p24) {
+	var _p25 = _p24;
+	return _gampleman$elm_visualization$Visualization_Scale$Scale(
+		{
+			ticks: F2(
+				function (domain, _p26) {
+					return domain;
+				}),
+			domain: _p25._0.domain,
+			tickFormat: F2(
+				function (_p28, _p27) {
+					return _elm_lang$core$Basics$toString;
+				}),
+			convert: F3(
+				function (domain, range, value) {
+					return A3(_p25._0.convert, domain, range, value) + (A2(_elm_lang$core$Basics$max, _p25._0.bandwidth - 1, 0) / 2);
+				}),
+			range: _p25._0.range,
+			rangeExtent: F2(
+				function (_p29, range) {
+					return range;
+				})
+		});
+};
+var _gampleman$elm_visualization$Visualization_Scale$clamp = function (_p30) {
+	var _p31 = _p30;
+	var convert_ = F3(
+		function (_p32, range, value) {
+			var _p33 = _p32;
+			var _p35 = _p33._0;
+			var _p34 = _p33._1;
+			return A3(
+				_p31._0.convert,
+				{ctor: '_Tuple2', _0: _p35, _1: _p34},
+				range,
+				A3(
+					_elm_lang$core$Basics$clamp,
+					A2(_elm_lang$core$Basics$min, _p35, _p34),
+					A2(_elm_lang$core$Basics$max, _p35, _p34),
+					value));
+		});
+	return _gampleman$elm_visualization$Visualization_Scale$Scale(
+		_elm_lang$core$Native_Utils.update(
+			_p31._0,
+			{convert: convert_}));
+};
+var _gampleman$elm_visualization$Visualization_Scale$nice = F2(
+	function (_p36, count) {
+		var _p37 = _p36;
+		return _gampleman$elm_visualization$Visualization_Scale$Scale(
+			_elm_lang$core$Native_Utils.update(
+				_p37._0,
+				{
+					domain: A2(_p37._0.nice, _p37._0.domain, count)
+				}));
+	});
+
+var _gampleman$elm_visualization$Visualization_Axis$Options = F7(
+	function (a, b, c, d, e, f, g) {
+		return {orientation: a, ticks: b, tickFormat: c, tickCount: d, tickSizeInner: e, tickSizeOuter: f, tickPadding: g};
+	});
+var _gampleman$elm_visualization$Visualization_Axis$Bottom = {ctor: 'Bottom'};
+var _gampleman$elm_visualization$Visualization_Axis$Top = {ctor: 'Top'};
+var _gampleman$elm_visualization$Visualization_Axis$Right = {ctor: 'Right'};
+var _gampleman$elm_visualization$Visualization_Axis$Left = {ctor: 'Left'};
+var _gampleman$elm_visualization$Visualization_Axis$defaultOptions = {orientation: _gampleman$elm_visualization$Visualization_Axis$Left, ticks: _elm_lang$core$Maybe$Nothing, tickFormat: _elm_lang$core$Maybe$Nothing, tickCount: 10, tickSizeInner: 6, tickSizeOuter: 6, tickPadding: 3};
+var _gampleman$elm_visualization$Visualization_Axis$axis = F2(
+	function (opts, scale) {
+		var verticalAttrs = {
+			ctor: '_Tuple6',
+			_0: function (_p0) {
+				return _elm_lang$svg$Svg_Attributes$y(
+					_elm_lang$core$Basics$toString(_p0));
+			},
+			_1: function (_p1) {
+				return _elm_lang$svg$Svg_Attributes$x(
+					_elm_lang$core$Basics$toString(_p1));
+			},
+			_2: function (_p2) {
+				return _elm_lang$svg$Svg_Attributes$y1(
+					_elm_lang$core$Basics$toString(_p2));
+			},
+			_3: function (_p3) {
+				return _elm_lang$svg$Svg_Attributes$y2(
+					_elm_lang$core$Basics$toString(_p3));
+			},
+			_4: function (_p4) {
+				return _elm_lang$svg$Svg_Attributes$x1(
+					_elm_lang$core$Basics$toString(_p4));
+			},
+			_5: function (_p5) {
+				return _elm_lang$svg$Svg_Attributes$x2(
+					_elm_lang$core$Basics$toString(_p5));
+			}
+		};
+		var horizontalAttrs = {
+			ctor: '_Tuple6',
+			_0: function (_p6) {
+				return _elm_lang$svg$Svg_Attributes$x(
+					_elm_lang$core$Basics$toString(_p6));
+			},
+			_1: function (_p7) {
+				return _elm_lang$svg$Svg_Attributes$y(
+					_elm_lang$core$Basics$toString(_p7));
+			},
+			_2: function (_p8) {
+				return _elm_lang$svg$Svg_Attributes$x1(
+					_elm_lang$core$Basics$toString(_p8));
+			},
+			_3: function (_p9) {
+				return _elm_lang$svg$Svg_Attributes$x2(
+					_elm_lang$core$Basics$toString(_p9));
+			},
+			_4: function (_p10) {
+				return _elm_lang$svg$Svg_Attributes$y1(
+					_elm_lang$core$Basics$toString(_p10));
+			},
+			_5: function (_p11) {
+				return _elm_lang$svg$Svg_Attributes$y2(
+					_elm_lang$core$Basics$toString(_p11));
+			}
+		};
+		var position = _gampleman$elm_visualization$Visualization_Scale$convert(scale);
+		var translateX = function (point) {
+			return A2(
+				_elm_lang$core$Basics_ops['++'],
+				'translate(',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$Basics$toString(
+						position(point)),
+					', 0)'));
+		};
+		var translateY = function (point) {
+			return A2(
+				_elm_lang$core$Basics_ops['++'],
+				'translate(0, ',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$Basics$toString(
+						position(point)),
+					')'));
+		};
+		var _p12 = function () {
+			var _p13 = opts.orientation;
+			switch (_p13.ctor) {
+				case 'Left':
+					return {ctor: '_Tuple5', _0: -1, _1: '0.32em', _2: 'end', _3: translateY, _4: horizontalAttrs};
+				case 'Top':
+					return {ctor: '_Tuple5', _0: -1, _1: '0em', _2: 'middle', _3: translateX, _4: verticalAttrs};
+				case 'Right':
+					return {ctor: '_Tuple5', _0: 1, _1: '0.32em', _2: 'start', _3: translateY, _4: horizontalAttrs};
+				default:
+					return {ctor: '_Tuple5', _0: 1, _1: '0.71em', _2: 'middle', _3: translateX, _4: verticalAttrs};
+			}
+		}();
+		var k = _p12._0;
+		var dy_ = _p12._1;
+		var textAnchorPosition = _p12._2;
+		var translate = _p12._3;
+		var x = _p12._4._0;
+		var y = _p12._4._1;
+		var x1 = _p12._4._2;
+		var x2 = _p12._4._3;
+		var y1 = _p12._4._4;
+		var y2 = _p12._4._5;
+		var rangeExtent = _gampleman$elm_visualization$Visualization_Scale$rangeExtent(scale);
+		var range0 = _elm_lang$core$Tuple$first(rangeExtent) + 0.5;
+		var range1 = _elm_lang$core$Tuple$second(rangeExtent) + 0.5;
+		var domainLine = (_elm_lang$core$Native_Utils.eq(opts.orientation, _gampleman$elm_visualization$Visualization_Axis$Left) || _elm_lang$core$Native_Utils.eq(opts.orientation, _gampleman$elm_visualization$Visualization_Axis$Right)) ? A2(
+			_elm_lang$core$Basics_ops['++'],
+			'M',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_elm_lang$core$Basics$toString(k * opts.tickSizeOuter),
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					',',
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_elm_lang$core$Basics$toString(range0),
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							'H0.5V',
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								_elm_lang$core$Basics$toString(range1),
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									'H',
+									_elm_lang$core$Basics$toString(k * opts.tickSizeOuter)))))))) : A2(
+			_elm_lang$core$Basics_ops['++'],
+			'M',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_elm_lang$core$Basics$toString(range0),
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					',',
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_elm_lang$core$Basics$toString(k * opts.tickSizeOuter),
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							'V0.5H',
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								_elm_lang$core$Basics$toString(range1),
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									'V',
+									_elm_lang$core$Basics$toString(k * opts.tickSizeOuter))))))));
+		var spacing = A2(_elm_lang$core$Basics$max, opts.tickSizeInner, 0) + opts.tickPadding;
+		var format = A2(
+			_elm_lang$core$Maybe$withDefault,
+			A2(_gampleman$elm_visualization$Visualization_Scale$tickFormat, scale, opts.tickCount),
+			opts.tickFormat);
+		var drawTick = function (tick) {
+			return A2(
+				_elm_lang$svg$Svg$g,
+				{
+					ctor: '::',
+					_0: _elm_lang$svg$Svg_Attributes$class('tick'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$transform(
+							translate(tick)),
+						_1: {ctor: '[]'}
+					}
+				},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$svg$Svg$line,
+						{
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$stroke('#000'),
+							_1: {
+								ctor: '::',
+								_0: x2(k * opts.tickSizeInner),
+								_1: {
+									ctor: '::',
+									_0: y1(0.5),
+									_1: {
+										ctor: '::',
+										_0: y2(0.5),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$svg$Svg$text_,
+							{
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$fill('#000'),
+								_1: {
+									ctor: '::',
+									_0: x(k * spacing),
+									_1: {
+										ctor: '::',
+										_0: y(0.5),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$svg$Svg_Attributes$dy(dy_),
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$svg$Svg$text(
+									format(tick)),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}
+				});
+		};
+		var ticks = A2(
+			_elm_lang$core$Maybe$withDefault,
+			A2(_gampleman$elm_visualization$Visualization_Scale$ticks, scale, opts.tickCount),
+			opts.ticks);
+		return A2(
+			_elm_lang$svg$Svg$g,
+			{
+				ctor: '::',
+				_0: _elm_lang$svg$Svg_Attributes$fill('none'),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$svg$Svg_Attributes$fontSize('10'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$fontFamily('sans-serif'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$textAnchor(textAnchorPosition),
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$svg$Svg$path,
+					{
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$class('domain'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$stroke('#000'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$d(domainLine),
+								_1: {ctor: '[]'}
+							}
+						}
+					},
+					{ctor: '[]'}),
+				_1: A2(_elm_lang$core$List$map, drawTick, ticks)
+			});
+	});
+
 var _lukewestby$elm_http_builder$HttpBuilder$replace = F2(
 	function (old, $new) {
 		return function (_p0) {
@@ -14258,7 +22528,7 @@ var _lukewestby$elm_http_builder$HttpBuilder$RequestBuilder = F9(
 	});
 
 var _shohamh$learnmath_frontend$Config$serverPort = '8080';
-var _shohamh$learnmath_frontend$Config$serverAddress = '213.57.236.76';
+var _shohamh$learnmath_frontend$Config$serverAddress = 'localhost';
 var _shohamh$learnmath_frontend$Config$protocol = 'https';
 var _shohamh$learnmath_frontend$Config$server = A2(
 	_elm_lang$core$Basics_ops['++'],
@@ -15014,6 +23284,448 @@ var _shohamh$learnmath_frontend$Page_AddQuestion$view = F2(
 			});
 	});
 
+var _shohamh$learnmath_frontend$SampleData$timeSeries = {
+	ctor: '::',
+	_0: {
+		ctor: '_Tuple2',
+		_0: _elm_lang$core$Date$fromTime(1448928000000),
+		_1: 2.5
+	},
+	_1: {
+		ctor: '::',
+		_0: {
+			ctor: '_Tuple2',
+			_0: _elm_lang$core$Date$fromTime(1451606400000),
+			_1: 2
+		},
+		_1: {
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: _elm_lang$core$Date$fromTime(1452211200000),
+				_1: 3.5
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Date$fromTime(1452816000000),
+					_1: 2
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Date$fromTime(1453420800000),
+						_1: 3
+					},
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Date$fromTime(1454284800000),
+							_1: 1
+						},
+						_1: {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: _elm_lang$core$Date$fromTime(1456790400000),
+								_1: 1.2
+							},
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			}
+		}
+	}
+};
+var _shohamh$learnmath_frontend$SampleData$CrimeRate = F9(
+	function (a, b, c, d, e, f, g, h, i) {
+		return {year: a, population: b, murder: c, rape: d, robbery: e, assault: f, burglary: g, larceny: h, motorTheft: i};
+	});
+var _shohamh$learnmath_frontend$SampleData$crimeRates = {
+	ctor: '::',
+	_0: A9(_shohamh$learnmath_frontend$SampleData$CrimeRate, 1994, 260327021, 23326, 102216, 618949, 1113179, 2712774, 7879812, 1539287),
+	_1: {
+		ctor: '::',
+		_0: A9(_shohamh$learnmath_frontend$SampleData$CrimeRate, 1995, 262803276, 21606, 97470, 580509, 1099207, 2593784, 7997710, 1472441),
+		_1: {
+			ctor: '::',
+			_0: A9(_shohamh$learnmath_frontend$SampleData$CrimeRate, 1996, 265228572, 19645, 96252, 535594, 1037049, 2506400, 7904685, 1394238),
+			_1: {
+				ctor: '::',
+				_0: A9(_shohamh$learnmath_frontend$SampleData$CrimeRate, 1997, 267783607, 18208, 96153, 498534, 1023201, 2460526, 7743760, 1354189),
+				_1: {
+					ctor: '::',
+					_0: A9(_shohamh$learnmath_frontend$SampleData$CrimeRate, 1998, 270248003, 16974, 93144, 447186, 976583, 2332735, 7376311, 1242781),
+					_1: {
+						ctor: '::',
+						_0: A9(_shohamh$learnmath_frontend$SampleData$CrimeRate, 1999, 272690813, 15522, 89411, 409371, 911740, 2100739, 6955520, 1152075),
+						_1: {
+							ctor: '::',
+							_0: A9(_shohamh$learnmath_frontend$SampleData$CrimeRate, 2000, 281421906, 15586, 90178, 408016, 911706, 2050992, 6971590, 1160002),
+							_1: {
+								ctor: '::',
+								_0: A9(_shohamh$learnmath_frontend$SampleData$CrimeRate, 2001, 285317559, 16037, 90863, 423557, 909023, 2116531, 7092267, 1228391),
+								_1: {
+									ctor: '::',
+									_0: A9(_shohamh$learnmath_frontend$SampleData$CrimeRate, 2002, 287973924, 16229, 95235, 420806, 891407, 2151252, 7057379, 1246646),
+									_1: {
+										ctor: '::',
+										_0: A9(_shohamh$learnmath_frontend$SampleData$CrimeRate, 2003, 290788976, 16528, 93883, 414235, 859030, 2154834, 7026802, 1261226),
+										_1: {
+											ctor: '::',
+											_0: A9(_shohamh$learnmath_frontend$SampleData$CrimeRate, 2004, 293656842, 16148, 95089, 401470, 847381, 2144446, 6937089, 1237851),
+											_1: {
+												ctor: '::',
+												_0: A9(_shohamh$learnmath_frontend$SampleData$CrimeRate, 2005, 296507061, 16740, 94347, 417438, 862220, 2155448, 6783447, 1235859),
+												_1: {
+													ctor: '::',
+													_0: A9(_shohamh$learnmath_frontend$SampleData$CrimeRate, 2006, 299398484, 17309, 94472, 449246, 874096, 2194993, 6626363, 1198245),
+													_1: {
+														ctor: '::',
+														_0: A9(_shohamh$learnmath_frontend$SampleData$CrimeRate, 2007, 301621157, 17128, 92160, 447324, 866358, 2190198, 6591542, 1100472),
+														_1: {
+															ctor: '::',
+															_0: A9(_shohamh$learnmath_frontend$SampleData$CrimeRate, 2008, 304059724, 16465, 90750, 443563, 843683, 2228887, 6586206, 959059),
+															_1: {
+																ctor: '::',
+																_0: A9(_shohamh$learnmath_frontend$SampleData$CrimeRate, 2009, 307006550, 15399, 89241, 408742, 812514, 2203313, 6338095, 795652),
+																_1: {
+																	ctor: '::',
+																	_0: A9(_shohamh$learnmath_frontend$SampleData$CrimeRate, 2010, 309330219, 14722, 85593, 369089, 781844, 2168459, 6204601, 739565),
+																	_1: {
+																		ctor: '::',
+																		_0: A9(_shohamh$learnmath_frontend$SampleData$CrimeRate, 2011, 311587816, 14661, 84175, 354746, 752423, 2185140, 6151095, 716508),
+																		_1: {
+																			ctor: '::',
+																			_0: A9(_shohamh$learnmath_frontend$SampleData$CrimeRate, 2012, 313873685, 14856, 85141, 355051, 762009, 2109932, 6168874, 723186),
+																			_1: {
+																				ctor: '::',
+																				_0: A9(_shohamh$learnmath_frontend$SampleData$CrimeRate, 2013, 316128839, 14196, 79770, 345031, 724149, 1928465, 6004453, 699594),
+																				_1: {ctor: '[]'}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+};
+
+var _shohamh$learnmath_frontend$Page_Dashboard$update = F3(
+	function (session, msg, model) {
+		var _p0 = msg;
+		return A2(
+			_elm_lang$core$Platform_Cmd_ops['!'],
+			model,
+			{ctor: '[]'});
+	});
+var _shohamh$learnmath_frontend$Page_Dashboard$padding = 30;
+var _shohamh$learnmath_frontend$Page_Dashboard$h = 450;
+var _shohamh$learnmath_frontend$Page_Dashboard$yScale = A2(
+	_gampleman$elm_visualization$Visualization_Scale$linear,
+	{ctor: '_Tuple2', _0: 0, _1: 5},
+	{ctor: '_Tuple2', _0: _shohamh$learnmath_frontend$Page_Dashboard$h - (2 * _shohamh$learnmath_frontend$Page_Dashboard$padding), _1: 0});
+var _shohamh$learnmath_frontend$Page_Dashboard$yAxis = A2(
+	_gampleman$elm_visualization$Visualization_Axis$axis,
+	_elm_lang$core$Native_Utils.update(
+		_gampleman$elm_visualization$Visualization_Axis$defaultOptions,
+		{orientation: _gampleman$elm_visualization$Visualization_Axis$Left, tickCount: 5}),
+	_shohamh$learnmath_frontend$Page_Dashboard$yScale);
+var _shohamh$learnmath_frontend$Page_Dashboard$column = F2(
+	function (xScale, _p1) {
+		var _p2 = _p1;
+		var _p4 = _p2._1;
+		var _p3 = _p2._0;
+		return A2(
+			_elm_lang$svg$Svg$g,
+			{
+				ctor: '::',
+				_0: _elm_lang$svg$Svg_Attributes$class('column'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$svg$Svg$rect,
+					{
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$x(
+							_elm_lang$core$Basics$toString(
+								A2(_gampleman$elm_visualization$Visualization_Scale$convert, xScale, _p3))),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$y(
+								_elm_lang$core$Basics$toString(
+									A2(_gampleman$elm_visualization$Visualization_Scale$convert, _shohamh$learnmath_frontend$Page_Dashboard$yScale, _p4))),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$width(
+									_elm_lang$core$Basics$toString(
+										_gampleman$elm_visualization$Visualization_Scale$bandwidth(xScale))),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$svg$Svg_Attributes$height(
+										_elm_lang$core$Basics$toString(
+											(_shohamh$learnmath_frontend$Page_Dashboard$h - A2(_gampleman$elm_visualization$Visualization_Scale$convert, _shohamh$learnmath_frontend$Page_Dashboard$yScale, _p4)) - (2 * _shohamh$learnmath_frontend$Page_Dashboard$padding))),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					},
+					{ctor: '[]'}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$svg$Svg$text_,
+						{
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$x(
+								_elm_lang$core$Basics$toString(
+									A2(
+										_gampleman$elm_visualization$Visualization_Scale$convert,
+										_gampleman$elm_visualization$Visualization_Scale$toRenderable(xScale),
+										_p3))),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$y(
+									_elm_lang$core$Basics$toString(
+										A2(_gampleman$elm_visualization$Visualization_Scale$convert, _shohamh$learnmath_frontend$Page_Dashboard$yScale, _p4) - 5)),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$svg$Svg_Attributes$textAnchor('middle'),
+									_1: {ctor: '[]'}
+								}
+							}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$svg$Svg$text(
+								_elm_lang$core$Basics$toString(_p4)),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _shohamh$learnmath_frontend$Page_Dashboard$w = 900;
+var _shohamh$learnmath_frontend$Page_Dashboard$xScale = function (model) {
+	return A3(
+		_gampleman$elm_visualization$Visualization_Scale$band,
+		_elm_lang$core$Native_Utils.update(
+			_gampleman$elm_visualization$Visualization_Scale$defaultBandConfig,
+			{paddingInner: 0.1, paddingOuter: 0.2}),
+		A2(_elm_lang$core$List$map, _elm_lang$core$Tuple$first, model),
+		{ctor: '_Tuple2', _0: 0, _1: _shohamh$learnmath_frontend$Page_Dashboard$w - (2 * _shohamh$learnmath_frontend$Page_Dashboard$padding)});
+};
+var _shohamh$learnmath_frontend$Page_Dashboard$xAxis = function (model) {
+	return A2(
+		_gampleman$elm_visualization$Visualization_Axis$axis,
+		_elm_lang$core$Native_Utils.update(
+			_gampleman$elm_visualization$Visualization_Axis$defaultOptions,
+			{
+				orientation: _gampleman$elm_visualization$Visualization_Axis$Bottom,
+				tickFormat: _elm_lang$core$Maybe$Just(
+					_justinmimbs$elm_date_extra$Date_Extra$toFormattedString('dd MMM'))
+			}),
+		_gampleman$elm_visualization$Visualization_Scale$toRenderable(
+			_shohamh$learnmath_frontend$Page_Dashboard$xScale(model)));
+};
+var _shohamh$learnmath_frontend$Page_Dashboard$view = F2(
+	function (session, model) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('dashboard-page'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('container page'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('Student Dashboard'),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('row'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$div,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('col-md-12'),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: A2(
+												_elm_lang$svg$Svg$svg,
+												{
+													ctor: '::',
+													_0: _elm_lang$svg$Svg_Attributes$width(
+														A2(
+															_elm_lang$core$Basics_ops['++'],
+															_elm_lang$core$Basics$toString(_shohamh$learnmath_frontend$Page_Dashboard$w),
+															'px')),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$svg$Svg_Attributes$height(
+															A2(
+																_elm_lang$core$Basics_ops['++'],
+																_elm_lang$core$Basics$toString(_shohamh$learnmath_frontend$Page_Dashboard$h),
+																'px')),
+														_1: {ctor: '[]'}
+													}
+												},
+												{
+													ctor: '::',
+													_0: A2(
+														_elm_lang$svg$Svg$style,
+														{ctor: '[]'},
+														{
+															ctor: '::',
+															_0: _elm_lang$svg$Svg$text('\n            .column rect { fill: rgba(118, 214, 78, 0.8); }\n            .column text { display: none; }\n            .column:hover rect { fill: rgb(118, 214, 78); }\n            .column:hover text { display: inline; }\n          '),
+															_1: {ctor: '[]'}
+														}),
+													_1: {
+														ctor: '::',
+														_0: A2(
+															_elm_lang$svg$Svg$g,
+															{
+																ctor: '::',
+																_0: _elm_lang$svg$Svg_Attributes$transform(
+																	A2(
+																		_elm_lang$core$Basics_ops['++'],
+																		'translate(',
+																		A2(
+																			_elm_lang$core$Basics_ops['++'],
+																			_elm_lang$core$Basics$toString(_shohamh$learnmath_frontend$Page_Dashboard$padding - 1),
+																			A2(
+																				_elm_lang$core$Basics_ops['++'],
+																				', ',
+																				A2(
+																					_elm_lang$core$Basics_ops['++'],
+																					_elm_lang$core$Basics$toString(_shohamh$learnmath_frontend$Page_Dashboard$h - _shohamh$learnmath_frontend$Page_Dashboard$padding),
+																					')'))))),
+																_1: {ctor: '[]'}
+															},
+															{
+																ctor: '::',
+																_0: _shohamh$learnmath_frontend$Page_Dashboard$xAxis(model.dataModel),
+																_1: {ctor: '[]'}
+															}),
+														_1: {
+															ctor: '::',
+															_0: A2(
+																_elm_lang$svg$Svg$g,
+																{
+																	ctor: '::',
+																	_0: _elm_lang$svg$Svg_Attributes$transform(
+																		A2(
+																			_elm_lang$core$Basics_ops['++'],
+																			'translate(',
+																			A2(
+																				_elm_lang$core$Basics_ops['++'],
+																				_elm_lang$core$Basics$toString(_shohamh$learnmath_frontend$Page_Dashboard$padding - 1),
+																				A2(
+																					_elm_lang$core$Basics_ops['++'],
+																					', ',
+																					A2(
+																						_elm_lang$core$Basics_ops['++'],
+																						_elm_lang$core$Basics$toString(_shohamh$learnmath_frontend$Page_Dashboard$padding),
+																						')'))))),
+																	_1: {ctor: '[]'}
+																},
+																{
+																	ctor: '::',
+																	_0: _shohamh$learnmath_frontend$Page_Dashboard$yAxis,
+																	_1: {ctor: '[]'}
+																}),
+															_1: {
+																ctor: '::',
+																_0: A2(
+																	_elm_lang$svg$Svg$g,
+																	{
+																		ctor: '::',
+																		_0: _elm_lang$svg$Svg_Attributes$transform(
+																			A2(
+																				_elm_lang$core$Basics_ops['++'],
+																				'translate(',
+																				A2(
+																					_elm_lang$core$Basics_ops['++'],
+																					_elm_lang$core$Basics$toString(_shohamh$learnmath_frontend$Page_Dashboard$padding),
+																					A2(
+																						_elm_lang$core$Basics_ops['++'],
+																						', ',
+																						A2(
+																							_elm_lang$core$Basics_ops['++'],
+																							_elm_lang$core$Basics$toString(_shohamh$learnmath_frontend$Page_Dashboard$padding),
+																							')'))))),
+																		_1: {
+																			ctor: '::',
+																			_0: _elm_lang$svg$Svg_Attributes$class('series'),
+																			_1: {ctor: '[]'}
+																		}
+																	},
+																	A2(
+																		_elm_lang$core$List$map,
+																		_shohamh$learnmath_frontend$Page_Dashboard$column(
+																			_shohamh$learnmath_frontend$Page_Dashboard$xScale(model.dataModel)),
+																		model.dataModel)),
+																_1: {
+																	ctor: '::',
+																	_0: _elm_lang$svg$Svg$text('svg hey'),
+																	_1: {ctor: '[]'}
+																}
+															}
+														}
+													}
+												}),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {ctor: '[]'}
+			});
+	});
+var _shohamh$learnmath_frontend$Page_Dashboard$model = {dataModel: _shohamh$learnmath_frontend$SampleData$timeSeries};
+var _shohamh$learnmath_frontend$Page_Dashboard$Model = function (a) {
+	return {dataModel: a};
+};
+var _shohamh$learnmath_frontend$Page_Dashboard$NoOp = {ctor: 'NoOp'};
+
 var _shohamh$learnmath_frontend$Route$routeToString = function (page) {
 	var pieces = function () {
 		var _p0 = page;
@@ -15511,136 +24223,6 @@ var _shohamh$learnmath_frontend$Views_Page$frame = F4(
 	});
 var _shohamh$learnmath_frontend$Views_Page$Other = {ctor: 'Other'};
 
-var _shohamh$learnmath_frontend$Page_Dashboard$update = F3(
-	function (session, msg, model) {
-		var _p0 = msg;
-		return A2(
-			_elm_lang$core$Platform_Cmd_ops['!'],
-			model,
-			{ctor: '[]'});
-	});
-var _shohamh$learnmath_frontend$Page_Dashboard$view = F2(
-	function (session, model) {
-		return A2(
-			_elm_lang$html$Html$div,
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class('feedback-page'),
-				_1: {ctor: '[]'}
-			},
-			{
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$div,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('container page'),
-						_1: {ctor: '[]'}
-					},
-					{
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$div,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('row'),
-								_1: {ctor: '[]'}
-							},
-							{
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$div,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('col-md-12'),
-										_1: {ctor: '[]'}
-									},
-									{
-										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$div,
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$class('sidebar'),
-												_1: {ctor: '[]'}
-											},
-											{
-												ctor: '::',
-												_0: function () {
-													var _p1 = session.user;
-													if (_p1.ctor === 'Just') {
-														return _elm_lang$html$Html$text(
-															A2(
-																_elm_lang$core$Basics_ops['++'],
-																'Hi ',
-																_shohamh$learnmath_frontend$Data_User$usernameToString(_p1._0.username)));
-													} else {
-														return A2(
-															_elm_lang$html$Html$div,
-															{ctor: '[]'},
-															{
-																ctor: '::',
-																_0: _elm_lang$html$Html$text('Hi random person! Would be great if you '),
-																_1: {
-																	ctor: '::',
-																	_0: A2(
-																		_elm_lang$html$Html$a,
-																		{
-																			ctor: '::',
-																			_0: _shohamh$learnmath_frontend$Route$href(_shohamh$learnmath_frontend$Route$Login),
-																			_1: {ctor: '[]'}
-																		},
-																		{
-																			ctor: '::',
-																			_0: _elm_lang$html$Html$text('logged in!'),
-																			_1: {ctor: '[]'}
-																		}),
-																	_1: {
-																		ctor: '::',
-																		_0: A2(
-																			_elm_lang$html$Html$br,
-																			{ctor: '[]'},
-																			{ctor: '[]'}),
-																		_1: {
-																			ctor: '::',
-																			_0: _elm_lang$html$Html$text('Don\'t have an account? '),
-																			_1: {
-																				ctor: '::',
-																				_0: A2(
-																					_elm_lang$html$Html$a,
-																					{
-																						ctor: '::',
-																						_0: _shohamh$learnmath_frontend$Route$href(_shohamh$learnmath_frontend$Route$Register),
-																						_1: {ctor: '[]'}
-																					},
-																					{
-																						ctor: '::',
-																						_0: _elm_lang$html$Html$text('Sign up!'),
-																						_1: {ctor: '[]'}
-																					}),
-																				_1: {ctor: '[]'}
-																			}
-																		}
-																	}
-																}
-															});
-													}
-												}(),
-												_1: {ctor: '[]'}
-											}),
-										_1: {ctor: '[]'}
-									}),
-								_1: {ctor: '[]'}
-							}),
-						_1: {ctor: '[]'}
-					}),
-				_1: {ctor: '[]'}
-			});
-	});
-var _shohamh$learnmath_frontend$Page_Dashboard$model = {};
-var _shohamh$learnmath_frontend$Page_Dashboard$Model = {};
-var _shohamh$learnmath_frontend$Page_Dashboard$NoOp = {ctor: 'NoOp'};
-
 var _shohamh$learnmath_frontend$Page_Errored$view = F2(
 	function (session, _p0) {
 		var _p1 = _p0;
@@ -15721,7 +24303,7 @@ var _shohamh$learnmath_frontend$Page_Home$view = F2(
 			_elm_lang$html$Html$div,
 			{
 				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class('home-page'),
+				_0: _elm_lang$html$Html_Attributes$class('feedback-page'),
 				_1: {ctor: '[]'}
 			},
 			{
@@ -15748,7 +24330,7 @@ var _shohamh$learnmath_frontend$Page_Home$view = F2(
 									_elm_lang$html$Html$div,
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('col-md-9'),
+										_0: _elm_lang$html$Html_Attributes$class('col-md-12'),
 										_1: {ctor: '[]'}
 									},
 									{

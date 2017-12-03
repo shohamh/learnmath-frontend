@@ -25,10 +25,10 @@ model =
 
 view : Session -> Model -> Html Msg
 view session model =
-    div [ class "home-page" ]
+    div [ class "feedback-page" ]
         [ div [ class "container page" ]
             [ div [ class "row" ]
-                [ div [ class "col-md-9" ]
+                [ div [ class "col-md-12" ]
                     [ div [ class "sidebar" ]
                         [ case session.user of
                             Just user ->
