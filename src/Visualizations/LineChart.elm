@@ -1,28 +1,17 @@
 module Visualizations.LineChart exposing (..)
 
 import Data.Session as Session exposing (Session)
-import Data.Subject exposing (Subject(..))
-import Data.User as User
-import Date exposing (Date)
-import Date.Extra as Date
 import Html exposing (..)
-import Html.Attributes exposing (attribute, class, classList, href, id, placeholder)
-import SampleData exposing (studentPerformanceInClass, subjectPerformance)
+import SampleData exposing (studentPerformanceInClass, subjectPerformance, uniteSuccessAndTime)
 import Svg exposing (Svg)
 import Svg.Attributes as SvgAttr
 import Visualization.Axis as Axis exposing (defaultOptions)
-import Visualization.List
 import Visualization.Scale as Scale exposing (BandConfig, BandScale, ContinuousScale, Scale, defaultBandConfig)
 import Visualization.Shape as Shape
 
 
 type alias Model =
     List ( String, ( Float, Float ) )
-
-
-map : ( Float, Float ) -> Float
-map ( success_percentage, avg_time_in_secs ) =
-    (avg_time_in_secs / 600 + success_percentage / 100) / 2
 
 
 model : Model
@@ -76,12 +65,12 @@ xAxis model =
 
 yAxis : Svg msg
 yAxis =
-    Axis.axis { defaultOptions | orientation = Axis.Left, tickCount = 5 } yScale
+    Axis.axis { defaultOptions | orientation = Axis.Left, tickCount = 10 } yScale
 
 
 transformToLineData : ( String, ( Float, Float ) ) -> Maybe ( Float, Float )
 transformToLineData ( student_name, ( success_percentage, avg_time_in_secs ) ) =
-    Just ( Scale.convert (xScale model) student_name, Scale.convert yScale (map ( success_percentage, avg_time_in_secs )) )
+    Just ( Scale.convert (xScale model) student_name, Scale.convert yScale (uniteSuccessAndTime ( success_percentage, avg_time_in_secs )) )
 
 
 
@@ -91,7 +80,8 @@ transformToLineData ( student_name, ( success_percentage, avg_time_in_secs ) ) =
 line : List ( String, ( Float, Float ) ) -> Attribute msg
 line model =
     List.map transformToLineData model
-        |> Shape.line Shape.monotoneInXCurve
+        |> Shape.line Shape.linearCurve
+        --Shape.monotoneInXCurve
         |> SvgAttr.d
 
 
@@ -102,7 +92,7 @@ viewLineChart session model =
             [ xAxis model ]
         , Svg.g [ SvgAttr.transform ("translate(" ++ toString (padding - 1) ++ ", " ++ toString padding ++ ")") ]
             [ yAxis ]
-        , Svg.g [ SvgAttr.transform ("translate(" ++ toString padding ++ ", " ++ toString padding ++ ")"), SvgAttr.class "series" ]
+        , Svg.g [ SvgAttr.transform ("translate(" ++ toString (padding + padding + padding / 2) ++ ", " ++ toString padding ++ ")") ]
             [ --Svg.path [ area model, stroke "none", strokeWidth "3px", fill "rgba(255, 0, 0, 0.54)" ] []
               Svg.path [ line model, SvgAttr.stroke "red", SvgAttr.strokeWidth "3px", SvgAttr.fill "none" ] []
             ]

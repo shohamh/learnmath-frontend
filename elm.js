@@ -35476,11 +35476,32 @@ var _shohamh$learnmath_frontend$Page_AddQuestion$view = F2(
 			});
 	});
 
+var _shohamh$learnmath_frontend$SampleData$mistakeTypeFrequency = {
+	ctor: '::',
+	_0: {ctor: '_Tuple2', _0: 'type1', _1: 10},
+	_1: {
+		ctor: '::',
+		_0: {ctor: '_Tuple2', _0: 'type2', _1: 71.3},
+		_1: {
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 'type3', _1: 2},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 'type4', _1: 10},
+				_1: {ctor: '[]'}
+			}
+		}
+	}
+};
+var _shohamh$learnmath_frontend$SampleData$uniteSuccessAndTime = function (_p0) {
+	var _p1 = _p0;
+	return ((_p1._1 / 600) + (_p1._0 / 100)) / 2;
+};
 var _shohamh$learnmath_frontend$SampleData$studentPerformanceInClass = A2(
 	_elm_lang$core$List$sortBy,
-	function (_p0) {
-		return _elm_lang$core$Tuple$first(
-			_elm_lang$core$Tuple$second(_p0));
+	function (_p2) {
+		return _shohamh$learnmath_frontend$SampleData$uniteSuccessAndTime(
+			_elm_lang$core$Tuple$second(_p2));
 	},
 	{
 		ctor: '::',
@@ -36042,7 +36063,7 @@ var _shohamh$learnmath_frontend$Visualizations_LineChart$yAxis = A2(
 	_gampleman$elm_visualization$Visualization_Axis$axis,
 	_elm_lang$core$Native_Utils.update(
 		_gampleman$elm_visualization$Visualization_Axis$defaultOptions,
-		{orientation: _gampleman$elm_visualization$Visualization_Axis$Left, tickCount: 5}),
+		{orientation: _gampleman$elm_visualization$Visualization_Axis$Left, tickCount: 10}),
 	_shohamh$learnmath_frontend$Visualizations_LineChart$yScale);
 var _shohamh$learnmath_frontend$Visualizations_LineChart$w = 900;
 var _shohamh$learnmath_frontend$Visualizations_LineChart$xScale = function (model) {
@@ -36067,31 +36088,27 @@ var _shohamh$learnmath_frontend$Visualizations_LineChart$xAxis = function (model
 			_shohamh$learnmath_frontend$Visualizations_LineChart$xScale(model)));
 };
 var _shohamh$learnmath_frontend$Visualizations_LineChart$model = _shohamh$learnmath_frontend$SampleData$studentPerformanceInClass;
-var _shohamh$learnmath_frontend$Visualizations_LineChart$map = function (_p0) {
+var _shohamh$learnmath_frontend$Visualizations_LineChart$transformToLineData = function (_p0) {
 	var _p1 = _p0;
-	return ((_p1._1 / 600) + (_p1._0 / 100)) / 2;
-};
-var _shohamh$learnmath_frontend$Visualizations_LineChart$transformToLineData = function (_p2) {
-	var _p3 = _p2;
 	return _elm_lang$core$Maybe$Just(
 		{
 			ctor: '_Tuple2',
 			_0: A2(
 				_gampleman$elm_visualization$Visualization_Scale$convert,
 				_shohamh$learnmath_frontend$Visualizations_LineChart$xScale(_shohamh$learnmath_frontend$Visualizations_LineChart$model),
-				_p3._0),
+				_p1._0),
 			_1: A2(
 				_gampleman$elm_visualization$Visualization_Scale$convert,
 				_shohamh$learnmath_frontend$Visualizations_LineChart$yScale,
-				_shohamh$learnmath_frontend$Visualizations_LineChart$map(
-					{ctor: '_Tuple2', _0: _p3._1._0, _1: _p3._1._1}))
+				_shohamh$learnmath_frontend$SampleData$uniteSuccessAndTime(
+					{ctor: '_Tuple2', _0: _p1._1._0, _1: _p1._1._1}))
 		});
 };
 var _shohamh$learnmath_frontend$Visualizations_LineChart$line = function (model) {
 	return _elm_lang$svg$Svg_Attributes$d(
 		A2(
 			_gampleman$elm_visualization$Visualization_Shape$line,
-			_gampleman$elm_visualization$Visualization_Shape$monotoneInXCurve,
+			_gampleman$elm_visualization$Visualization_Shape$linearCurve,
 			A2(_elm_lang$core$List$map, _shohamh$learnmath_frontend$Visualizations_LineChart$transformToLineData, model)));
 };
 var _shohamh$learnmath_frontend$Visualizations_LineChart$viewLineChart = F2(
@@ -36181,7 +36198,7 @@ var _shohamh$learnmath_frontend$Visualizations_LineChart$viewLineChart = F2(
 										'translate(',
 										A2(
 											_elm_lang$core$Basics_ops['++'],
-											_elm_lang$core$Basics$toString(_shohamh$learnmath_frontend$Visualizations_LineChart$padding),
+											_elm_lang$core$Basics$toString((_shohamh$learnmath_frontend$Visualizations_LineChart$padding + _shohamh$learnmath_frontend$Visualizations_LineChart$padding) + (_shohamh$learnmath_frontend$Visualizations_LineChart$padding / 2)),
 											A2(
 												_elm_lang$core$Basics_ops['++'],
 												', ',
@@ -36189,11 +36206,7 @@ var _shohamh$learnmath_frontend$Visualizations_LineChart$viewLineChart = F2(
 													_elm_lang$core$Basics_ops['++'],
 													_elm_lang$core$Basics$toString(_shohamh$learnmath_frontend$Visualizations_LineChart$padding),
 													')'))))),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$svg$Svg_Attributes$class('series'),
-									_1: {ctor: '[]'}
-								}
+								_1: {ctor: '[]'}
 							},
 							{
 								ctor: '::',
@@ -36224,6 +36237,166 @@ var _shohamh$learnmath_frontend$Visualizations_LineChart$viewLineChart = F2(
 				}
 			});
 	});
+
+var _shohamh$learnmath_frontend$Visualizations_PieChart$colors = _elm_lang$core$Array$fromList(
+	{
+		ctor: '::',
+		_0: '#98abc5',
+		_1: {
+			ctor: '::',
+			_0: '#8a89a6',
+			_1: {
+				ctor: '::',
+				_0: '#7b6888',
+				_1: {
+					ctor: '::',
+					_0: '#6b486b',
+					_1: {
+						ctor: '::',
+						_0: '#a05d56',
+						_1: {
+							ctor: '::',
+							_0: '#d0743c',
+							_1: {
+								ctor: '::',
+								_0: '#ff8c00',
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				}
+			}
+		}
+	});
+var _shohamh$learnmath_frontend$Visualizations_PieChart$h = 450;
+var _shohamh$learnmath_frontend$Visualizations_PieChart$w = 900;
+var _shohamh$learnmath_frontend$Visualizations_PieChart$radius = A2(_elm_lang$core$Basics$min, _shohamh$learnmath_frontend$Visualizations_PieChart$w, _shohamh$learnmath_frontend$Visualizations_PieChart$h) / 2;
+var _shohamh$learnmath_frontend$Visualizations_PieChart$viewPieChart = F2(
+	function (session, model) {
+		var makeLabel = F2(
+			function (slice, _p0) {
+				var _p1 = _p0;
+				return A2(
+					_elm_lang$svg$Svg$text_,
+					{
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$transform(
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								'translate',
+								_elm_lang$core$Basics$toString(
+									_gampleman$elm_visualization$Visualization_Shape$centroid(
+										_elm_lang$core$Native_Utils.update(
+											slice,
+											{innerRadius: _shohamh$learnmath_frontend$Visualizations_PieChart$radius - 40, outerRadius: _shohamh$learnmath_frontend$Visualizations_PieChart$radius - 40}))))),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$dy('.35em'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$textAnchor('middle'),
+								_1: {ctor: '[]'}
+							}
+						}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$svg$Svg$text(_p1._0),
+						_1: {ctor: '[]'}
+					});
+			});
+		var makeSlice = F2(
+			function (index, datum) {
+				return A2(
+					_elm_lang$svg$Svg$path,
+					{
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$d(
+							_gampleman$elm_visualization$Visualization_Shape$arc(datum)),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$style(
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									'fill:',
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										A2(
+											_elm_lang$core$Maybe$withDefault,
+											'#000',
+											A2(_elm_lang$core$Array$get, index, _shohamh$learnmath_frontend$Visualizations_PieChart$colors)),
+										'; stroke: #fff;'))),
+							_1: {ctor: '[]'}
+						}
+					},
+					{ctor: '[]'});
+			});
+		var pieData = A2(
+			_gampleman$elm_visualization$Visualization_Shape$pie,
+			_elm_lang$core$Native_Utils.update(
+				_gampleman$elm_visualization$Visualization_Shape$defaultPieConfig,
+				{outerRadius: _shohamh$learnmath_frontend$Visualizations_PieChart$radius}),
+			A2(_elm_lang$core$List$map, _elm_lang$core$Tuple$second, model));
+		return A2(
+			_elm_lang$svg$Svg$svg,
+			{
+				ctor: '::',
+				_0: _elm_lang$svg$Svg_Attributes$width(
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_elm_lang$core$Basics$toString(_shohamh$learnmath_frontend$Visualizations_PieChart$w),
+						'px')),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$svg$Svg_Attributes$height(
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_elm_lang$core$Basics$toString(_shohamh$learnmath_frontend$Visualizations_PieChart$h),
+							'px')),
+					_1: {ctor: '[]'}
+				}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$svg$Svg$g,
+					{
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$transform(
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								'translate(',
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									_elm_lang$core$Basics$toString(_shohamh$learnmath_frontend$Visualizations_PieChart$w / 2),
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										',',
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											_elm_lang$core$Basics$toString(_shohamh$learnmath_frontend$Visualizations_PieChart$h / 2),
+											')'))))),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$svg$Svg$g,
+							{ctor: '[]'},
+							A2(_elm_lang$core$List$indexedMap, makeSlice, pieData)),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$svg$Svg$g,
+								{ctor: '[]'},
+								A3(_elm_lang$core$List$map2, makeLabel, pieData, model)),
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {ctor: '[]'}
+			});
+	});
+var _shohamh$learnmath_frontend$Visualizations_PieChart$model = _shohamh$learnmath_frontend$SampleData$mistakeTypeFrequency;
 
 var _shohamh$learnmath_frontend$Page_Dashboard$update = F3(
 	function (session, msg, model) {
@@ -36304,17 +36477,43 @@ var _shohamh$learnmath_frontend$Page_Dashboard$view = F2(
 											}),
 										_1: {ctor: '[]'}
 									}),
-								_1: {ctor: '[]'}
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$div,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('row'),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$div,
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$class('col-md-12'),
+													_1: {ctor: '[]'}
+												},
+												{
+													ctor: '::',
+													_0: A2(_shohamh$learnmath_frontend$Visualizations_PieChart$viewPieChart, session, model.pieChartModel),
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}
 							}
 						}
 					}),
 				_1: {ctor: '[]'}
 			});
 	});
-var _shohamh$learnmath_frontend$Page_Dashboard$model = {barChartModel: _shohamh$learnmath_frontend$Visualizations_BarChart$model, lineChartModel: _shohamh$learnmath_frontend$Visualizations_LineChart$model};
-var _shohamh$learnmath_frontend$Page_Dashboard$Model = F2(
-	function (a, b) {
-		return {barChartModel: a, lineChartModel: b};
+var _shohamh$learnmath_frontend$Page_Dashboard$model = {barChartModel: _shohamh$learnmath_frontend$Visualizations_BarChart$model, lineChartModel: _shohamh$learnmath_frontend$Visualizations_LineChart$model, pieChartModel: _shohamh$learnmath_frontend$Visualizations_PieChart$model};
+var _shohamh$learnmath_frontend$Page_Dashboard$Model = F3(
+	function (a, b, c) {
+		return {barChartModel: a, lineChartModel: b, pieChartModel: c};
 	});
 var _shohamh$learnmath_frontend$Page_Dashboard$NoOp = {ctor: 'NoOp'};
 

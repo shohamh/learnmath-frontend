@@ -6,11 +6,13 @@ import Html.Attributes exposing (attribute, class, classList, href, id, placehol
 import SampleData exposing (studentPerformanceInClass, subjectPerformance)
 import Visualizations.BarChart as BarChart exposing (viewBarChart)
 import Visualizations.LineChart as LineChart exposing (viewLineChart)
+import Visualizations.PieChart as PieChart exposing (viewPieChart)
 
 
 type alias Model =
     { barChartModel : BarChart.Model
     , lineChartModel : LineChart.Model
+    , pieChartModel : PieChart.Model
     }
 
 
@@ -18,6 +20,7 @@ model : Model
 model =
     { barChartModel = BarChart.model
     , lineChartModel = LineChart.model
+    , pieChartModel = PieChart.model
     }
 
 
@@ -38,6 +41,11 @@ view session model =
             , div [ class "row" ]
                 [ div [ class "col-md-12" ]
                     [ viewLineChart session model.lineChartModel
+                    ]
+                ]
+            , div [ class "row" ]
+                [ div [ class "col-md-12" ]
+                    [ viewPieChart session model.pieChartModel
                     ]
                 ]
             ]
