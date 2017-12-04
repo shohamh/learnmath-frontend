@@ -1,5 +1,6 @@
-module SampleData exposing (CrimeRate, crimeRates, timeSeries)
+module SampleData exposing (CrimeRate, crimeRates, studentPerformanceInClass, subjectPerformance, timeSeries)
 
+import Data.Subject exposing (Subject(..))
 import Date exposing (Date)
 import Dict exposing (Dict)
 
@@ -14,6 +15,35 @@ timeSeries =
     , ( Date.fromTime 1454284800000, 1 )
     , ( Date.fromTime 1456790400000, 1.2 )
     ]
+
+
+subjectPerformance : List ( Subject, ( Float, Float ) )
+subjectPerformance =
+    [ ( Subject "subject1", ( 10, 5 ) )
+    , ( Subject "subject2", ( 0, 5 ) )
+    , ( Subject "subject3", ( 10, 1 ) )
+    , ( Subject "subject4", ( 10, 0 ) )
+    , ( Subject "subject5", ( 0, 10 ) )
+    , ( Subject "subject6", ( 8, 8 ) )
+    ]
+
+
+
+-- performance of student name, first float = success percentage in general/in subject/whatever, second float = average time in seconds
+
+
+studentPerformanceInClass : List ( String, ( Float, Float ) )
+studentPerformanceInClass =
+    List.sortBy (Tuple.second >> Tuple.first) <|
+        [ ( "rick", ( 80.0, 150.0 ) )
+        , ( "yosi", ( 90.5, 600.0 ) )
+        , ( "ruti", ( 55.0, 10.0 ) )
+        , ( "mickie", ( 10, 100 ) )
+        , ( "mor", ( 67, 200 ) )
+        , ( "yuval", ( 30, 20 ) )
+        , ( "yoram", ( 100, 90 ) )
+        , ( "bella", ( 85, 300 ) )
+        ]
 
 
 type alias CrimeRate =
