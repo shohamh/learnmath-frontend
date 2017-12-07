@@ -25,6 +25,7 @@ type ActivePage
     | Register
     | Question
     | AddQuestion
+    | AddPractice
     | Dashboard Username
     | TeacherDashboard
 
@@ -44,7 +45,8 @@ frame isLoading user page content =
     div [ class "page-frame" ]
         [ viewHeader page user isLoading
         , content
-        , viewFooter
+
+        --, viewFooter
         ]
 
 
@@ -74,20 +76,21 @@ viewSignIn page maybeUser =
             case user.role of
                 Student ->
                     [ navbarLink (page == Dashboard user.username) (Route.Dashboard user.username) [ text "Dashboard" ]
-                    , navbarLink (page == Question) Route.Question [ text "Question" ]
+                    , navbarLink (page == Question) Route.Question [ text "Practice" ]
                     , navbarLink False Route.Logout [ text "Sign out" ]
                     ]
 
                 Teacher ->
                     [ navbarLink (page == TeacherDashboard) Route.TeacherDashboard [ text "Dashboard" ]
                     , navbarLink (page == AddQuestion) Route.AddQuestion [ text "Add Question" ]
+                    , navbarLink (page == AddPractice) Route.AddPractice [ text "Add Practice" ]
                     , navbarLink False Route.Logout [ text "Sign out" ]
                     ]
 
 
 viewFooter : Html msg
 viewFooter =
-    footer []
+    footer [ style [ ( "display", "inline" ) ] ]
         [ div [ class "container" ]
             [ a [ class "logo-font", href "/" ] [ text "LearnMath" ]
             , span [ class "attribution" ]

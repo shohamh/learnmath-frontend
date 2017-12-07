@@ -23,7 +23,8 @@ type alias Model =
 
 model : Model
 model =
-    mistakeTypeFrequency
+    --mistakeTypeFrequency
+    []
 
 
 w : Float

@@ -21,7 +21,8 @@ type alias Model =
 
 model : Model
 model =
-    subjectPerformance
+    --subjectPerformance
+    []
 
 
 w : Float
@@ -53,58 +54,61 @@ xScale model =
     Scale.band { defaultBandConfig | paddingInner = 0.1, paddingOuter = 0.2 } (List.map Tuple.first model) ( 0, w - 2 * padding )
 
 
-scaleHeight : Float
-scaleHeight =
-    20
+scaleHeight : Model -> Float
+scaleHeight model =
+    Maybe.withDefault 20 <| List.maximum (List.map (Tuple.second >> (\( wrong, right ) -> wrong + right)) model)
 
 
-yScale : ContinuousScale
-yScale =
-    Scale.linear ( 0, scaleHeight ) ( realH, 0 )
+yScale : Model -> ContinuousScale
+yScale model =
+    Scale.linear ( 0, scaleHeight model ) ( realH, 0 )
 
 
-xAxis : List ( Subject, ( Float, Float ) ) -> Svg msg
+xAxis : Model -> Svg msg
 xAxis model =
     Axis.axis { defaultOptions | orientation = Axis.Bottom, tickFormat = Just Data.Subject.toString } (Scale.toRenderable (xScale model))
 
 
-yAxis : Svg msg
-yAxis =
-    Axis.axis { defaultOptions | orientation = Axis.Left } yScale
+yAxis : Model -> Svg msg
+yAxis model =
+    Axis.axis { defaultOptions | orientation = Axis.Left } (yScale model)
 
 
 column : BandScale Subject -> ( Subject, ( Float, Float ) ) -> Svg msg
 column xScale ( subject, ( correct, wrong ) ) =
     let
         bottomRectHeight =
-            Scale.convert yScale fixedCorrect
+            Scale.convert (yScale model) fixedCorrect
 
         fixedCorrect =
-            scaleHeight - correct
+            scaleHeight model - correct
 
         fixedWrong =
-            scaleHeight - wrong
+            scaleHeight model - wrong
+
+        yScaled =
+            yScale model
     in
     Svg.g [ SvgAttr.class "column" ]
         [ Svg.rect
             [ SvgAttr.x <| toString <| Scale.convert xScale subject
-            , SvgAttr.y <| toString <| Debug.log "bottom y" (realH - Scale.convert yScale fixedCorrect)
+            , SvgAttr.y <| toString <| (realH - Scale.convert yScaled fixedCorrect)
             , SvgAttr.width <| toString <| Scale.bandwidth xScale
-            , SvgAttr.height <| toString <| Debug.log "bottom height" (Scale.convert yScale fixedCorrect)
+            , SvgAttr.height <| toString <| Scale.convert yScaled fixedCorrect
             , SvgAttr.class "bottomrect"
             ]
             []
         , Svg.rect
             [ SvgAttr.x <| toString <| Scale.convert xScale subject
-            , SvgAttr.y <| toString <| Debug.log "upper y" (realH - (bottomRectHeight + Scale.convert yScale fixedWrong))
+            , SvgAttr.y <| toString <| (realH - (bottomRectHeight + Scale.convert yScaled fixedWrong))
             , SvgAttr.width <| toString <| Scale.bandwidth xScale
-            , SvgAttr.height <| toString <| Debug.log "upper height" (Scale.convert yScale fixedWrong)
+            , SvgAttr.height <| toString <| Scale.convert yScaled fixedWrong
             , SvgAttr.class "upperrect"
             ]
             []
         , Svg.text_
             [ SvgAttr.x <| toString <| Scale.convert (Scale.toRenderable xScale) subject
-            , SvgAttr.y <| toString <| realH - Scale.convert yScale (scaleHeight - (correct + wrong)) - padding / 2
+            , SvgAttr.y <| toString <| realH - Scale.convert yScaled (scaleHeight model - (correct + wrong)) - padding / 2
             , SvgAttr.textAnchor "middle"
             ]
             [ Svg.text <| toString (correct + wrong) ]
@@ -125,7 +129,7 @@ viewBarChart session model =
         , Svg.g [ SvgAttr.transform ("translate(" ++ toString (padding - 1) ++ ", " ++ toString (h - padding) ++ ")") ]
             [ xAxis model ]
         , Svg.g [ SvgAttr.transform ("translate(" ++ toString (padding - 1) ++ ", " ++ toString padding ++ ")") ]
-            [ yAxis ]
+            [ yAxis model ]
         , Svg.g [ SvgAttr.transform ("translate(" ++ toString padding ++ ", " ++ toString padding ++ ")"), SvgAttr.class "series" ] <|
             List.map (column (xScale model)) model
         ]

@@ -1,4 +1,4 @@
-module Util exposing ((=>), appendErrors, httpErrorToString, httpPost, onClickStopPropagation, pair, viewIf)
+module Util exposing ((=>), appendErrors, httpErrorToString, httpPost, maybeJoin, onClickStopPropagation, pair, viewIf)
 
 import Config
 import Html exposing (Attribute, Html)
@@ -83,3 +83,13 @@ httpErrorToString httpError =
 
         Http.BadPayload debug_str response ->
             "JSON decoding of response failed: " ++ debug_str
+
+
+maybeJoin : Maybe (Maybe a) -> Maybe a
+maybeJoin mx =
+    case mx of
+        Just x ->
+            x
+
+        Nothing ->
+            Nothing

@@ -17,6 +17,7 @@ type Route
     | Register
     | Question
     | AddQuestion
+    | AddPractice
     | Dashboard Username
     | TeacherDashboard
 
@@ -34,6 +35,7 @@ route =
         , Url.map Register (s "register")
         , Url.map Question (s "question")
         , Url.map AddQuestion (s "add_question")
+        , Url.map AddPractice (s "add_practice")
         , Url.map Dashboard (s "dashboard" </> User.usernameParser)
         , Url.map TeacherDashboard (s "teacher_dashboard")
 
@@ -67,6 +69,9 @@ routeToString page =
 
                 AddQuestion ->
                     [ "add_question" ]
+
+                AddPractice ->
+                    [ "add_practice" ]
 
                 Dashboard username ->
                     [ "dashboard", User.usernameToString username ]

@@ -6,6 +6,7 @@ import Html exposing (..)
 import Html.Attributes exposing (attribute)
 import Json.Decode as Decode exposing (Value)
 import Navigation exposing (Location)
+import Page.AddPractice as AddPractice
 import Page.AddQuestion as AddQuestion
 import Page.Dashboard as Dashboard
 import Page.Errored as Errored exposing (PageLoadError)
@@ -31,6 +32,7 @@ type Page
     | Register Register.Model
     | Question Question.Model
     | AddQuestion AddQuestion.Model
+    | AddPractice AddPractice.Model
     | Dashboard Dashboard.Model
     | TeacherDashboard TeacherDashboard.Model
 
@@ -81,6 +83,7 @@ type Msg
     | RegisterMsg Register.Msg
     | QuestionMsg Question.Msg
     | AddQuestionMsg AddQuestion.Msg
+    | AddPracticeMsg AddPractice.Msg
     | DashboardMsg Dashboard.Msg
     | TeacherDashboardMsg TeacherDashboard.Msg
     | SetUser (Maybe User)
@@ -108,10 +111,13 @@ setRoute maybeRoute model =
             transition HomeLoaded (Home.init model.session)
 
         Just Route.Question ->
-            { model | pageState = Loaded (Question Question.model) } => Cmd.map QuestionMsg (Question.loadQuestion model.session Question.model)
+            { model | pageState = Loaded (Question Question.model) } => Cmd.map QuestionMsg (Question.loadQuestions model.session Question.model)
 
         Just Route.AddQuestion ->
             { model | pageState = Loaded (AddQuestion AddQuestion.model) } => Cmd.map AddQuestionMsg (AddQuestion.loadCurriculumsAndSubjects model.session AddQuestion.model)
+
+        Just Route.AddPractice ->
+            { model | pageState = Loaded (AddPractice AddPractice.model) } => Cmd.map AddPracticeMsg (AddPractice.loadCurriculumsAndSubjects model.session AddPractice.model)
 
         Just Route.Login ->
             { model | pageState = Loaded (Login Login.model) } => Cmd.none
@@ -131,10 +137,24 @@ setRoute maybeRoute model =
             { model | pageState = Loaded (Register Register.model) } => Cmd.none
 
         Just (Route.Dashboard username) ->
-            { model | pageState = Loaded (Dashboard Dashboard.model) } => Cmd.none
+            { model | pageState = Loaded (Dashboard Dashboard.model) }
+                => Cmd.batch
+                    (List.map (Cmd.map DashboardMsg)
+                        [ Dashboard.loadStudentPerformance model.session Dashboard.model
+                        , Dashboard.loadSubjectPerformance model.session Dashboard.model
+                        , Dashboard.loadMistakeTypes model.session Dashboard.model
+                        ]
+                    )
 
         Just Route.TeacherDashboard ->
-            { model | pageState = Loaded (TeacherDashboard TeacherDashboard.model) } => Cmd.none
+            { model | pageState = Loaded (TeacherDashboard TeacherDashboard.model) }
+                => Cmd.batch
+                    (List.map (Cmd.map TeacherDashboardMsg)
+                        [ TeacherDashboard.loadStudentPerformance model.session TeacherDashboard.model
+                        , TeacherDashboard.loadSubjectPerformance model.session TeacherDashboard.model
+                        , TeacherDashboard.loadMistakeTypes model.session TeacherDashboard.model
+                        ]
+                    )
 
 
 
@@ -254,6 +274,15 @@ updatePage page msg model =
         ( AddQuestionMsg subMsg, AddQuestion subModel ) ->
             toPage AddQuestion AddQuestionMsg (AddQuestion.update session) subMsg subModel
 
+        ( AddPracticeMsg subMsg, AddPractice subModel ) ->
+            toPage AddPractice AddPracticeMsg (AddPractice.update session) subMsg subModel
+
+        ( DashboardMsg subMsg, Dashboard subModel ) ->
+            toPage Dashboard DashboardMsg (Dashboard.update session) subMsg subModel
+
+        ( TeacherDashboardMsg subMsg, TeacherDashboard subModel ) ->
+            toPage TeacherDashboard TeacherDashboardMsg (TeacherDashboard.update session) subMsg subModel
+
         {- ( ProfileMsg subMsg, Profile username subModel ) ->
            toPage (Profile username) ProfileMsg (Profile.update model.session) subMsg subModel
         -}
@@ -359,6 +388,9 @@ viewPage session isLoading page =
         AddQuestion subModel ->
             AddQuestion.view session subModel |> frame Page.Other |> Html.map AddQuestionMsg
 
+        AddPractice subModel ->
+            AddPractice.view session subModel |> frame Page.Other |> Html.map AddPracticeMsg
+
         Dashboard subModel ->
             Dashboard.view session subModel |> frame Page.Other |> Html.map DashboardMsg
 
@@ -394,6 +426,9 @@ pageSubscriptions page =
             Sub.map QuestionMsg (Question.subs subModel)
 
         AddQuestion subModel ->
+            Sub.none
+
+        AddPractice subModel ->
             Sub.none
 
         Dashboard subModel ->

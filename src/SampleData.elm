@@ -34,20 +34,25 @@ subjectPerformance =
 
 uniteSuccessAndTime : ( Float, Float ) -> Float
 uniteSuccessAndTime ( success_percentage, avg_time_in_secs ) =
-    (avg_time_in_secs / 600 + success_percentage / 100) / 2
+    let
+        func : Float
+        func =
+            Basics.min 1 (20 * (1 / avg_time_in_secs))
+    in
+    Debug.log "unite" <| 0.5 * success_percentage + 0.5 * func
 
 
 studentPerformanceInClass : List ( String, ( Float, Float ) )
 studentPerformanceInClass =
     List.sortBy (Tuple.second >> uniteSuccessAndTime) <|
-        [ ( "rick", ( 80.0, 150.0 ) )
-        , ( "yosi", ( 90.5, 600.0 ) )
-        , ( "ruti", ( 55.0, 10.0 ) )
-        , ( "mickie", ( 10, 100 ) )
-        , ( "mor", ( 67, 200 ) )
-        , ( "yuval", ( 30, 20 ) )
-        , ( "yoram", ( 100, 90 ) )
-        , ( "bella", ( 85, 300 ) )
+        [ ( "rick", ( 0.8, 150.0 ) )
+        , ( "yosi", ( 0.905, 600.0 ) )
+        , ( "ruti", ( 0.55, 10.0 ) )
+        , ( "mickie", ( 0.1, 100 ) )
+        , ( "mor", ( 0.67, 200 ) )
+        , ( "yuval", ( 0.3, 20 ) )
+        , ( "yoram", ( 1.0, 90 ) )
+        , ( "bella", ( 0.85, 300 ) )
         ]
 
 

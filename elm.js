@@ -34863,11 +34863,19 @@ var _shohamh$learnmath_frontend$Data_User$decoder = A3(
 				_elm_lang$core$Json_Decode$string,
 				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_shohamh$learnmath_frontend$Data_User$User)))));
 
+var _shohamh$learnmath_frontend$Util$maybeJoin = function (mx) {
+	var _p0 = mx;
+	if (_p0.ctor === 'Just') {
+		return _p0._0;
+	} else {
+		return _elm_lang$core$Maybe$Nothing;
+	}
+};
 var _shohamh$learnmath_frontend$Util$httpErrorToString = function (httpError) {
-	var _p0 = httpError;
-	switch (_p0.ctor) {
+	var _p1 = httpError;
+	switch (_p1.ctor) {
 		case 'BadUrl':
-			return A2(_elm_lang$core$Basics_ops['++'], 'Bad url: ', _p0._0);
+			return A2(_elm_lang$core$Basics_ops['++'], 'Bad url: ', _p1._0);
 		case 'Timeout':
 			return 'Request timed out.';
 		case 'NetworkError':
@@ -34876,9 +34884,9 @@ var _shohamh$learnmath_frontend$Util$httpErrorToString = function (httpError) {
 			return A2(
 				_elm_lang$core$Basics_ops['++'],
 				'Bad status code returned: ',
-				_elm_lang$core$Basics$toString(_p0._0.status.code));
+				_elm_lang$core$Basics$toString(_p1._0.status.code));
 		default:
-			return A2(_elm_lang$core$Basics_ops['++'], 'JSON decoding of response failed: ', _p0._0);
+			return A2(_elm_lang$core$Basics_ops['++'], 'JSON decoding of response failed: ', _p1._0);
 	}
 };
 var _shohamh$learnmath_frontend$Util$httpPost = F5(
@@ -34974,6 +34982,653 @@ var _shohamh$learnmath_frontend$Data_Subject$Subject = function (a) {
 	return {ctor: 'Subject', _0: a};
 };
 var _shohamh$learnmath_frontend$Data_Subject$decoder = A2(_elm_lang$core$Json_Decode$map, _shohamh$learnmath_frontend$Data_Subject$Subject, _elm_lang$core$Json_Decode$string);
+
+var _shohamh$learnmath_frontend$Views_Form$control = F3(
+	function (element, attributes, children) {
+		return A2(
+			_elm_lang$html$Html$fieldset,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('form-group'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					element,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('form-control'),
+						_1: attributes
+					},
+					children),
+				_1: {ctor: '[]'}
+			});
+	});
+var _shohamh$learnmath_frontend$Views_Form$viewErrors = function (errors) {
+	return A2(
+		_elm_lang$html$Html$ul,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('error-messages'),
+			_1: {ctor: '[]'}
+		},
+		A2(
+			_elm_lang$core$List$map,
+			function (_p0) {
+				var _p1 = _p0;
+				return A2(
+					_elm_lang$html$Html$li,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(_p1._1),
+						_1: {ctor: '[]'}
+					});
+			},
+			errors));
+};
+var _shohamh$learnmath_frontend$Views_Form$textarea = _shohamh$learnmath_frontend$Views_Form$control(_elm_lang$html$Html$textarea);
+var _shohamh$learnmath_frontend$Views_Form$radio = F6(
+	function (name, values, msg, msgValues, attrs, children) {
+		return A2(
+			_elm_lang$html$Html$fieldset,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('form-group'),
+				_1: {ctor: '[]'}
+			},
+			A3(
+				_elm_lang$core$List$map2,
+				F2(
+					function (strValue, msgValue) {
+						return A2(
+							_elm_lang$html$Html$label,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$input,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('form-control'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('radio'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$name(name),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$type_('radio'),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$value(strValue),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$html$Html_Events$onClick(
+																msg(msgValue)),
+															_1: attrs
+														}
+													}
+												}
+											}
+										}
+									},
+									children),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html$text(strValue),
+									_1: {ctor: '[]'}
+								}
+							});
+					}),
+				values,
+				msgValues));
+	});
+var _shohamh$learnmath_frontend$Views_Form$numberInput = function (attrs) {
+	return A2(
+		_shohamh$learnmath_frontend$Views_Form$control,
+		_elm_lang$html$Html$input,
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$type_('number'),
+				_1: {ctor: '[]'}
+			},
+			attrs));
+};
+var _shohamh$learnmath_frontend$Views_Form$input = function (attrs) {
+	return A2(
+		_shohamh$learnmath_frontend$Views_Form$control,
+		_elm_lang$html$Html$input,
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$type_('text'),
+				_1: {ctor: '[]'}
+			},
+			attrs));
+};
+var _shohamh$learnmath_frontend$Views_Form$password = function (attrs) {
+	return A2(
+		_shohamh$learnmath_frontend$Views_Form$control,
+		_elm_lang$html$Html$input,
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$type_('password'),
+				_1: {ctor: '[]'}
+			},
+			attrs));
+};
+
+var _shohamh$learnmath_frontend$Page_AddPractice$subs = function (model) {
+	return _elm_lang$core$Platform_Sub$none;
+};
+var _shohamh$learnmath_frontend$Page_AddPractice$viewErrorMessages = function (errorMessages) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		A2(
+			_elm_lang$core$List$intersperse,
+			A2(
+				_elm_lang$html$Html$br,
+				{ctor: '[]'},
+				{ctor: '[]'}),
+			A2(_elm_lang$core$List$map, _elm_lang$html$Html$text, errorMessages)));
+};
+var _shohamh$learnmath_frontend$Page_AddPractice$loadCurriculumsAndSubjectsEncoder = function (sid) {
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'sid',
+				_1: _elm_lang$core$Json_Encode$string(sid)
+			},
+			_1: {ctor: '[]'}
+		});
+};
+var _shohamh$learnmath_frontend$Page_AddPractice$addPracticeRequestEncoder = function (_p0) {
+	var _p1 = _p0;
+	var _p3 = _p1._1;
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'sid',
+				_1: function () {
+					var _p2 = _p1._0.user;
+					if (_p2.ctor === 'Just') {
+						return _shohamh$learnmath_frontend$Data_AuthToken$encode(_p2._0.token);
+					} else {
+						return _elm_lang$core$Json_Encode$null;
+					}
+				}()
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'subjects',
+					_1: _elm_lang$core$Json_Encode$list(
+						A2(_elm_lang$core$List$map, _elm_lang$core$Json_Encode$string, _p3.selectedSubjects))
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'question_count',
+						_1: _elm_lang$core$Json_Encode$int(_p3.numberOfQuestions)
+					},
+					_1: {ctor: '[]'}
+				}
+			}
+		});
+};
+var _shohamh$learnmath_frontend$Page_AddPractice$model = {
+	successMessage: '',
+	errorMessages: {ctor: '[]'},
+	curriculums: {ctor: '[]'},
+	selectedCurriculum: '',
+	selectedSubjects: {ctor: '[]'},
+	numberOfQuestions: 10,
+	subjectsInCurriculums: _elm_lang$core$Dict$empty
+};
+var _shohamh$learnmath_frontend$Page_AddPractice$Model = F7(
+	function (a, b, c, d, e, f, g) {
+		return {successMessage: a, errorMessages: b, curriculums: c, selectedCurriculum: d, selectedSubjects: e, numberOfQuestions: f, subjectsInCurriculums: g};
+	});
+var _shohamh$learnmath_frontend$Page_AddPractice$ResponseData = F2(
+	function (a, b) {
+		return {success: a, error_messages: b};
+	});
+var _shohamh$learnmath_frontend$Page_AddPractice$responseDecoder = A3(
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+	'error_messages',
+	_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string),
+	A3(
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+		'success',
+		_elm_lang$core$Json_Decode$bool,
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_shohamh$learnmath_frontend$Page_AddPractice$ResponseData)));
+var _shohamh$learnmath_frontend$Page_AddPractice$SubjectsInCurriculums = F3(
+	function (a, b, c) {
+		return {subjectsInCurriculums: a, success: b, error_messages: c};
+	});
+var _shohamh$learnmath_frontend$Page_AddPractice$loadCursAndSubjectsRespDecoder = A3(
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+	'error_messages',
+	_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string),
+	A3(
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+		'success',
+		_elm_lang$core$Json_Decode$bool,
+		A3(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+			'subjects_in_curriculums',
+			_elm_lang$core$Json_Decode$dict(
+				_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)),
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_shohamh$learnmath_frontend$Page_AddPractice$SubjectsInCurriculums))));
+var _shohamh$learnmath_frontend$Page_AddPractice$LoadSubjectsInCurriculums = function (a) {
+	return {ctor: 'LoadSubjectsInCurriculums', _0: a};
+};
+var _shohamh$learnmath_frontend$Page_AddPractice$loadCurriculumsAndSubjects = F2(
+	function (session, model) {
+		var sid = function () {
+			var _p4 = session.user;
+			if (_p4.ctor === 'Just') {
+				return _shohamh$learnmath_frontend$Data_AuthToken$toString(_p4._0.token);
+			} else {
+				return '';
+			}
+		}();
+		return A5(_shohamh$learnmath_frontend$Util$httpPost, 'subjects_in_all_curriculums', sid, _shohamh$learnmath_frontend$Page_AddPractice$loadCurriculumsAndSubjectsEncoder, _shohamh$learnmath_frontend$Page_AddPractice$loadCursAndSubjectsRespDecoder, _shohamh$learnmath_frontend$Page_AddPractice$LoadSubjectsInCurriculums);
+	});
+var _shohamh$learnmath_frontend$Page_AddPractice$AddPracticeResult = function (a) {
+	return {ctor: 'AddPracticeResult', _0: a};
+};
+var _shohamh$learnmath_frontend$Page_AddPractice$addPractice = F2(
+	function (session, model) {
+		return A5(
+			_shohamh$learnmath_frontend$Util$httpPost,
+			'create_practice_session',
+			{ctor: '_Tuple2', _0: session, _1: model},
+			_shohamh$learnmath_frontend$Page_AddPractice$addPracticeRequestEncoder,
+			_shohamh$learnmath_frontend$Page_AddPractice$responseDecoder,
+			_shohamh$learnmath_frontend$Page_AddPractice$AddPracticeResult);
+	});
+var _shohamh$learnmath_frontend$Page_AddPractice$update = F3(
+	function (session, msg, model) {
+		var _p5 = msg;
+		switch (_p5.ctor) {
+			case 'SelectCurriculum':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{selectedCurriculum: _p5._0}),
+					{ctor: '[]'});
+			case 'SelectSubjects':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{selectedSubjects: _p5._0}),
+					{ctor: '[]'});
+			case 'UpdateNumberOfQuestions':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{
+							numberOfQuestions: A2(
+								_elm_lang$core$Result$withDefault,
+								10,
+								_elm_lang$core$String$toInt(_p5._0))
+						}),
+					{ctor: '[]'});
+			case 'AddPractice':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					model,
+					{
+						ctor: '::',
+						_0: A2(_shohamh$learnmath_frontend$Page_AddPractice$addPractice, session, model),
+						_1: {ctor: '[]'}
+					});
+			case 'AddPracticeResult':
+				if (_p5._0.ctor === 'Err') {
+					var errorMessage = function () {
+						var _p6 = _p5._0._0;
+						switch (_p6.ctor) {
+							case 'BadUrl':
+								return A2(_elm_lang$core$Basics_ops['++'], 'Bad url: ', _p6._0);
+							case 'Timeout':
+								return 'Request timed out.';
+							case 'NetworkError':
+								return 'Network error (no connectivity).';
+							case 'BadStatus':
+								return A2(
+									_elm_lang$core$Basics_ops['++'],
+									'Bad status code returned: ',
+									_elm_lang$core$Basics$toString(_p6._0.status.code));
+							default:
+								return A2(_elm_lang$core$Basics_ops['++'], 'JSON decoding of response failed: ', _p6._0);
+						}
+					}();
+					return A2(
+						_shohamh$learnmath_frontend$Util_ops['=>'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								errorMessages: A2(
+									_elm_lang$core$List$append,
+									model.errorMessages,
+									{
+										ctor: '::',
+										_0: errorMessage,
+										_1: {ctor: '[]'}
+									})
+							}),
+						_elm_lang$core$Platform_Cmd$none);
+				} else {
+					var newModel = _elm_lang$core$Native_Utils.update(
+						model,
+						{successMessage: 'Practice added successfully to all relevant students.'});
+					return A2(_shohamh$learnmath_frontend$Util_ops['=>'], newModel, _elm_lang$core$Platform_Cmd$none);
+				}
+			default:
+				if (_p5._0.ctor === 'Ok') {
+					var _p7 = _p5._0._0;
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						A2(
+							_elm_lang$core$Debug$log,
+							'loadsubjectsinCurriculums model',
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{
+									curriculums: _elm_lang$core$Dict$keys(
+										A2(_elm_lang$core$Debug$log, 'curriculums:', _p7.subjectsInCurriculums)),
+									subjectsInCurriculums: _p7.subjectsInCurriculums
+								})),
+						{ctor: '[]'});
+				} else {
+					var errorMessage = function () {
+						var _p8 = _p5._0._0;
+						switch (_p8.ctor) {
+							case 'BadUrl':
+								return A2(_elm_lang$core$Basics_ops['++'], 'Bad url: ', _p8._0);
+							case 'Timeout':
+								return 'Request timed out.';
+							case 'NetworkError':
+								return 'Network error (no connectivity).';
+							case 'BadStatus':
+								return A2(
+									_elm_lang$core$Basics_ops['++'],
+									'Bad status code returned: ',
+									_elm_lang$core$Basics$toString(_p8._0.status.code));
+							default:
+								return A2(_elm_lang$core$Basics_ops['++'], 'JSON decoding of response failed: ', _p8._0);
+						}
+					}();
+					return A2(
+						_shohamh$learnmath_frontend$Util_ops['=>'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								errorMessages: A2(
+									_elm_lang$core$List$append,
+									model.errorMessages,
+									{
+										ctor: '::',
+										_0: errorMessage,
+										_1: {ctor: '[]'}
+									})
+							}),
+						_elm_lang$core$Platform_Cmd$none);
+				}
+		}
+	});
+var _shohamh$learnmath_frontend$Page_AddPractice$AddPractice = {ctor: 'AddPractice'};
+var _shohamh$learnmath_frontend$Page_AddPractice$UpdateNumberOfQuestions = function (a) {
+	return {ctor: 'UpdateNumberOfQuestions', _0: a};
+};
+var _shohamh$learnmath_frontend$Page_AddPractice$SelectSubjects = function (a) {
+	return {ctor: 'SelectSubjects', _0: a};
+};
+var _shohamh$learnmath_frontend$Page_AddPractice$SelectCurriculum = function (a) {
+	return {ctor: 'SelectCurriculum', _0: a};
+};
+var _shohamh$learnmath_frontend$Page_AddPractice$view = F2(
+	function (session, model) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('add-practice-page'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('container page'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('row'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$div,
+									{ctor: '[]'},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Curriculum:'),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$br,
+												{ctor: '[]'},
+												{ctor: '[]'}),
+											_1: {
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$select,
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html_Events$onInput(_shohamh$learnmath_frontend$Page_AddPractice$SelectCurriculum),
+														_1: {ctor: '[]'}
+													},
+													A2(
+														_elm_lang$core$List$map,
+														function (x) {
+															return A2(
+																_elm_lang$html$Html$option,
+																{ctor: '[]'},
+																{
+																	ctor: '::',
+																	_0: _elm_lang$html$Html$text(x),
+																	_1: {ctor: '[]'}
+																});
+														},
+														model.curriculums)),
+												_1: {ctor: '[]'}
+											}
+										}
+									}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$div,
+										{ctor: '[]'},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('Pick subjects (Hold Ctrl to select multiple subjects) for the students to practice in this session:'),
+											_1: {
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$br,
+													{ctor: '[]'},
+													{ctor: '[]'}),
+												_1: {
+													ctor: '::',
+													_0: function () {
+														var items = function () {
+															var _p9 = A2(_elm_lang$core$Dict$get, model.selectedCurriculum, model.subjectsInCurriculums);
+															if (_p9.ctor === 'Just') {
+																return _p9._0;
+															} else {
+																return {ctor: '[]'};
+															}
+														}();
+														return A3(
+															_abadi199$elm_input_extra$MultiSelect$multiSelect,
+															A2(
+																_abadi199$elm_input_extra$MultiSelect$Options,
+																A2(
+																	_elm_lang$core$List$map,
+																	function (x) {
+																		return A3(_abadi199$elm_input_extra$MultiSelect$Item, x, x, true);
+																	},
+																	items),
+																_shohamh$learnmath_frontend$Page_AddPractice$SelectSubjects),
+															{ctor: '[]'},
+															model.selectedSubjects);
+													}(),
+													_1: {ctor: '[]'}
+												}
+											}
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$div,
+											{ctor: '[]'},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('Number of questions:'),
+												_1: {
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$br,
+														{ctor: '[]'},
+														{ctor: '[]'}),
+													_1: {
+														ctor: '::',
+														_0: A2(
+															_shohamh$learnmath_frontend$Views_Form$numberInput,
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$value(
+																	_elm_lang$core$Basics$toString(model.numberOfQuestions)),
+																_1: {
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Events$onInput(_shohamh$learnmath_frontend$Page_AddPractice$UpdateNumberOfQuestions),
+																	_1: {ctor: '[]'}
+																}
+															},
+															{ctor: '[]'}),
+														_1: {ctor: '[]'}
+													}
+												}
+											}),
+										_1: {ctor: '[]'}
+									}
+								}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('row'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$div,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('col-md-10 offset-md-1 col-xs-12'),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$button,
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$class('btn btn-lg btn-primary pull-xs-right'),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Events$onClick(_shohamh$learnmath_frontend$Page_AddPractice$AddPractice),
+														_1: {ctor: '[]'}
+													}
+												},
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html$text('Add Practice Session'),
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$div,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('row'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$div,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$class('col-md-10 offset-md-1 col-xs-12'),
+												_1: {ctor: '[]'}
+											},
+											{
+												ctor: '::',
+												_0: _shohamh$learnmath_frontend$Page_AddPractice$viewErrorMessages(model.errorMessages),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html$text(model.successMessage),
+													_1: {ctor: '[]'}
+												}
+											}),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}
+						}
+					}),
+				_1: {ctor: '[]'}
+			});
+	});
 
 var _shohamh$learnmath_frontend$Page_AddQuestion$onExport = function (message) {
 	return A2(
@@ -35230,7 +35885,9 @@ var _shohamh$learnmath_frontend$Page_AddQuestion$update = F3(
 							}),
 						_elm_lang$core$Platform_Cmd$none);
 				} else {
-					var newModel = model;
+					var newModel = _elm_lang$core$Native_Utils.update(
+						model,
+						{successMessage: 'Question added successfuly.'});
 					return A2(_shohamh$learnmath_frontend$Util_ops['=>'], newModel, _elm_lang$core$Platform_Cmd$none);
 				}
 			default:
@@ -35447,23 +36104,27 @@ var _shohamh$learnmath_frontend$Page_AddQuestion$view = F2(
 												_0: _shohamh$learnmath_frontend$Page_AddQuestion$viewErrorMessages(model.errorMessages),
 												_1: {
 													ctor: '::',
-													_0: A2(
-														_elm_lang$html$Html$button,
-														{
-															ctor: '::',
-															_0: _elm_lang$html$Html_Attributes$class('btn btn-lg btn-primary pull-xs-right'),
-															_1: {
+													_0: _elm_lang$html$Html$text(model.successMessage),
+													_1: {
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$button,
+															{
 																ctor: '::',
-																_0: _elm_lang$html$Html_Events$onClick(_shohamh$learnmath_frontend$Page_AddQuestion$AddQuestion),
+																_0: _elm_lang$html$Html_Attributes$class('btn btn-lg btn-primary pull-xs-right'),
+																_1: {
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Events$onClick(_shohamh$learnmath_frontend$Page_AddQuestion$AddQuestion),
+																	_1: {ctor: '[]'}
+																}
+															},
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html$text('Add Question'),
 																_1: {ctor: '[]'}
-															}
-														},
-														{
-															ctor: '::',
-															_0: _elm_lang$html$Html$text('Add Question'),
-															_1: {ctor: '[]'}
-														}),
-													_1: {ctor: '[]'}
+															}),
+														_1: {ctor: '[]'}
+													}
 												}
 											}
 										}),
@@ -35495,7 +36156,8 @@ var _shohamh$learnmath_frontend$SampleData$mistakeTypeFrequency = {
 };
 var _shohamh$learnmath_frontend$SampleData$uniteSuccessAndTime = function (_p0) {
 	var _p1 = _p0;
-	return ((_p1._1 / 600) + (_p1._0 / 100)) / 2;
+	var func = A2(_elm_lang$core$Basics$min, 1, 20 * (1 / _p1._1));
+	return A2(_elm_lang$core$Debug$log, 'unite', (0.5 * _p1._0) + (0.5 * func));
 };
 var _shohamh$learnmath_frontend$SampleData$studentPerformanceInClass = A2(
 	_elm_lang$core$List$sortBy,
@@ -35508,56 +36170,56 @@ var _shohamh$learnmath_frontend$SampleData$studentPerformanceInClass = A2(
 		_0: {
 			ctor: '_Tuple2',
 			_0: 'rick',
-			_1: {ctor: '_Tuple2', _0: 80.0, _1: 150.0}
+			_1: {ctor: '_Tuple2', _0: 0.8, _1: 150.0}
 		},
 		_1: {
 			ctor: '::',
 			_0: {
 				ctor: '_Tuple2',
 				_0: 'yosi',
-				_1: {ctor: '_Tuple2', _0: 90.5, _1: 600.0}
+				_1: {ctor: '_Tuple2', _0: 0.905, _1: 600.0}
 			},
 			_1: {
 				ctor: '::',
 				_0: {
 					ctor: '_Tuple2',
 					_0: 'ruti',
-					_1: {ctor: '_Tuple2', _0: 55.0, _1: 10.0}
+					_1: {ctor: '_Tuple2', _0: 0.55, _1: 10.0}
 				},
 				_1: {
 					ctor: '::',
 					_0: {
 						ctor: '_Tuple2',
 						_0: 'mickie',
-						_1: {ctor: '_Tuple2', _0: 10, _1: 100}
+						_1: {ctor: '_Tuple2', _0: 0.1, _1: 100}
 					},
 					_1: {
 						ctor: '::',
 						_0: {
 							ctor: '_Tuple2',
 							_0: 'mor',
-							_1: {ctor: '_Tuple2', _0: 67, _1: 200}
+							_1: {ctor: '_Tuple2', _0: 0.67, _1: 200}
 						},
 						_1: {
 							ctor: '::',
 							_0: {
 								ctor: '_Tuple2',
 								_0: 'yuval',
-								_1: {ctor: '_Tuple2', _0: 30, _1: 20}
+								_1: {ctor: '_Tuple2', _0: 0.3, _1: 20}
 							},
 							_1: {
 								ctor: '::',
 								_0: {
 									ctor: '_Tuple2',
 									_0: 'yoram',
-									_1: {ctor: '_Tuple2', _0: 100, _1: 90}
+									_1: {ctor: '_Tuple2', _0: 1.0, _1: 90}
 								},
 								_1: {
 									ctor: '::',
 									_0: {
 										ctor: '_Tuple2',
 										_0: 'bella',
-										_1: {ctor: '_Tuple2', _0: 85, _1: 300}
+										_1: {ctor: '_Tuple2', _0: 0.85, _1: 300}
 									},
 									_1: {ctor: '[]'}
 								}
@@ -35760,151 +36422,43 @@ var _shohamh$learnmath_frontend$SampleData$crimeRates = {
 	}
 };
 
-var _shohamh$learnmath_frontend$Visualizations_BarChart$scaleHeight = 20;
+var _shohamh$learnmath_frontend$Visualizations_BarChart$scaleHeight = function (model) {
+	return A2(
+		_elm_lang$core$Maybe$withDefault,
+		20,
+		_elm_lang$core$List$maximum(
+			A2(
+				_elm_lang$core$List$map,
+				function (_p0) {
+					return function (_p1) {
+						var _p2 = _p1;
+						return _p2._0 + _p2._1;
+					}(
+						_elm_lang$core$Tuple$second(_p0));
+				},
+				model)));
+};
 var _shohamh$learnmath_frontend$Visualizations_BarChart$padding = 30;
 var _shohamh$learnmath_frontend$Visualizations_BarChart$h = 450;
 var _shohamh$learnmath_frontend$Visualizations_BarChart$realH = _shohamh$learnmath_frontend$Visualizations_BarChart$h - (2 * _shohamh$learnmath_frontend$Visualizations_BarChart$padding);
-var _shohamh$learnmath_frontend$Visualizations_BarChart$yScale = A2(
-	_gampleman$elm_visualization$Visualization_Scale$linear,
-	{ctor: '_Tuple2', _0: 0, _1: _shohamh$learnmath_frontend$Visualizations_BarChart$scaleHeight},
-	{ctor: '_Tuple2', _0: _shohamh$learnmath_frontend$Visualizations_BarChart$realH, _1: 0});
-var _shohamh$learnmath_frontend$Visualizations_BarChart$yAxis = A2(
-	_gampleman$elm_visualization$Visualization_Axis$axis,
-	_elm_lang$core$Native_Utils.update(
-		_gampleman$elm_visualization$Visualization_Axis$defaultOptions,
-		{orientation: _gampleman$elm_visualization$Visualization_Axis$Left}),
-	_shohamh$learnmath_frontend$Visualizations_BarChart$yScale);
-var _shohamh$learnmath_frontend$Visualizations_BarChart$column = F2(
-	function (xScale, _p0) {
-		var _p1 = _p0;
-		var _p4 = _p1._1._1;
-		var _p3 = _p1._0;
-		var _p2 = _p1._1._0;
-		var fixedWrong = _shohamh$learnmath_frontend$Visualizations_BarChart$scaleHeight - _p4;
-		var fixedCorrect = _shohamh$learnmath_frontend$Visualizations_BarChart$scaleHeight - _p2;
-		var bottomRectHeight = A2(_gampleman$elm_visualization$Visualization_Scale$convert, _shohamh$learnmath_frontend$Visualizations_BarChart$yScale, fixedCorrect);
-		return A2(
-			_elm_lang$svg$Svg$g,
-			{
-				ctor: '::',
-				_0: _elm_lang$svg$Svg_Attributes$class('column'),
-				_1: {ctor: '[]'}
-			},
-			{
-				ctor: '::',
-				_0: A2(
-					_elm_lang$svg$Svg$rect,
-					{
-						ctor: '::',
-						_0: _elm_lang$svg$Svg_Attributes$x(
-							_elm_lang$core$Basics$toString(
-								A2(_gampleman$elm_visualization$Visualization_Scale$convert, xScale, _p3))),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$svg$Svg_Attributes$y(
-								_elm_lang$core$Basics$toString(
-									A2(
-										_elm_lang$core$Debug$log,
-										'bottom y',
-										_shohamh$learnmath_frontend$Visualizations_BarChart$realH - A2(_gampleman$elm_visualization$Visualization_Scale$convert, _shohamh$learnmath_frontend$Visualizations_BarChart$yScale, fixedCorrect)))),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$svg$Svg_Attributes$width(
-									_elm_lang$core$Basics$toString(
-										_gampleman$elm_visualization$Visualization_Scale$bandwidth(xScale))),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$svg$Svg_Attributes$height(
-										_elm_lang$core$Basics$toString(
-											A2(
-												_elm_lang$core$Debug$log,
-												'bottom height',
-												A2(_gampleman$elm_visualization$Visualization_Scale$convert, _shohamh$learnmath_frontend$Visualizations_BarChart$yScale, fixedCorrect)))),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$svg$Svg_Attributes$class('bottomrect'),
-										_1: {ctor: '[]'}
-									}
-								}
-							}
-						}
-					},
-					{ctor: '[]'}),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$svg$Svg$rect,
-						{
-							ctor: '::',
-							_0: _elm_lang$svg$Svg_Attributes$x(
-								_elm_lang$core$Basics$toString(
-									A2(_gampleman$elm_visualization$Visualization_Scale$convert, xScale, _p3))),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$svg$Svg_Attributes$y(
-									_elm_lang$core$Basics$toString(
-										A2(
-											_elm_lang$core$Debug$log,
-											'upper y',
-											_shohamh$learnmath_frontend$Visualizations_BarChart$realH - (bottomRectHeight + A2(_gampleman$elm_visualization$Visualization_Scale$convert, _shohamh$learnmath_frontend$Visualizations_BarChart$yScale, fixedWrong))))),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$svg$Svg_Attributes$width(
-										_elm_lang$core$Basics$toString(
-											_gampleman$elm_visualization$Visualization_Scale$bandwidth(xScale))),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$svg$Svg_Attributes$height(
-											_elm_lang$core$Basics$toString(
-												A2(
-													_elm_lang$core$Debug$log,
-													'upper height',
-													A2(_gampleman$elm_visualization$Visualization_Scale$convert, _shohamh$learnmath_frontend$Visualizations_BarChart$yScale, fixedWrong)))),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$svg$Svg_Attributes$class('upperrect'),
-											_1: {ctor: '[]'}
-										}
-									}
-								}
-							}
-						},
-						{ctor: '[]'}),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$svg$Svg$text_,
-							{
-								ctor: '::',
-								_0: _elm_lang$svg$Svg_Attributes$x(
-									_elm_lang$core$Basics$toString(
-										A2(
-											_gampleman$elm_visualization$Visualization_Scale$convert,
-											_gampleman$elm_visualization$Visualization_Scale$toRenderable(xScale),
-											_p3))),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$svg$Svg_Attributes$y(
-										_elm_lang$core$Basics$toString(
-											(_shohamh$learnmath_frontend$Visualizations_BarChart$realH - A2(_gampleman$elm_visualization$Visualization_Scale$convert, _shohamh$learnmath_frontend$Visualizations_BarChart$yScale, _shohamh$learnmath_frontend$Visualizations_BarChart$scaleHeight - (_p2 + _p4))) - (_shohamh$learnmath_frontend$Visualizations_BarChart$padding / 2))),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$svg$Svg_Attributes$textAnchor('middle'),
-										_1: {ctor: '[]'}
-									}
-								}
-							},
-							{
-								ctor: '::',
-								_0: _elm_lang$svg$Svg$text(
-									_elm_lang$core$Basics$toString(_p2 + _p4)),
-								_1: {ctor: '[]'}
-							}),
-						_1: {ctor: '[]'}
-					}
-				}
-			});
-	});
+var _shohamh$learnmath_frontend$Visualizations_BarChart$yScale = function (model) {
+	return A2(
+		_gampleman$elm_visualization$Visualization_Scale$linear,
+		{
+			ctor: '_Tuple2',
+			_0: 0,
+			_1: _shohamh$learnmath_frontend$Visualizations_BarChart$scaleHeight(model)
+		},
+		{ctor: '_Tuple2', _0: _shohamh$learnmath_frontend$Visualizations_BarChart$realH, _1: 0});
+};
+var _shohamh$learnmath_frontend$Visualizations_BarChart$yAxis = function (model) {
+	return A2(
+		_gampleman$elm_visualization$Visualization_Axis$axis,
+		_elm_lang$core$Native_Utils.update(
+			_gampleman$elm_visualization$Visualization_Axis$defaultOptions,
+			{orientation: _gampleman$elm_visualization$Visualization_Axis$Left}),
+		_shohamh$learnmath_frontend$Visualizations_BarChart$yScale(model));
+};
 var _shohamh$learnmath_frontend$Visualizations_BarChart$w = 900;
 var _shohamh$learnmath_frontend$Visualizations_BarChart$xScale = function (model) {
 	return A3(
@@ -35927,6 +36481,133 @@ var _shohamh$learnmath_frontend$Visualizations_BarChart$xAxis = function (model)
 		_gampleman$elm_visualization$Visualization_Scale$toRenderable(
 			_shohamh$learnmath_frontend$Visualizations_BarChart$xScale(model)));
 };
+var _shohamh$learnmath_frontend$Visualizations_BarChart$model = {ctor: '[]'};
+var _shohamh$learnmath_frontend$Visualizations_BarChart$column = F2(
+	function (xScale, _p3) {
+		var _p4 = _p3;
+		var _p7 = _p4._1._1;
+		var _p6 = _p4._0;
+		var _p5 = _p4._1._0;
+		var yScaled = _shohamh$learnmath_frontend$Visualizations_BarChart$yScale(_shohamh$learnmath_frontend$Visualizations_BarChart$model);
+		var fixedWrong = _shohamh$learnmath_frontend$Visualizations_BarChart$scaleHeight(_shohamh$learnmath_frontend$Visualizations_BarChart$model) - _p7;
+		var fixedCorrect = _shohamh$learnmath_frontend$Visualizations_BarChart$scaleHeight(_shohamh$learnmath_frontend$Visualizations_BarChart$model) - _p5;
+		var bottomRectHeight = A2(
+			_gampleman$elm_visualization$Visualization_Scale$convert,
+			_shohamh$learnmath_frontend$Visualizations_BarChart$yScale(_shohamh$learnmath_frontend$Visualizations_BarChart$model),
+			fixedCorrect);
+		return A2(
+			_elm_lang$svg$Svg$g,
+			{
+				ctor: '::',
+				_0: _elm_lang$svg$Svg_Attributes$class('column'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$svg$Svg$rect,
+					{
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$x(
+							_elm_lang$core$Basics$toString(
+								A2(_gampleman$elm_visualization$Visualization_Scale$convert, xScale, _p6))),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$y(
+								_elm_lang$core$Basics$toString(
+									_shohamh$learnmath_frontend$Visualizations_BarChart$realH - A2(_gampleman$elm_visualization$Visualization_Scale$convert, yScaled, fixedCorrect))),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$width(
+									_elm_lang$core$Basics$toString(
+										_gampleman$elm_visualization$Visualization_Scale$bandwidth(xScale))),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$svg$Svg_Attributes$height(
+										_elm_lang$core$Basics$toString(
+											A2(_gampleman$elm_visualization$Visualization_Scale$convert, yScaled, fixedCorrect))),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$svg$Svg_Attributes$class('bottomrect'),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
+					},
+					{ctor: '[]'}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$svg$Svg$rect,
+						{
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$x(
+								_elm_lang$core$Basics$toString(
+									A2(_gampleman$elm_visualization$Visualization_Scale$convert, xScale, _p6))),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$y(
+									_elm_lang$core$Basics$toString(
+										_shohamh$learnmath_frontend$Visualizations_BarChart$realH - (bottomRectHeight + A2(_gampleman$elm_visualization$Visualization_Scale$convert, yScaled, fixedWrong)))),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$svg$Svg_Attributes$width(
+										_elm_lang$core$Basics$toString(
+											_gampleman$elm_visualization$Visualization_Scale$bandwidth(xScale))),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$svg$Svg_Attributes$height(
+											_elm_lang$core$Basics$toString(
+												A2(_gampleman$elm_visualization$Visualization_Scale$convert, yScaled, fixedWrong))),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$svg$Svg_Attributes$class('upperrect'),
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							}
+						},
+						{ctor: '[]'}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$svg$Svg$text_,
+							{
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$x(
+									_elm_lang$core$Basics$toString(
+										A2(
+											_gampleman$elm_visualization$Visualization_Scale$convert,
+											_gampleman$elm_visualization$Visualization_Scale$toRenderable(xScale),
+											_p6))),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$svg$Svg_Attributes$y(
+										_elm_lang$core$Basics$toString(
+											(_shohamh$learnmath_frontend$Visualizations_BarChart$realH - A2(
+												_gampleman$elm_visualization$Visualization_Scale$convert,
+												yScaled,
+												_shohamh$learnmath_frontend$Visualizations_BarChart$scaleHeight(_shohamh$learnmath_frontend$Visualizations_BarChart$model) - (_p5 + _p7))) - (_shohamh$learnmath_frontend$Visualizations_BarChart$padding / 2))),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$svg$Svg_Attributes$textAnchor('middle'),
+										_1: {ctor: '[]'}
+									}
+								}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$svg$Svg$text(
+									_elm_lang$core$Basics$toString(_p5 + _p7)),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}
+				}
+			});
+	});
 var _shohamh$learnmath_frontend$Visualizations_BarChart$viewBarChart = F2(
 	function (session, model) {
 		return A2(
@@ -36009,7 +36690,7 @@ var _shohamh$learnmath_frontend$Visualizations_BarChart$viewBarChart = F2(
 							},
 							{
 								ctor: '::',
-								_0: _shohamh$learnmath_frontend$Visualizations_BarChart$yAxis,
+								_0: _shohamh$learnmath_frontend$Visualizations_BarChart$yAxis(model),
 								_1: {ctor: '[]'}
 							}),
 						_1: {
@@ -36049,7 +36730,6 @@ var _shohamh$learnmath_frontend$Visualizations_BarChart$viewBarChart = F2(
 				}
 			});
 	});
-var _shohamh$learnmath_frontend$Visualizations_BarChart$model = _shohamh$learnmath_frontend$SampleData$subjectPerformance;
 
 var _shohamh$learnmath_frontend$Visualizations_LineChart$scaleHeight = 1;
 var _shohamh$learnmath_frontend$Visualizations_LineChart$padding = 30;
@@ -36072,7 +36752,10 @@ var _shohamh$learnmath_frontend$Visualizations_LineChart$xScale = function (mode
 		_elm_lang$core$Native_Utils.update(
 			_gampleman$elm_visualization$Visualization_Scale$defaultBandConfig,
 			{paddingInner: 0.1, paddingOuter: 0.2}),
-		A2(_elm_lang$core$List$map, _elm_lang$core$Tuple$first, model),
+		A2(
+			_elm_lang$core$Debug$log,
+			'students list',
+			A2(_elm_lang$core$List$map, _elm_lang$core$Tuple$first, model)),
 		{ctor: '_Tuple2', _0: 0, _1: _shohamh$learnmath_frontend$Visualizations_LineChart$w - (2 * _shohamh$learnmath_frontend$Visualizations_LineChart$padding)});
 };
 var _shohamh$learnmath_frontend$Visualizations_LineChart$xAxis = function (model) {
@@ -36087,29 +36770,32 @@ var _shohamh$learnmath_frontend$Visualizations_LineChart$xAxis = function (model
 		_gampleman$elm_visualization$Visualization_Scale$toRenderable(
 			_shohamh$learnmath_frontend$Visualizations_LineChart$xScale(model)));
 };
-var _shohamh$learnmath_frontend$Visualizations_LineChart$model = _shohamh$learnmath_frontend$SampleData$studentPerformanceInClass;
-var _shohamh$learnmath_frontend$Visualizations_LineChart$transformToLineData = function (_p0) {
-	var _p1 = _p0;
-	return _elm_lang$core$Maybe$Just(
-		{
-			ctor: '_Tuple2',
-			_0: A2(
-				_gampleman$elm_visualization$Visualization_Scale$convert,
-				_shohamh$learnmath_frontend$Visualizations_LineChart$xScale(_shohamh$learnmath_frontend$Visualizations_LineChart$model),
-				_p1._0),
-			_1: A2(
-				_gampleman$elm_visualization$Visualization_Scale$convert,
-				_shohamh$learnmath_frontend$Visualizations_LineChart$yScale,
-				_shohamh$learnmath_frontend$SampleData$uniteSuccessAndTime(
-					{ctor: '_Tuple2', _0: _p1._1._0, _1: _p1._1._1}))
-		});
-};
+var _shohamh$learnmath_frontend$Visualizations_LineChart$transformToLineData = F2(
+	function (model, _p0) {
+		var _p1 = _p0;
+		return _elm_lang$core$Maybe$Just(
+			{
+				ctor: '_Tuple2',
+				_0: A2(
+					_gampleman$elm_visualization$Visualization_Scale$convert,
+					_shohamh$learnmath_frontend$Visualizations_LineChart$xScale(model),
+					_p1._0),
+				_1: A2(
+					_gampleman$elm_visualization$Visualization_Scale$convert,
+					_shohamh$learnmath_frontend$Visualizations_LineChart$yScale,
+					_shohamh$learnmath_frontend$SampleData$uniteSuccessAndTime(
+						{ctor: '_Tuple2', _0: _p1._1._0, _1: _p1._1._1}))
+			});
+	});
 var _shohamh$learnmath_frontend$Visualizations_LineChart$line = function (model) {
 	return _elm_lang$svg$Svg_Attributes$d(
 		A2(
 			_gampleman$elm_visualization$Visualization_Shape$line,
 			_gampleman$elm_visualization$Visualization_Shape$linearCurve,
-			A2(_elm_lang$core$List$map, _shohamh$learnmath_frontend$Visualizations_LineChart$transformToLineData, model)));
+			A2(
+				_elm_lang$core$List$map,
+				_shohamh$learnmath_frontend$Visualizations_LineChart$transformToLineData(model),
+				model)));
 };
 var _shohamh$learnmath_frontend$Visualizations_LineChart$viewLineChart = F2(
 	function (session, model) {
@@ -36156,7 +36842,8 @@ var _shohamh$learnmath_frontend$Visualizations_LineChart$viewLineChart = F2(
 					},
 					{
 						ctor: '::',
-						_0: _shohamh$learnmath_frontend$Visualizations_LineChart$xAxis(model),
+						_0: _shohamh$learnmath_frontend$Visualizations_LineChart$xAxis(
+							A2(_elm_lang$core$Debug$log, 'xaxis running with', model)),
 						_1: {ctor: '[]'}
 					}),
 				_1: {
@@ -36198,7 +36885,7 @@ var _shohamh$learnmath_frontend$Visualizations_LineChart$viewLineChart = F2(
 										'translate(',
 										A2(
 											_elm_lang$core$Basics_ops['++'],
-											_elm_lang$core$Basics$toString((_shohamh$learnmath_frontend$Visualizations_LineChart$padding + _shohamh$learnmath_frontend$Visualizations_LineChart$padding) + (_shohamh$learnmath_frontend$Visualizations_LineChart$padding / 2)),
+											_elm_lang$core$Basics$toString(_shohamh$learnmath_frontend$Visualizations_LineChart$padding * 6),
 											A2(
 												_elm_lang$core$Basics_ops['++'],
 												', ',
@@ -36237,6 +36924,7 @@ var _shohamh$learnmath_frontend$Visualizations_LineChart$viewLineChart = F2(
 				}
 			});
 	});
+var _shohamh$learnmath_frontend$Visualizations_LineChart$model = {ctor: '[]'};
 
 var _shohamh$learnmath_frontend$Visualizations_PieChart$colors = _elm_lang$core$Array$fromList(
 	{
@@ -36396,16 +37084,20 @@ var _shohamh$learnmath_frontend$Visualizations_PieChart$viewPieChart = F2(
 				_1: {ctor: '[]'}
 			});
 	});
-var _shohamh$learnmath_frontend$Visualizations_PieChart$model = _shohamh$learnmath_frontend$SampleData$mistakeTypeFrequency;
+var _shohamh$learnmath_frontend$Visualizations_PieChart$model = {ctor: '[]'};
 
-var _shohamh$learnmath_frontend$Page_Dashboard$update = F3(
-	function (session, msg, model) {
-		var _p0 = msg;
-		return A2(
-			_elm_lang$core$Platform_Cmd_ops['!'],
-			model,
-			{ctor: '[]'});
-	});
+var _shohamh$learnmath_frontend$Page_Dashboard$viewErrorMessages = function (errorMessages) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		A2(
+			_elm_lang$core$List$intersperse,
+			A2(
+				_elm_lang$html$Html$br,
+				{ctor: '[]'},
+				{ctor: '[]'}),
+			A2(_elm_lang$core$List$map, _elm_lang$html$Html$text, errorMessages)));
+};
 var _shohamh$learnmath_frontend$Page_Dashboard$view = F2(
 	function (session, model) {
 		return A2(
@@ -36502,7 +37194,33 @@ var _shohamh$learnmath_frontend$Page_Dashboard$view = F2(
 												}),
 											_1: {ctor: '[]'}
 										}),
-									_1: {ctor: '[]'}
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$div,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$class('row'),
+												_1: {ctor: '[]'}
+											},
+											{
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$div,
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$class('col-md-12'),
+														_1: {ctor: '[]'}
+													},
+													{
+														ctor: '::',
+														_0: _shohamh$learnmath_frontend$Page_Dashboard$viewErrorMessages(model.errorMessages),
+														_1: {ctor: '[]'}
+													}),
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									}
 								}
 							}
 						}
@@ -36510,12 +37228,333 @@ var _shohamh$learnmath_frontend$Page_Dashboard$view = F2(
 				_1: {ctor: '[]'}
 			});
 	});
-var _shohamh$learnmath_frontend$Page_Dashboard$model = {barChartModel: _shohamh$learnmath_frontend$Visualizations_BarChart$model, lineChartModel: _shohamh$learnmath_frontend$Visualizations_LineChart$model, pieChartModel: _shohamh$learnmath_frontend$Visualizations_PieChart$model};
-var _shohamh$learnmath_frontend$Page_Dashboard$Model = F3(
-	function (a, b, c) {
-		return {barChartModel: a, lineChartModel: b, pieChartModel: c};
+var _shohamh$learnmath_frontend$Page_Dashboard$update = F3(
+	function (session, msg, model) {
+		var _p0 = msg;
+		switch (_p0.ctor) {
+			case 'LoadStudentPerformance':
+				if (_p0._0.ctor === 'Ok') {
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{lineChartModel: _p0._0._0.result}),
+						{ctor: '[]'});
+				} else {
+					var errorMessage = _shohamh$learnmath_frontend$Util$httpErrorToString(_p0._0._0);
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								errorMessages: A2(
+									_elm_lang$core$List$append,
+									model.errorMessages,
+									{
+										ctor: '::',
+										_0: errorMessage,
+										_1: {ctor: '[]'}
+									})
+							}),
+						{ctor: '[]'});
+				}
+			case 'LoadSubjectPerformance':
+				if (_p0._0.ctor === 'Ok') {
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{barChartModel: _p0._0._0.result}),
+						{ctor: '[]'});
+				} else {
+					var errorMessage = _shohamh$learnmath_frontend$Util$httpErrorToString(_p0._0._0);
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								errorMessages: A2(
+									_elm_lang$core$List$append,
+									model.errorMessages,
+									{
+										ctor: '::',
+										_0: errorMessage,
+										_1: {ctor: '[]'}
+									})
+							}),
+						{ctor: '[]'});
+				}
+			default:
+				if (_p0._0.ctor === 'Ok') {
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{pieChartModel: _p0._0._0.result}),
+						{ctor: '[]'});
+				} else {
+					var errorMessage = _shohamh$learnmath_frontend$Util$httpErrorToString(_p0._0._0);
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								errorMessages: A2(
+									_elm_lang$core$List$append,
+									model.errorMessages,
+									{
+										ctor: '::',
+										_0: errorMessage,
+										_1: {ctor: '[]'}
+									})
+							}),
+						{ctor: '[]'});
+				}
+		}
 	});
-var _shohamh$learnmath_frontend$Page_Dashboard$NoOp = {ctor: 'NoOp'};
+var _shohamh$learnmath_frontend$Page_Dashboard$mistakeTypesTransformer = function (dict) {
+	return A2(
+		_elm_lang$core$List$map,
+		function (mistakeType) {
+			return {
+				ctor: '_Tuple2',
+				_0: mistakeType,
+				_1: A2(
+					_elm_lang$core$Maybe$withDefault,
+					0,
+					A2(
+						_elm_lang$core$Dict$get,
+						mistakeType,
+						A2(
+							_elm_lang$core$Maybe$withDefault,
+							_elm_lang$core$Dict$empty,
+							A2(_elm_lang$core$Dict$get, mistakeType, dict))))
+			};
+		},
+		_elm_lang$core$Dict$keys(dict));
+};
+var _shohamh$learnmath_frontend$Page_Dashboard$loadMistakeTypesEncoder = function (_p1) {
+	var _p2 = _p1;
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'sid',
+				_1: _elm_lang$core$Json_Encode$string(
+					_shohamh$learnmath_frontend$Data_Session$getSid(_p2._0))
+			},
+			_1: {ctor: '[]'}
+		});
+};
+var _shohamh$learnmath_frontend$Page_Dashboard$subjectPerformanceTransformer = function (dict) {
+	return A2(
+		_elm_lang$core$List$map,
+		function (subjectName) {
+			return {
+				ctor: '_Tuple2',
+				_0: _shohamh$learnmath_frontend$Data_Subject$Subject(subjectName),
+				_1: {
+					ctor: '_Tuple2',
+					_0: A2(
+						_elm_lang$core$Maybe$withDefault,
+						0,
+						A2(
+							_elm_lang$core$Dict$get,
+							'wrong',
+							A2(
+								_elm_lang$core$Maybe$withDefault,
+								_elm_lang$core$Dict$empty,
+								A2(_elm_lang$core$Dict$get, subjectName, dict)))),
+					_1: A2(
+						_elm_lang$core$Maybe$withDefault,
+						0,
+						A2(
+							_elm_lang$core$Dict$get,
+							'correct',
+							A2(
+								_elm_lang$core$Maybe$withDefault,
+								_elm_lang$core$Dict$empty,
+								A2(_elm_lang$core$Dict$get, subjectName, dict))))
+				}
+			};
+		},
+		_elm_lang$core$Dict$keys(dict));
+};
+var _shohamh$learnmath_frontend$Page_Dashboard$loadSubjectPerformanceEncoder = function (_p3) {
+	var _p4 = _p3;
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'sid',
+				_1: _elm_lang$core$Json_Encode$string(
+					_shohamh$learnmath_frontend$Data_Session$getSid(_p4._0))
+			},
+			_1: {ctor: '[]'}
+		});
+};
+var _shohamh$learnmath_frontend$Page_Dashboard$studentPerformanceTransformer = function (dict) {
+	return A2(
+		_elm_lang$core$List$map,
+		function (studentName) {
+			return {
+				ctor: '_Tuple2',
+				_0: studentName,
+				_1: {
+					ctor: '_Tuple2',
+					_0: A2(
+						_elm_lang$core$Maybe$withDefault,
+						0.5,
+						A2(
+							_elm_lang$core$Dict$get,
+							'success_percentage',
+							A2(
+								_elm_lang$core$Maybe$withDefault,
+								_elm_lang$core$Dict$empty,
+								A2(_elm_lang$core$Dict$get, studentName, dict)))),
+					_1: A2(
+						_elm_lang$core$Maybe$withDefault,
+						100,
+						A2(
+							_elm_lang$core$Dict$get,
+							'average_solving_time',
+							A2(
+								_elm_lang$core$Maybe$withDefault,
+								_elm_lang$core$Dict$empty,
+								A2(_elm_lang$core$Dict$get, studentName, dict))))
+				}
+			};
+		},
+		_elm_lang$core$Dict$keys(dict));
+};
+var _shohamh$learnmath_frontend$Page_Dashboard$loadStudentPerformanceEncoder = function (_p5) {
+	var _p6 = _p5;
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'sid',
+				_1: _elm_lang$core$Json_Encode$string(
+					_shohamh$learnmath_frontend$Data_Session$getSid(_p6._0))
+			},
+			_1: {ctor: '[]'}
+		});
+};
+var _shohamh$learnmath_frontend$Page_Dashboard$model = {
+	barChartModel: _shohamh$learnmath_frontend$Visualizations_BarChart$model,
+	lineChartModel: _shohamh$learnmath_frontend$Visualizations_LineChart$model,
+	pieChartModel: _shohamh$learnmath_frontend$Visualizations_PieChart$model,
+	errorMessages: {ctor: '[]'}
+};
+var _shohamh$learnmath_frontend$Page_Dashboard$Model = F4(
+	function (a, b, c, d) {
+		return {barChartModel: a, lineChartModel: b, pieChartModel: c, errorMessages: d};
+	});
+var _shohamh$learnmath_frontend$Page_Dashboard$LoadSubjectPerformanceResponseData = F3(
+	function (a, b, c) {
+		return {success: a, error_messages: b, result: c};
+	});
+var _shohamh$learnmath_frontend$Page_Dashboard$loadSubjectPerformanceResponseDecoder = A3(
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+	'result',
+	A2(
+		_elm_lang$core$Json_Decode$map,
+		_shohamh$learnmath_frontend$Page_Dashboard$subjectPerformanceTransformer,
+		_elm_lang$core$Json_Decode$dict(
+			_elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$float))),
+	A3(
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+		'error_messages',
+		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string),
+		A3(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+			'success',
+			_elm_lang$core$Json_Decode$bool,
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_shohamh$learnmath_frontend$Page_Dashboard$LoadSubjectPerformanceResponseData))));
+var _shohamh$learnmath_frontend$Page_Dashboard$LoadStudentPerformanceResponseData = F3(
+	function (a, b, c) {
+		return {success: a, error_messages: b, result: c};
+	});
+var _shohamh$learnmath_frontend$Page_Dashboard$loadStudentPerformanceResponseDecoder = A3(
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+	'result',
+	A2(
+		_elm_lang$core$Json_Decode$map,
+		_shohamh$learnmath_frontend$Page_Dashboard$studentPerformanceTransformer,
+		_elm_lang$core$Json_Decode$dict(
+			_elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$float))),
+	A3(
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+		'error_messages',
+		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string),
+		A3(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+			'success',
+			_elm_lang$core$Json_Decode$bool,
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_shohamh$learnmath_frontend$Page_Dashboard$LoadStudentPerformanceResponseData))));
+var _shohamh$learnmath_frontend$Page_Dashboard$LoadMistakeTypesResponseData = F3(
+	function (a, b, c) {
+		return {success: a, error_messages: b, result: c};
+	});
+var _shohamh$learnmath_frontend$Page_Dashboard$loadMistakeTypesResponseDecoder = A3(
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+	'result',
+	A2(
+		_elm_lang$core$Json_Decode$map,
+		_shohamh$learnmath_frontend$Page_Dashboard$mistakeTypesTransformer,
+		_elm_lang$core$Json_Decode$dict(
+			_elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$float))),
+	A3(
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+		'error_messages',
+		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string),
+		A3(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+			'success',
+			_elm_lang$core$Json_Decode$bool,
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_shohamh$learnmath_frontend$Page_Dashboard$LoadMistakeTypesResponseData))));
+var _shohamh$learnmath_frontend$Page_Dashboard$LoadMistakeTypes = function (a) {
+	return {ctor: 'LoadMistakeTypes', _0: a};
+};
+var _shohamh$learnmath_frontend$Page_Dashboard$loadMistakeTypes = F2(
+	function (session, model) {
+		return A5(
+			_shohamh$learnmath_frontend$Util$httpPost,
+			'get_mistake_type_stats',
+			{ctor: '_Tuple2', _0: session, _1: model},
+			_shohamh$learnmath_frontend$Page_Dashboard$loadMistakeTypesEncoder,
+			_shohamh$learnmath_frontend$Page_Dashboard$loadMistakeTypesResponseDecoder,
+			_shohamh$learnmath_frontend$Page_Dashboard$LoadMistakeTypes);
+	});
+var _shohamh$learnmath_frontend$Page_Dashboard$LoadSubjectPerformance = function (a) {
+	return {ctor: 'LoadSubjectPerformance', _0: a};
+};
+var _shohamh$learnmath_frontend$Page_Dashboard$loadSubjectPerformance = F2(
+	function (session, model) {
+		return A5(
+			_shohamh$learnmath_frontend$Util$httpPost,
+			'get_wrong_right_stats',
+			{ctor: '_Tuple2', _0: session, _1: model},
+			_shohamh$learnmath_frontend$Page_Dashboard$loadSubjectPerformanceEncoder,
+			_shohamh$learnmath_frontend$Page_Dashboard$loadSubjectPerformanceResponseDecoder,
+			_shohamh$learnmath_frontend$Page_Dashboard$LoadSubjectPerformance);
+	});
+var _shohamh$learnmath_frontend$Page_Dashboard$LoadStudentPerformance = function (a) {
+	return {ctor: 'LoadStudentPerformance', _0: a};
+};
+var _shohamh$learnmath_frontend$Page_Dashboard$loadStudentPerformance = F2(
+	function (session, model) {
+		return A5(
+			_shohamh$learnmath_frontend$Util$httpPost,
+			'get_success_percentage_avg_time_stats',
+			{ctor: '_Tuple2', _0: session, _1: model},
+			_shohamh$learnmath_frontend$Page_Dashboard$loadStudentPerformanceEncoder,
+			_shohamh$learnmath_frontend$Page_Dashboard$loadStudentPerformanceResponseDecoder,
+			_shohamh$learnmath_frontend$Page_Dashboard$LoadStudentPerformance);
+	});
 
 var _shohamh$learnmath_frontend$Route$routeToString = function (page) {
 	var pieces = function () {
@@ -36553,6 +37592,12 @@ var _shohamh$learnmath_frontend$Route$routeToString = function (page) {
 					_0: 'add_question',
 					_1: {ctor: '[]'}
 				};
+			case 'AddPractice':
+				return {
+					ctor: '::',
+					_0: 'add_practice',
+					_1: {ctor: '[]'}
+				};
 			case 'Dashboard':
 				return {
 					ctor: '::',
@@ -36588,6 +37633,7 @@ var _shohamh$learnmath_frontend$Route$TeacherDashboard = {ctor: 'TeacherDashboar
 var _shohamh$learnmath_frontend$Route$Dashboard = function (a) {
 	return {ctor: 'Dashboard', _0: a};
 };
+var _shohamh$learnmath_frontend$Route$AddPractice = {ctor: 'AddPractice'};
 var _shohamh$learnmath_frontend$Route$AddQuestion = {ctor: 'AddQuestion'};
 var _shohamh$learnmath_frontend$Route$Question = {ctor: 'Question'};
 var _shohamh$learnmath_frontend$Route$Register = {ctor: 'Register'};
@@ -36635,18 +37681,25 @@ var _shohamh$learnmath_frontend$Route$route = _evancz$url_parser$UrlParser$oneOf
 								ctor: '::',
 								_0: A2(
 									_evancz$url_parser$UrlParser$map,
-									_shohamh$learnmath_frontend$Route$Dashboard,
-									A2(
-										_evancz$url_parser$UrlParser_ops['</>'],
-										_evancz$url_parser$UrlParser$s('dashboard'),
-										_shohamh$learnmath_frontend$Data_User$usernameParser)),
+									_shohamh$learnmath_frontend$Route$AddPractice,
+									_evancz$url_parser$UrlParser$s('add_practice')),
 								_1: {
 									ctor: '::',
 									_0: A2(
 										_evancz$url_parser$UrlParser$map,
-										_shohamh$learnmath_frontend$Route$TeacherDashboard,
-										_evancz$url_parser$UrlParser$s('teacher_dashboard')),
-									_1: {ctor: '[]'}
+										_shohamh$learnmath_frontend$Route$Dashboard,
+										A2(
+											_evancz$url_parser$UrlParser_ops['</>'],
+											_evancz$url_parser$UrlParser$s('dashboard'),
+											_shohamh$learnmath_frontend$Data_User$usernameParser)),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_evancz$url_parser$UrlParser$map,
+											_shohamh$learnmath_frontend$Route$TeacherDashboard,
+											_evancz$url_parser$UrlParser$s('teacher_dashboard')),
+										_1: {ctor: '[]'}
+									}
 								}
 							}
 						}
@@ -36752,7 +37805,16 @@ var _shohamh$learnmath_frontend$Views_Page$navbarLink = F3(
 	});
 var _shohamh$learnmath_frontend$Views_Page$viewFooter = A2(
 	_elm_lang$html$Html$footer,
-	{ctor: '[]'},
+	{
+		ctor: '::',
+		_0: _elm_lang$html$Html_Attributes$style(
+			{
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 'display', _1: 'inline'},
+				_1: {ctor: '[]'}
+			}),
+		_1: {ctor: '[]'}
+	},
 	{
 		ctor: '::',
 		_0: A2(
@@ -36803,6 +37865,7 @@ var _shohamh$learnmath_frontend$Views_Page$TeacherDashboard = {ctor: 'TeacherDas
 var _shohamh$learnmath_frontend$Views_Page$Dashboard = function (a) {
 	return {ctor: 'Dashboard', _0: a};
 };
+var _shohamh$learnmath_frontend$Views_Page$AddPractice = {ctor: 'AddPractice'};
 var _shohamh$learnmath_frontend$Views_Page$AddQuestion = {ctor: 'AddQuestion'};
 var _shohamh$learnmath_frontend$Views_Page$Question = {ctor: 'Question'};
 var _shohamh$learnmath_frontend$Views_Page$Register = {ctor: 'Register'};
@@ -36861,7 +37924,7 @@ var _shohamh$learnmath_frontend$Views_Page$viewSignIn = F2(
 							_shohamh$learnmath_frontend$Route$Question,
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html$text('Question'),
+								_0: _elm_lang$html$Html$text('Practice'),
 								_1: {ctor: '[]'}
 							}),
 						_1: {
@@ -36906,14 +37969,26 @@ var _shohamh$learnmath_frontend$Views_Page$viewSignIn = F2(
 							ctor: '::',
 							_0: A3(
 								_shohamh$learnmath_frontend$Views_Page$navbarLink,
-								false,
-								_shohamh$learnmath_frontend$Route$Logout,
+								_elm_lang$core$Native_Utils.eq(page, _shohamh$learnmath_frontend$Views_Page$AddPractice),
+								_shohamh$learnmath_frontend$Route$AddPractice,
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html$text('Sign out'),
+									_0: _elm_lang$html$Html$text('Add Practice'),
 									_1: {ctor: '[]'}
 								}),
-							_1: {ctor: '[]'}
+							_1: {
+								ctor: '::',
+								_0: A3(
+									_shohamh$learnmath_frontend$Views_Page$navbarLink,
+									false,
+									_shohamh$learnmath_frontend$Route$Logout,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Sign out'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}
 						}
 					}
 				};
@@ -37004,11 +38079,7 @@ var _shohamh$learnmath_frontend$Views_Page$frame = F4(
 				_1: {
 					ctor: '::',
 					_0: content,
-					_1: {
-						ctor: '::',
-						_0: _shohamh$learnmath_frontend$Views_Page$viewFooter,
-						_1: {ctor: '[]'}
-					}
+					_1: {ctor: '[]'}
 				}
 			});
 	});
@@ -37227,7 +38298,7 @@ var _shohamh$learnmath_frontend$Ports$storeSession = _elm_lang$core$Native_Platf
 var _shohamh$learnmath_frontend$Ports$importQuestion = _elm_lang$core$Native_Platform.outgoingPort(
 	'importQuestion',
 	function (v) {
-		return (v.ctor === 'Nothing') ? null : v._0;
+		return [v._0, v._1];
 	});
 var _shohamh$learnmath_frontend$Ports$myscriptConvert = _elm_lang$core$Native_Platform.outgoingPort(
 	'myscriptConvert',
@@ -37235,136 +38306,6 @@ var _shohamh$learnmath_frontend$Ports$myscriptConvert = _elm_lang$core$Native_Pl
 		return null;
 	});
 var _shohamh$learnmath_frontend$Ports$onSessionChange = _elm_lang$core$Native_Platform.incomingPort('onSessionChange', _elm_lang$core$Json_Decode$value);
-
-var _shohamh$learnmath_frontend$Views_Form$control = F3(
-	function (element, attributes, children) {
-		return A2(
-			_elm_lang$html$Html$fieldset,
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class('form-group'),
-				_1: {ctor: '[]'}
-			},
-			{
-				ctor: '::',
-				_0: A2(
-					element,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('form-control'),
-						_1: attributes
-					},
-					children),
-				_1: {ctor: '[]'}
-			});
-	});
-var _shohamh$learnmath_frontend$Views_Form$viewErrors = function (errors) {
-	return A2(
-		_elm_lang$html$Html$ul,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('error-messages'),
-			_1: {ctor: '[]'}
-		},
-		A2(
-			_elm_lang$core$List$map,
-			function (_p0) {
-				var _p1 = _p0;
-				return A2(
-					_elm_lang$html$Html$li,
-					{ctor: '[]'},
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html$text(_p1._1),
-						_1: {ctor: '[]'}
-					});
-			},
-			errors));
-};
-var _shohamh$learnmath_frontend$Views_Form$textarea = _shohamh$learnmath_frontend$Views_Form$control(_elm_lang$html$Html$textarea);
-var _shohamh$learnmath_frontend$Views_Form$radio = F6(
-	function (name, values, msg, msgValues, attrs, children) {
-		return A2(
-			_elm_lang$html$Html$fieldset,
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class('form-group'),
-				_1: {ctor: '[]'}
-			},
-			A3(
-				_elm_lang$core$List$map2,
-				F2(
-					function (strValue, msgValue) {
-						return A2(
-							_elm_lang$html$Html$label,
-							{ctor: '[]'},
-							{
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$input,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('form-control'),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$class('radio'),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$name(name),
-												_1: {
-													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$type_('radio'),
-													_1: {
-														ctor: '::',
-														_0: _elm_lang$html$Html_Attributes$value(strValue),
-														_1: {
-															ctor: '::',
-															_0: _elm_lang$html$Html_Events$onClick(
-																msg(msgValue)),
-															_1: attrs
-														}
-													}
-												}
-											}
-										}
-									},
-									children),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html$text(strValue),
-									_1: {ctor: '[]'}
-								}
-							});
-					}),
-				values,
-				msgValues));
-	});
-var _shohamh$learnmath_frontend$Views_Form$input = function (attrs) {
-	return A2(
-		_shohamh$learnmath_frontend$Views_Form$control,
-		_elm_lang$html$Html$input,
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$type_('text'),
-				_1: {ctor: '[]'}
-			},
-			attrs));
-};
-var _shohamh$learnmath_frontend$Views_Form$password = function (attrs) {
-	return A2(
-		_shohamh$learnmath_frontend$Views_Form$control,
-		_elm_lang$html$Html$input,
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$type_('password'),
-				_1: {ctor: '[]'}
-			},
-			attrs));
-};
 
 var _shohamh$learnmath_frontend$Page_Login$viewErrorMessages = function (errorMessages) {
 	return A2(
@@ -37811,12 +38752,17 @@ var _shohamh$learnmath_frontend$Page_Question$onExport = function (message) {
 				_elm_lang$core$Json_Decode$string)));
 };
 var _shohamh$learnmath_frontend$Page_Question$onConvert = function (message) {
+	var map2d = F2(
+		function (string, $int) {
+			return message(
+				{ctor: '_Tuple2', _0: string, _1: $int});
+		});
 	return A2(
 		_elm_lang$html$Html_Events$on,
 		'convert',
-		A2(
-			_elm_lang$core$Json_Decode$map,
-			message,
+		A3(
+			_elm_lang$core$Json_Decode$map2,
+			map2d,
 			A2(
 				_elm_lang$core$Json_Decode$at,
 				{
@@ -37836,10 +38782,15 @@ var _shohamh$learnmath_frontend$Page_Question$onConvert = function (message) {
 						}
 					}
 				},
+				_elm_lang$core$Json_Decode$string),
+			A2(
+				_elm_lang$core$Json_Decode$at,
+				{
+					ctor: '::',
+					_0: '',
+					_1: {ctor: '[]'}
+				},
 				_elm_lang$core$Json_Decode$string)));
-};
-var _shohamh$learnmath_frontend$Page_Question$subs = function (model) {
-	return _elm_lang$core$Platform_Sub$none;
 };
 var _shohamh$learnmath_frontend$Page_Question$viewErrorMessages = function (errorMessages) {
 	return A2(
@@ -37853,9 +38804,9 @@ var _shohamh$learnmath_frontend$Page_Question$viewErrorMessages = function (erro
 				{ctor: '[]'}),
 			A2(_elm_lang$core$List$map, _elm_lang$html$Html$text, errorMessages)));
 };
-var _shohamh$learnmath_frontend$Page_Question$checkSolutionEncoder = function (_p0) {
+var _shohamh$learnmath_frontend$Page_Question$validateSolutionEncoder = function (_p0) {
 	var _p1 = _p0;
-	var _p2 = _p1._1;
+	var _p3 = _p1._1;
 	return _elm_lang$core$Json_Encode$object(
 		{
 			ctor: '::',
@@ -37869,23 +38820,36 @@ var _shohamh$learnmath_frontend$Page_Question$checkSolutionEncoder = function (_
 				ctor: '::',
 				_0: {
 					ctor: '_Tuple2',
-					_0: 'question',
-					_1: _elm_lang$core$Json_Encode$string(_p2.question)
+					_0: 'solution_history',
+					_1: _elm_lang$core$Json_Encode$list(
+						A2(
+							_elm_lang$core$List$map,
+							_elm_lang$core$Json_Encode$string,
+							A2(
+								_elm_lang$core$Maybe$withDefault,
+								{ctor: '[]'},
+								A2(_elm_lang$core$Array$get, _p3.currentQuestionIndex, _p3.solutionHistory))))
 				},
 				_1: {
 					ctor: '::',
 					_0: {
 						ctor: '_Tuple2',
-						_0: 'solutions',
-						_1: _elm_lang$core$Json_Encode$string(_p2.lastExport)
+						_0: 'index',
+						_1: _elm_lang$core$Json_Encode$int(_p3.currentQuestionIndex)
 					},
 					_1: {
 						ctor: '::',
 						_0: {
 							ctor: '_Tuple2',
-							_0: 'subjects',
-							_1: _elm_lang$core$Json_Encode$list(
-								A2(_elm_lang$core$List$map, _elm_lang$core$Json_Encode$string, _p2.subjects))
+							_0: 'time',
+							_1: function () {
+								var _p2 = A2(_elm_lang$core$Array$get, _p3.currentQuestionIndex, _p3.timers);
+								if (_p2.ctor === 'Just') {
+									return _elm_lang$core$Json_Encode$int(_p2._0);
+								} else {
+									return _elm_lang$core$Json_Encode$null;
+								}
+							}()
 						},
 						_1: {ctor: '[]'}
 					}
@@ -37893,7 +38857,60 @@ var _shohamh$learnmath_frontend$Page_Question$checkSolutionEncoder = function (_
 			}
 		});
 };
-var _shohamh$learnmath_frontend$Page_Question$loadQuestionEncoder = function (sid) {
+var _shohamh$learnmath_frontend$Page_Question$checkSolutionEncoder = function (_p4) {
+	var _p5 = _p4;
+	var _p8 = _p5._1;
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'sid',
+				_1: _elm_lang$core$Json_Encode$string(
+					_shohamh$learnmath_frontend$Data_Session$getSid(_p5._0))
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'solutions',
+					_1: function () {
+						var _p6 = A2(_elm_lang$core$Array$get, _p8.currentQuestionIndex, _p8.currentAnswers);
+						if (_p6.ctor === 'Just') {
+							return _elm_lang$core$Json_Encode$string(_p6._0);
+						} else {
+							return _elm_lang$core$Json_Encode$null;
+						}
+					}()
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'index',
+						_1: _elm_lang$core$Json_Encode$int(_p8.currentQuestionIndex)
+					},
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'time',
+							_1: function () {
+								var _p7 = A2(_elm_lang$core$Array$get, _p8.currentQuestionIndex, _p8.timers);
+								if (_p7.ctor === 'Just') {
+									return _elm_lang$core$Json_Encode$int(_p7._0);
+								} else {
+									return _elm_lang$core$Json_Encode$null;
+								}
+							}()
+						},
+						_1: {ctor: '[]'}
+					}
+				}
+			}
+		});
+};
+var _shohamh$learnmath_frontend$Page_Question$loadQuestionsEncoder = function (sid) {
 	return _elm_lang$core$Json_Encode$object(
 		{
 			ctor: '::',
@@ -37908,39 +38925,79 @@ var _shohamh$learnmath_frontend$Page_Question$loadQuestionEncoder = function (si
 var _shohamh$learnmath_frontend$Page_Question$model = {
 	successMessage: '',
 	errorMessages: {ctor: '[]'},
-	lastExport: '',
+	currentAnswers: _elm_lang$core$Array$empty,
+	solutionHistory: _elm_lang$core$Array$empty,
+	currentQuestionIndex: 0,
 	exportCount: 0,
 	lastConvert: '',
 	convertCount: 0,
-	question: '',
+	questions: _elm_lang$core$Array$empty,
 	subjects: {ctor: '[]'},
-	isCorrect: _elm_lang$core$Maybe$Nothing
+	curriculum: '',
+	questionEditors: _elm_lang$core$Array$empty,
+	isCorrect: _elm_lang$core$Array$empty,
+	timers: _elm_lang$core$Array$empty,
+	mistakeStep: _elm_lang$core$Maybe$Nothing,
+	mistakeType: _elm_lang$core$Maybe$Nothing
 };
-var _shohamh$learnmath_frontend$Page_Question$Model = F9(
-	function (a, b, c, d, e, f, g, h, i) {
-		return {successMessage: a, errorMessages: b, lastExport: c, exportCount: d, lastConvert: e, convertCount: f, question: g, subjects: h, isCorrect: i};
-	});
-var _shohamh$learnmath_frontend$Page_Question$LoadQuestionResponseData = F4(
-	function (a, b, c, d) {
-		return {success: a, error_messages: b, problem: c, subjects: d};
+var _shohamh$learnmath_frontend$Page_Question$Model = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return function (k) {
+											return function (l) {
+												return function (m) {
+													return function (n) {
+														return function (o) {
+															return function (p) {
+																return {successMessage: a, errorMessages: b, currentQuestionIndex: c, currentAnswers: d, solutionHistory: e, exportCount: f, lastConvert: g, convertCount: h, questions: i, subjects: j, curriculum: k, questionEditors: l, isCorrect: m, timers: n, mistakeStep: o, mistakeType: p};
+															};
+														};
+													};
+												};
+											};
+										};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var _shohamh$learnmath_frontend$Page_Question$LoadQuestionResponseData = F5(
+	function (a, b, c, d, e) {
+		return {success: a, error_messages: b, questions: c, subjects: d, curriculum: e};
 	});
 var _shohamh$learnmath_frontend$Page_Question$loadQuestionResponseDecoder = A3(
 	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-	'subjects',
-	_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string),
+	'curriculum',
+	_elm_lang$core$Json_Decode$string,
 	A3(
 		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-		'problem',
-		_elm_lang$core$Json_Decode$string,
+		'subjects',
+		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string),
 		A3(
 			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-			'error_messages',
-			_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string),
+			'questions',
+			_elm_lang$core$Json_Decode$array(_elm_lang$core$Json_Decode$string),
 			A3(
 				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-				'success',
-				_elm_lang$core$Json_Decode$bool,
-				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_shohamh$learnmath_frontend$Page_Question$LoadQuestionResponseData)))));
+				'error_messages',
+				_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string),
+				A3(
+					_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+					'success',
+					_elm_lang$core$Json_Decode$bool,
+					_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_shohamh$learnmath_frontend$Page_Question$LoadQuestionResponseData))))));
 var _shohamh$learnmath_frontend$Page_Question$CheckSolutionResponseData = F3(
 	function (a, b, c) {
 		return {success: a, error_messages: b, correct: c};
@@ -37958,6 +39015,62 @@ var _shohamh$learnmath_frontend$Page_Question$checkSolutionResponseDecoder = A3(
 			'success',
 			_elm_lang$core$Json_Decode$bool,
 			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_shohamh$learnmath_frontend$Page_Question$CheckSolutionResponseData))));
+var _shohamh$learnmath_frontend$Page_Question$ValidateSolutionResponseData = F5(
+	function (a, b, c, d, e) {
+		return {success: a, error_messages: b, correct: c, step: d, mistake_type: e};
+	});
+var _shohamh$learnmath_frontend$Page_Question$validateSolutionResponseDecoder = A4(
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional,
+	'mistake_type',
+	A2(
+		_elm_lang$core$Json_Decode$map,
+		function (x) {
+			return _elm_lang$core$Native_Utils.eq(x, '') ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(x);
+		},
+		_elm_lang$core$Json_Decode$string),
+	_elm_lang$core$Maybe$Just(''),
+	A4(
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional,
+		'step',
+		A2(
+			_elm_lang$core$Json_Decode$map,
+			function (x) {
+				return _elm_lang$core$Native_Utils.eq(x, -1) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(x);
+			},
+			_elm_lang$core$Json_Decode$int),
+		_elm_lang$core$Maybe$Just(-1),
+		A3(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+			'correct',
+			_elm_lang$core$Json_Decode$bool,
+			A3(
+				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+				'error_messages',
+				_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string),
+				A3(
+					_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+					'success',
+					_elm_lang$core$Json_Decode$bool,
+					_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_shohamh$learnmath_frontend$Page_Question$ValidateSolutionResponseData))))));
+var _shohamh$learnmath_frontend$Page_Question$TimerTick = function (a) {
+	return {ctor: 'TimerTick', _0: a};
+};
+var _shohamh$learnmath_frontend$Page_Question$subs = function (model) {
+	return A2(_elm_lang$core$Time$every, _elm_lang$core$Time$second, _shohamh$learnmath_frontend$Page_Question$TimerTick);
+};
+var _shohamh$learnmath_frontend$Page_Question$ValidateResult = function (a) {
+	return {ctor: 'ValidateResult', _0: a};
+};
+var _shohamh$learnmath_frontend$Page_Question$validateSolution = F2(
+	function (session, model) {
+		return A5(
+			_shohamh$learnmath_frontend$Util$httpPost,
+			'validate_solution',
+			{ctor: '_Tuple2', _0: session, _1: model},
+			_shohamh$learnmath_frontend$Page_Question$validateSolutionEncoder,
+			_shohamh$learnmath_frontend$Page_Question$validateSolutionResponseDecoder,
+			_shohamh$learnmath_frontend$Page_Question$ValidateResult);
+	});
 var _shohamh$learnmath_frontend$Page_Question$CheckSolutionResult = function (a) {
 	return {ctor: 'CheckSolutionResult', _0: a};
 };
@@ -37971,126 +39084,23 @@ var _shohamh$learnmath_frontend$Page_Question$checkSolution = F2(
 			_shohamh$learnmath_frontend$Page_Question$checkSolutionResponseDecoder,
 			_shohamh$learnmath_frontend$Page_Question$CheckSolutionResult);
 	});
-var _shohamh$learnmath_frontend$Page_Question$update = F3(
-	function (session, msg, model) {
-		var _p3 = msg;
-		switch (_p3.ctor) {
-			case 'MyScriptExport':
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{
-							lastExport: A2(_elm_lang$core$Debug$log, 'latestExport', _p3._0),
-							exportCount: model.exportCount + 1
-						}),
-					{
-						ctor: '::',
-						_0: (_elm_lang$core$Native_Utils.cmp(model.exportCount, 2) < 1) ? _shohamh$learnmath_frontend$Ports$myscriptConvert(
-							{ctor: '_Tuple0'}) : _elm_lang$core$Platform_Cmd$none,
-						_1: {ctor: '[]'}
-					});
-			case 'MyScriptConvert':
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{
-							lastConvert: A2(_elm_lang$core$Debug$log, 'latestConvert', _p3._0),
-							convertCount: model.convertCount + 1
-						}),
-					{ctor: '[]'});
-			case 'CheckSolution':
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					model,
-					{
-						ctor: '::',
-						_0: A2(_shohamh$learnmath_frontend$Page_Question$checkSolution, session, model),
-						_1: {ctor: '[]'}
-					});
-			case 'CheckSolutionResult':
-				if (_p3._0.ctor === 'Err') {
-					var errorMessage = _shohamh$learnmath_frontend$Util$httpErrorToString(_p3._0._0);
-					return A2(
-						_shohamh$learnmath_frontend$Util_ops['=>'],
-						_elm_lang$core$Native_Utils.update(
-							model,
-							{
-								errorMessages: A2(
-									_elm_lang$core$List$append,
-									model.errorMessages,
-									{
-										ctor: '::',
-										_0: errorMessage,
-										_1: {ctor: '[]'}
-									})
-							}),
-						_elm_lang$core$Platform_Cmd$none);
-				} else {
-					var _p4 = _p3._0._0;
-					return A2(
-						_shohamh$learnmath_frontend$Util_ops['=>'],
-						_elm_lang$core$Native_Utils.update(
-							model,
-							{
-								isCorrect: _elm_lang$core$Maybe$Just(_p4.correct),
-								errorMessages: _p4.error_messages
-							}),
-						_elm_lang$core$Platform_Cmd$none);
-				}
-			default:
-				if (_p3._0.ctor === 'Err') {
-					var errorMessage = _shohamh$learnmath_frontend$Util$httpErrorToString(_p3._0._0);
-					return A2(
-						_shohamh$learnmath_frontend$Util_ops['=>'],
-						_elm_lang$core$Native_Utils.update(
-							model,
-							{
-								errorMessages: A2(
-									_elm_lang$core$List$append,
-									model.errorMessages,
-									{
-										ctor: '::',
-										_0: errorMessage,
-										_1: {ctor: '[]'}
-									})
-							}),
-						_elm_lang$core$Platform_Cmd$none);
-				} else {
-					var _p5 = _p3._0._0;
-					var newModel = _elm_lang$core$Native_Utils.update(
-						model,
-						{question: _p5.problem, subjects: _p5.subjects});
-					return A2(
-						_shohamh$learnmath_frontend$Util_ops['=>'],
-						newModel,
-						_shohamh$learnmath_frontend$Ports$importQuestion(
-							_elm_lang$core$Maybe$Just(
-								A2(_elm_lang$core$Debug$log, 'question from server', newModel.question))));
-				}
-		}
-	});
 var _shohamh$learnmath_frontend$Page_Question$LoadQuestionResult = function (a) {
 	return {ctor: 'LoadQuestionResult', _0: a};
 };
-var _shohamh$learnmath_frontend$Page_Question$loadQuestion = F2(
+var _shohamh$learnmath_frontend$Page_Question$loadQuestions = F2(
 	function (session, model) {
 		return A5(
 			_shohamh$learnmath_frontend$Util$httpPost,
-			'question',
+			'get_practice_session_questions',
 			_shohamh$learnmath_frontend$Data_Session$getSid(session),
-			_shohamh$learnmath_frontend$Page_Question$loadQuestionEncoder,
+			_shohamh$learnmath_frontend$Page_Question$loadQuestionsEncoder,
 			_shohamh$learnmath_frontend$Page_Question$loadQuestionResponseDecoder,
 			_shohamh$learnmath_frontend$Page_Question$LoadQuestionResult);
 	});
+var _shohamh$learnmath_frontend$Page_Question$NextQuestion = {ctor: 'NextQuestion'};
+var _shohamh$learnmath_frontend$Page_Question$PrevQuestion = {ctor: 'PrevQuestion'};
+var _shohamh$learnmath_frontend$Page_Question$Validate = {ctor: 'Validate'};
 var _shohamh$learnmath_frontend$Page_Question$CheckSolution = {ctor: 'CheckSolution'};
-var _shohamh$learnmath_frontend$Page_Question$MyScriptConvert = function (a) {
-	return {ctor: 'MyScriptConvert', _0: a};
-};
-var _shohamh$learnmath_frontend$Page_Question$MyScriptExport = function (a) {
-	return {ctor: 'MyScriptExport', _0: a};
-};
 var _shohamh$learnmath_frontend$Page_Question$view = F2(
 	function (session, model) {
 		return A2(
@@ -38120,7 +39130,7 @@ var _shohamh$learnmath_frontend$Page_Question$view = F2(
 							},
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html$text('Question subjects:'),
+								_0: _elm_lang$html$Html$text('Practice subjects:'),
 								_1: {
 									ctor: '::',
 									_0: A2(
@@ -38139,7 +39149,100 @@ var _shohamh$learnmath_frontend$Page_Question$view = F2(
 													});
 											},
 											model.subjects)),
-									_1: {ctor: '[]'}
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$br,
+											{ctor: '[]'},
+											{ctor: '[]'}),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$div,
+												{ctor: '[]'},
+												{
+													ctor: '::',
+													_0: function () {
+														var _p9 = _elm_lang$core$Array$length(model.questions);
+														if (_p9 === 0) {
+															return _elm_lang$html$Html$text('Couldn\'t load questions.');
+														} else {
+															return _elm_lang$html$Html$text(
+																A2(
+																	_elm_lang$core$Basics_ops['++'],
+																	'Question ',
+																	A2(
+																		_elm_lang$core$Basics_ops['++'],
+																		_elm_lang$core$Basics$toString(model.currentQuestionIndex + 1),
+																		A2(
+																			_elm_lang$core$Basics_ops['++'],
+																			'/',
+																			_elm_lang$core$Basics$toString(
+																				_elm_lang$core$Array$length(model.questions))))));
+														}
+													}(),
+													_1: {ctor: '[]'}
+												}),
+											_1: {
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$div,
+													{ctor: '[]'},
+													{
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$button,
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$class('btn btn-lg btn-primary pull-xs-right'),
+																_1: {
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Events$onClick(_shohamh$learnmath_frontend$Page_Question$NextQuestion),
+																	_1: {
+																		ctor: '::',
+																		_0: _elm_lang$html$Html_Attributes$disabled(
+																			!(_elm_lang$core$Native_Utils.cmp(
+																				model.currentQuestionIndex + 1,
+																				_elm_lang$core$Array$length(model.questions)) < 0)),
+																		_1: {ctor: '[]'}
+																	}
+																}
+															},
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html$text('Next'),
+																_1: {ctor: '[]'}
+															}),
+														_1: {
+															ctor: '::',
+															_0: A2(
+																_elm_lang$html$Html$button,
+																{
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Attributes$class('btn btn-lg btn-primary pull-xs-right'),
+																	_1: {
+																		ctor: '::',
+																		_0: _elm_lang$html$Html_Events$onClick(_shohamh$learnmath_frontend$Page_Question$PrevQuestion),
+																		_1: {
+																			ctor: '::',
+																			_0: _elm_lang$html$Html_Attributes$disabled(
+																				!(_elm_lang$core$Native_Utils.cmp(model.currentQuestionIndex, 0) > 0)),
+																			_1: {ctor: '[]'}
+																		}
+																	}
+																},
+																{
+																	ctor: '::',
+																	_0: _elm_lang$html$Html$text('Prev'),
+																	_1: {ctor: '[]'}
+																}),
+															_1: {ctor: '[]'}
+														}
+													}),
+												_1: {ctor: '[]'}
+											}
+										}
+									}
 								}
 							}),
 						_1: {
@@ -38160,59 +39263,7 @@ var _shohamh$learnmath_frontend$Page_Question$view = F2(
 											_0: _elm_lang$html$Html_Attributes$class('col-md-12'),
 											_1: {ctor: '[]'}
 										},
-										{
-											ctor: '::',
-											_0: function () {
-												var mimetypes = {
-													ctor: '::',
-													_0: 'application/x-latex',
-													_1: {
-														ctor: '::',
-														_0: 'application/mathml+xml',
-														_1: {ctor: '[]'}
-													}
-												};
-												var mimetypesEncoded = A2(
-													_elm_lang$core$Json_Encode$encode,
-													0,
-													_elm_lang$core$Json_Encode$list(
-														A2(_elm_lang$core$List$map, _elm_lang$core$Json_Encode$string, mimetypes)));
-												return A3(
-													_elm_lang$html$Html$node,
-													'myscript-math-web',
-													{
-														ctor: '::',
-														_0: A2(_elm_lang$html$Html_Attributes$attribute, 'mimetypes', mimetypesEncoded),
-														_1: {
-															ctor: '::',
-															_0: A2(_elm_lang$html$Html_Attributes$attribute, 'scheme', 'https'),
-															_1: {
-																ctor: '::',
-																_0: A2(_elm_lang$html$Html_Attributes$attribute, 'host', 'cloud.myscript.com'),
-																_1: {
-																	ctor: '::',
-																	_0: _shohamh$learnmath_frontend$Page_Question$onExport(_shohamh$learnmath_frontend$Page_Question$MyScriptExport),
-																	_1: {
-																		ctor: '::',
-																		_0: _shohamh$learnmath_frontend$Page_Question$onConvert(_shohamh$learnmath_frontend$Page_Question$MyScriptConvert),
-																		_1: {
-																			ctor: '::',
-																			_0: A2(_elm_lang$html$Html_Attributes$attribute, 'applicationkey', '22bd37fa-2ee4-4bfd-98d9-137a39b81720'),
-																			_1: {
-																				ctor: '::',
-																				_0: A2(_elm_lang$html$Html_Attributes$attribute, 'hmackey', 'b79d64ad-89ba-4eed-a302-dee159005446'),
-																				_1: {ctor: '[]'}
-																			}
-																		}
-																	}
-																}
-															}
-														}
-													},
-													{ctor: '[]'});
-											}(),
-											_1: {ctor: '[]'}
-										}),
+										_elm_lang$core$Array$toList(model.questionEditors)),
 									_1: {ctor: '[]'}
 								}),
 							_1: {
@@ -38239,8 +39290,9 @@ var _shohamh$learnmath_frontend$Page_Question$view = F2(
 												_1: {
 													ctor: '::',
 													_0: function () {
-														var _p6 = model.isCorrect;
-														if (_p6.ctor === 'Nothing') {
+														var _p10 = _shohamh$learnmath_frontend$Util$maybeJoin(
+															A2(_elm_lang$core$Array$get, model.currentQuestionIndex, model.isCorrect));
+														if (_p10.ctor === 'Nothing') {
 															return A2(
 																_elm_lang$html$Html$div,
 																{ctor: '[]'},
@@ -38251,14 +39303,7 @@ var _shohamh$learnmath_frontend$Page_Question$view = F2(
 																{ctor: '[]'},
 																{
 																	ctor: '::',
-																	_0: function () {
-																		var _p7 = _p6._0;
-																		if (_p7 === true) {
-																			return _elm_lang$html$Html$text('Correct! Good job!');
-																		} else {
-																			return _elm_lang$html$Html$text('Incorrect, check your work for mistakes and try again!');
-																		}
-																	}(),
+																	_0: _p10._0 ? _elm_lang$html$Html$text('Correct! Good job!') : _elm_lang$html$Html$text('Incorrect, check your work for mistakes and try again!'),
 																	_1: {ctor: '[]'}
 																});
 														}
@@ -38272,16 +39317,54 @@ var _shohamh$learnmath_frontend$Page_Question$view = F2(
 																_0: _elm_lang$html$Html_Attributes$class('btn btn-lg btn-primary pull-xs-right'),
 																_1: {
 																	ctor: '::',
-																	_0: _elm_lang$html$Html_Events$onClick(_shohamh$learnmath_frontend$Page_Question$CheckSolution),
+																	_0: _elm_lang$html$Html_Events$onClick(_shohamh$learnmath_frontend$Page_Question$Validate),
 																	_1: {ctor: '[]'}
 																}
 															},
 															{
 																ctor: '::',
-																_0: _elm_lang$html$Html$text('Check Solution'),
+																_0: _elm_lang$html$Html$text('Validate'),
 																_1: {ctor: '[]'}
 															}),
-														_1: {ctor: '[]'}
+														_1: {
+															ctor: '::',
+															_0: A2(
+																_elm_lang$html$Html$button,
+																{
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Attributes$class('btn btn-lg btn-primary pull-xs-right'),
+																	_1: {
+																		ctor: '::',
+																		_0: _elm_lang$html$Html_Events$onClick(_shohamh$learnmath_frontend$Page_Question$CheckSolution),
+																		_1: {ctor: '[]'}
+																	}
+																},
+																{
+																	ctor: '::',
+																	_0: _elm_lang$html$Html$text(
+																		A2(
+																			_elm_lang$core$Basics_ops['++'],
+																			'Done ',
+																			function () {
+																				var _p11 = A2(_elm_lang$core$Array$get, model.currentQuestionIndex, model.timers);
+																				if (_p11.ctor === 'Just') {
+																					var _p12 = _p11._0;
+																					return A2(
+																						_elm_lang$core$Basics_ops['++'],
+																						_elm_lang$core$Basics$toString((_p12 / 60) | 0),
+																						A2(
+																							_elm_lang$core$Basics_ops['++'],
+																							':',
+																							_elm_lang$core$Basics$toString(
+																								A2(_elm_lang$core$Basics_ops['%'], _p12, 60))));
+																				} else {
+																					return '';
+																				}
+																			}())),
+																	_1: {ctor: '[]'}
+																}),
+															_1: {ctor: '[]'}
+														}
 													}
 												}
 											}),
@@ -38293,6 +39376,373 @@ var _shohamh$learnmath_frontend$Page_Question$view = F2(
 					}),
 				_1: {ctor: '[]'}
 			});
+	});
+var _shohamh$learnmath_frontend$Page_Question$MyScriptConvert = function (a) {
+	return {ctor: 'MyScriptConvert', _0: a};
+};
+var _shohamh$learnmath_frontend$Page_Question$MyScriptExport = function (a) {
+	return {ctor: 'MyScriptExport', _0: a};
+};
+var _shohamh$learnmath_frontend$Page_Question$editor = F2(
+	function (index, show) {
+		var mimetypes = {
+			ctor: '::',
+			_0: 'application/x-latex',
+			_1: {
+				ctor: '::',
+				_0: 'application/mathml+xml',
+				_1: {ctor: '[]'}
+			}
+		};
+		var mimetypesEncoded = A2(
+			_elm_lang$core$Json_Encode$encode,
+			0,
+			_elm_lang$core$Json_Encode$list(
+				A2(_elm_lang$core$List$map, _elm_lang$core$Json_Encode$string, mimetypes)));
+		return A3(
+			_elm_lang$html$Html$node,
+			'myscript-math-web',
+			{
+				ctor: '::',
+				_0: A2(_elm_lang$html$Html_Attributes$attribute, 'mimetypes', mimetypesEncoded),
+				_1: {
+					ctor: '::',
+					_0: A2(_elm_lang$html$Html_Attributes$attribute, 'scheme', 'https'),
+					_1: {
+						ctor: '::',
+						_0: A2(_elm_lang$html$Html_Attributes$attribute, 'host', 'cloud.myscript.com'),
+						_1: {
+							ctor: '::',
+							_0: _shohamh$learnmath_frontend$Page_Question$onExport(_shohamh$learnmath_frontend$Page_Question$MyScriptExport),
+							_1: {
+								ctor: '::',
+								_0: _shohamh$learnmath_frontend$Page_Question$onConvert(_shohamh$learnmath_frontend$Page_Question$MyScriptConvert),
+								_1: {
+									ctor: '::',
+									_0: A2(_elm_lang$html$Html_Attributes$attribute, 'applicationkey', '22bd37fa-2ee4-4bfd-98d9-137a39b81720'),
+									_1: {
+										ctor: '::',
+										_0: A2(_elm_lang$html$Html_Attributes$attribute, 'hmackey', 'b79d64ad-89ba-4eed-a302-dee159005446'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$id(
+												A2(
+													_elm_lang$core$Debug$log,
+													'id',
+													A2(
+														_elm_lang$core$Basics_ops['++'],
+														'myscript-editor-',
+														_elm_lang$core$Basics$toString(index)))),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$style(
+													{
+														ctor: '::',
+														_0: {
+															ctor: '_Tuple2',
+															_0: 'display',
+															_1: show ? 'block' : 'none'
+														},
+														_1: {ctor: '[]'}
+													}),
+												_1: {ctor: '[]'}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			{ctor: '[]'});
+	});
+var _shohamh$learnmath_frontend$Page_Question$update = F3(
+	function (session, msg, model) {
+		var _p13 = msg;
+		switch (_p13.ctor) {
+			case 'PrevQuestion':
+				return (_elm_lang$core$Native_Utils.cmp(model.currentQuestionIndex, 0) > 0) ? A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{
+							currentQuestionIndex: model.currentQuestionIndex - 1,
+							questionEditors: A3(
+								_elm_lang$core$Array$set,
+								model.currentQuestionIndex - 1,
+								A2(_shohamh$learnmath_frontend$Page_Question$editor, model.currentQuestionIndex - 1, true),
+								A3(
+									_elm_lang$core$Array$set,
+									model.currentQuestionIndex,
+									A2(_shohamh$learnmath_frontend$Page_Question$editor, model.currentQuestionIndex, false),
+									model.questionEditors))
+						}),
+					{ctor: '[]'}) : A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					model,
+					{ctor: '[]'});
+			case 'NextQuestion':
+				return (_elm_lang$core$Native_Utils.cmp(
+					model.currentQuestionIndex + 1,
+					_elm_lang$core$Array$length(model.questions)) < 0) ? A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{
+							currentQuestionIndex: model.currentQuestionIndex + 1,
+							questionEditors: A3(
+								_elm_lang$core$Array$set,
+								model.currentQuestionIndex + 1,
+								A2(_shohamh$learnmath_frontend$Page_Question$editor, model.currentQuestionIndex - 1, true),
+								A3(
+									_elm_lang$core$Array$set,
+									model.currentQuestionIndex,
+									A2(_shohamh$learnmath_frontend$Page_Question$editor, model.currentQuestionIndex, false),
+									model.questionEditors))
+						}),
+					{ctor: '[]'}) : A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					model,
+					{ctor: '[]'});
+			case 'MyScriptExport':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{
+							currentAnswers: A3(
+								_elm_lang$core$Array$set,
+								model.currentQuestionIndex,
+								A2(_elm_lang$core$Debug$log, 'latestExport', _p13._0),
+								model.currentAnswers),
+							exportCount: model.exportCount + 1
+						}),
+					{
+						ctor: '::',
+						_0: (_elm_lang$core$Native_Utils.cmp(model.exportCount, 2) < 1) ? _shohamh$learnmath_frontend$Ports$myscriptConvert(
+							{ctor: '_Tuple0'}) : _elm_lang$core$Platform_Cmd$none,
+						_1: {ctor: '[]'}
+					});
+			case 'MyScriptConvert':
+				var _p14 = _p13._0._0;
+				var ind = A2(
+					_elm_lang$core$Result$withDefault,
+					0,
+					_elm_lang$core$String$toInt(
+						A2(
+							_elm_lang$core$Maybe$withDefault,
+							'0',
+							A2(
+								_elm_lang$core$Array$get,
+								2,
+								_elm_lang$core$Array$fromList(
+									A2(_elm_lang$core$String$split, '-', _p13._0._1))))));
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{
+							lastConvert: A2(_elm_lang$core$Debug$log, 'latestConvert', _p14),
+							convertCount: model.convertCount + 1,
+							solutionHistory: A3(
+								_elm_lang$core$Array$set,
+								A2(_elm_lang$core$Debug$log, 'ind', ind),
+								A2(
+									_elm_lang$core$List$append,
+									A2(
+										_elm_lang$core$Maybe$withDefault,
+										{ctor: '[]'},
+										A2(_elm_lang$core$Array$get, model.currentQuestionIndex, model.solutionHistory)),
+									{
+										ctor: '::',
+										_0: _p14,
+										_1: {ctor: '[]'}
+									}),
+								model.solutionHistory)
+						}),
+					{ctor: '[]'});
+			case 'Validate':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					model,
+					{
+						ctor: '::',
+						_0: A2(_shohamh$learnmath_frontend$Page_Question$validateSolution, session, model),
+						_1: {ctor: '[]'}
+					});
+			case 'CheckSolution':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					model,
+					{
+						ctor: '::',
+						_0: A2(_shohamh$learnmath_frontend$Page_Question$checkSolution, session, model),
+						_1: {ctor: '[]'}
+					});
+			case 'CheckSolutionResult':
+				if (_p13._0.ctor === 'Err') {
+					var errorMessage = _shohamh$learnmath_frontend$Util$httpErrorToString(_p13._0._0);
+					return A2(
+						_shohamh$learnmath_frontend$Util_ops['=>'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								errorMessages: A2(
+									_elm_lang$core$List$append,
+									model.errorMessages,
+									{
+										ctor: '::',
+										_0: errorMessage,
+										_1: {ctor: '[]'}
+									})
+							}),
+						_elm_lang$core$Platform_Cmd$none);
+				} else {
+					var _p15 = _p13._0._0;
+					return A2(
+						_shohamh$learnmath_frontend$Util_ops['=>'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								isCorrect: A3(
+									_elm_lang$core$Array$set,
+									model.currentQuestionIndex,
+									_elm_lang$core$Maybe$Just(_p15.correct),
+									model.isCorrect),
+								errorMessages: _p15.error_messages
+							}),
+						_elm_lang$core$Platform_Cmd$none);
+				}
+			case 'ValidateResult':
+				if (_p13._0.ctor === 'Err') {
+					var errorMessage = _shohamh$learnmath_frontend$Util$httpErrorToString(_p13._0._0);
+					return A2(
+						_shohamh$learnmath_frontend$Util_ops['=>'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								errorMessages: A2(
+									_elm_lang$core$List$append,
+									model.errorMessages,
+									{
+										ctor: '::',
+										_0: errorMessage,
+										_1: {ctor: '[]'}
+									})
+							}),
+						_elm_lang$core$Platform_Cmd$none);
+				} else {
+					var _p16 = _p13._0._0;
+					return A2(
+						_shohamh$learnmath_frontend$Util_ops['=>'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								isCorrect: A3(
+									_elm_lang$core$Array$set,
+									model.currentQuestionIndex,
+									_elm_lang$core$Maybe$Just(_p16.correct),
+									model.isCorrect),
+								mistakeStep: _p16.step,
+								mistakeType: _p16.mistake_type,
+								errorMessages: _p16.error_messages
+							}),
+						_elm_lang$core$Platform_Cmd$none);
+				}
+			case 'LoadQuestionResult':
+				if (_p13._0.ctor === 'Err') {
+					var errorMessage = _shohamh$learnmath_frontend$Util$httpErrorToString(_p13._0._0);
+					return A2(
+						_shohamh$learnmath_frontend$Util_ops['=>'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								errorMessages: A2(
+									_elm_lang$core$List$append,
+									model.errorMessages,
+									{
+										ctor: '::',
+										_0: errorMessage,
+										_1: {ctor: '[]'}
+									})
+							}),
+						_elm_lang$core$Platform_Cmd$none);
+				} else {
+					var _p17 = _p13._0._0;
+					var newModel = _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							questions: A2(_elm_lang$core$Debug$log, 'questions haha', _p17.questions),
+							currentAnswers: A2(
+								_elm_lang$core$Array$repeat,
+								_elm_lang$core$Array$length(_p17.questions),
+								''),
+							isCorrect: A2(
+								_elm_lang$core$Array$repeat,
+								_elm_lang$core$Array$length(_p17.questions),
+								_elm_lang$core$Maybe$Nothing),
+							timers: A2(
+								_elm_lang$core$Array$repeat,
+								_elm_lang$core$Array$length(_p17.questions),
+								0),
+							subjects: _p17.subjects,
+							curriculum: _p17.curriculum,
+							solutionHistory: A2(
+								_elm_lang$core$Array$repeat,
+								_elm_lang$core$Array$length(_p17.questions),
+								{ctor: '[]'}),
+							questionEditors: A2(
+								_elm_lang$core$Array$indexedMap,
+								F2(
+									function (index, item) {
+										return A2(
+											_shohamh$learnmath_frontend$Page_Question$editor,
+											index,
+											_elm_lang$core$Native_Utils.eq(model.currentQuestionIndex, index));
+									}),
+								A2(_elm_lang$core$Debug$log, 'resp.questions', _p17.questions))
+						});
+					var stringList = {ctor: '[]'};
+					return _p17.success ? A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						newModel,
+						_elm_lang$core$Array$toList(
+							A2(
+								_elm_lang$core$Array$indexedMap,
+								F2(
+									function (index, item) {
+										return _shohamh$learnmath_frontend$Ports$importQuestion(
+											{
+												ctor: '_Tuple2',
+												_0: A2(_elm_lang$core$Debug$log, 'question from server', item),
+												_1: A2(_elm_lang$core$Debug$log, 'index', index)
+											});
+									}),
+								newModel.questions))) : A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{errorMessages: _p17.error_messages}),
+						{ctor: '[]'});
+				}
+			default:
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{
+							timers: A3(
+								_elm_lang$core$Array$set,
+								model.currentQuestionIndex,
+								A2(
+									_elm_lang$core$Maybe$withDefault,
+									42,
+									A2(_elm_lang$core$Array$get, model.currentQuestionIndex, model.timers)) + 1,
+								model.timers)
+						}),
+					{ctor: '[]'});
+		}
 	});
 
 var _shohamh$learnmath_frontend$Page_Register$viewErrorMessages = function (errorMessages) {
@@ -38780,21 +40230,25 @@ var _shohamh$learnmath_frontend$Page_Register$update = F2(
 		}
 	});
 
-var _shohamh$learnmath_frontend$Page_TeacherDashboard$update = F3(
-	function (session, msg, model) {
-		var _p0 = msg;
-		return A2(
-			_elm_lang$core$Platform_Cmd_ops['!'],
-			model,
-			{ctor: '[]'});
-	});
+var _shohamh$learnmath_frontend$Page_TeacherDashboard$viewErrorMessages = function (errorMessages) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		A2(
+			_elm_lang$core$List$intersperse,
+			A2(
+				_elm_lang$html$Html$br,
+				{ctor: '[]'},
+				{ctor: '[]'}),
+			A2(_elm_lang$core$List$map, _elm_lang$html$Html$text, errorMessages)));
+};
 var _shohamh$learnmath_frontend$Page_TeacherDashboard$view = F2(
 	function (session, model) {
 		return A2(
 			_elm_lang$html$Html$div,
 			{
 				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class('feedback-page'),
+				_0: _elm_lang$html$Html_Attributes$class('dashboard-page'),
 				_1: {ctor: '[]'}
 			},
 			{
@@ -38808,20 +40262,39 @@ var _shohamh$learnmath_frontend$Page_TeacherDashboard$view = F2(
 					},
 					{
 						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$div,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('row'),
-								_1: {ctor: '[]'}
-							},
-							{
+						_0: _elm_lang$html$Html$text('Teacher Dashboard'),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('row'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$div,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('col-md-12'),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: A2(_shohamh$learnmath_frontend$Visualizations_BarChart$viewBarChart, session, model.barChartModel),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
 								ctor: '::',
 								_0: A2(
 									_elm_lang$html$Html$div,
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('col-md-12'),
+										_0: _elm_lang$html$Html_Attributes$class('row'),
 										_1: {ctor: '[]'}
 									},
 									{
@@ -38830,85 +40303,413 @@ var _shohamh$learnmath_frontend$Page_TeacherDashboard$view = F2(
 											_elm_lang$html$Html$div,
 											{
 												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$class('sidebar'),
+												_0: _elm_lang$html$Html_Attributes$class('col-md-12'),
 												_1: {ctor: '[]'}
 											},
 											{
 												ctor: '::',
-												_0: function () {
-													var _p1 = session.user;
-													if (_p1.ctor === 'Just') {
-														return _elm_lang$html$Html$text(
-															A2(
-																_elm_lang$core$Basics_ops['++'],
-																'Hi ',
-																_shohamh$learnmath_frontend$Data_User$usernameToString(_p1._0.username)));
-													} else {
-														return A2(
-															_elm_lang$html$Html$div,
-															{ctor: '[]'},
-															{
-																ctor: '::',
-																_0: _elm_lang$html$Html$text('Hi random person! Would be great if you '),
-																_1: {
-																	ctor: '::',
-																	_0: A2(
-																		_elm_lang$html$Html$a,
-																		{
-																			ctor: '::',
-																			_0: _shohamh$learnmath_frontend$Route$href(_shohamh$learnmath_frontend$Route$Login),
-																			_1: {ctor: '[]'}
-																		},
-																		{
-																			ctor: '::',
-																			_0: _elm_lang$html$Html$text('logged in!'),
-																			_1: {ctor: '[]'}
-																		}),
-																	_1: {
-																		ctor: '::',
-																		_0: A2(
-																			_elm_lang$html$Html$br,
-																			{ctor: '[]'},
-																			{ctor: '[]'}),
-																		_1: {
-																			ctor: '::',
-																			_0: _elm_lang$html$Html$text('Don\'t have an account? '),
-																			_1: {
-																				ctor: '::',
-																				_0: A2(
-																					_elm_lang$html$Html$a,
-																					{
-																						ctor: '::',
-																						_0: _shohamh$learnmath_frontend$Route$href(_shohamh$learnmath_frontend$Route$Register),
-																						_1: {ctor: '[]'}
-																					},
-																					{
-																						ctor: '::',
-																						_0: _elm_lang$html$Html$text('Sign up!'),
-																						_1: {ctor: '[]'}
-																					}),
-																				_1: {ctor: '[]'}
-																			}
-																		}
-																	}
-																}
-															});
-													}
-												}(),
+												_0: A2(_shohamh$learnmath_frontend$Visualizations_LineChart$viewLineChart, session, model.lineChartModel),
 												_1: {ctor: '[]'}
 											}),
 										_1: {ctor: '[]'}
 									}),
-								_1: {ctor: '[]'}
-							}),
-						_1: {ctor: '[]'}
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$div,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('row'),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$div,
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$class('col-md-12'),
+													_1: {ctor: '[]'}
+												},
+												{
+													ctor: '::',
+													_0: A2(_shohamh$learnmath_frontend$Visualizations_PieChart$viewPieChart, session, model.pieChartModel),
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$div,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$class('row'),
+												_1: {ctor: '[]'}
+											},
+											{
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$div,
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$class('col-md-12'),
+														_1: {ctor: '[]'}
+													},
+													{
+														ctor: '::',
+														_0: _shohamh$learnmath_frontend$Page_TeacherDashboard$viewErrorMessages(model.errorMessages),
+														_1: {ctor: '[]'}
+													}),
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
 					}),
 				_1: {ctor: '[]'}
 			});
 	});
-var _shohamh$learnmath_frontend$Page_TeacherDashboard$model = {};
-var _shohamh$learnmath_frontend$Page_TeacherDashboard$Model = {};
-var _shohamh$learnmath_frontend$Page_TeacherDashboard$NoOp = {ctor: 'NoOp'};
+var _shohamh$learnmath_frontend$Page_TeacherDashboard$update = F3(
+	function (session, msg, model) {
+		var _p0 = msg;
+		switch (_p0.ctor) {
+			case 'LoadStudentPerformance':
+				if (_p0._0.ctor === 'Ok') {
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								lineChartModel: A2(_elm_lang$core$Debug$log, 'lineChart', _p0._0._0.result)
+							}),
+						{ctor: '[]'});
+				} else {
+					var errorMessage = _shohamh$learnmath_frontend$Util$httpErrorToString(_p0._0._0);
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								errorMessages: A2(
+									_elm_lang$core$List$append,
+									model.errorMessages,
+									{
+										ctor: '::',
+										_0: errorMessage,
+										_1: {ctor: '[]'}
+									})
+							}),
+						{ctor: '[]'});
+				}
+			case 'LoadSubjectPerformance':
+				if (_p0._0.ctor === 'Ok') {
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								barChartModel: A2(_elm_lang$core$Debug$log, 'barChart', _p0._0._0.result)
+							}),
+						{ctor: '[]'});
+				} else {
+					var errorMessage = _shohamh$learnmath_frontend$Util$httpErrorToString(_p0._0._0);
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								errorMessages: A2(
+									_elm_lang$core$List$append,
+									model.errorMessages,
+									{
+										ctor: '::',
+										_0: errorMessage,
+										_1: {ctor: '[]'}
+									})
+							}),
+						{ctor: '[]'});
+				}
+			default:
+				if (_p0._0.ctor === 'Ok') {
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								pieChartModel: A2(_elm_lang$core$Debug$log, 'pieChart', _p0._0._0.result)
+							}),
+						{ctor: '[]'});
+				} else {
+					var errorMessage = _shohamh$learnmath_frontend$Util$httpErrorToString(_p0._0._0);
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								errorMessages: A2(
+									_elm_lang$core$List$append,
+									model.errorMessages,
+									{
+										ctor: '::',
+										_0: errorMessage,
+										_1: {ctor: '[]'}
+									})
+							}),
+						{ctor: '[]'});
+				}
+		}
+	});
+var _shohamh$learnmath_frontend$Page_TeacherDashboard$mistakeTypesTransformer = function (dict) {
+	return A2(
+		_elm_lang$core$List$map,
+		function (mistakeType) {
+			return {
+				ctor: '_Tuple2',
+				_0: mistakeType,
+				_1: A2(
+					_elm_lang$core$Maybe$withDefault,
+					0,
+					A2(
+						_elm_lang$core$Dict$get,
+						mistakeType,
+						A2(
+							_elm_lang$core$Maybe$withDefault,
+							_elm_lang$core$Dict$empty,
+							A2(_elm_lang$core$Dict$get, mistakeType, dict))))
+			};
+		},
+		_elm_lang$core$Dict$keys(dict));
+};
+var _shohamh$learnmath_frontend$Page_TeacherDashboard$loadMistakeTypesEncoder = function (_p1) {
+	var _p2 = _p1;
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'sid',
+				_1: _elm_lang$core$Json_Encode$string(
+					_shohamh$learnmath_frontend$Data_Session$getSid(_p2._0))
+			},
+			_1: {ctor: '[]'}
+		});
+};
+var _shohamh$learnmath_frontend$Page_TeacherDashboard$subjectPerformanceTransformer = function (dict) {
+	return A2(
+		_elm_lang$core$Debug$log,
+		'subjectPerformance list',
+		A2(
+			_elm_lang$core$List$map,
+			function (subjectName) {
+				return {
+					ctor: '_Tuple2',
+					_0: _shohamh$learnmath_frontend$Data_Subject$Subject(
+						A2(_elm_lang$core$Debug$log, 'subjectPerformance subject', subjectName)),
+					_1: {
+						ctor: '_Tuple2',
+						_0: A2(
+							_elm_lang$core$Maybe$withDefault,
+							0,
+							A2(
+								_elm_lang$core$Dict$get,
+								'wrong',
+								A2(
+									_elm_lang$core$Maybe$withDefault,
+									_elm_lang$core$Dict$empty,
+									A2(_elm_lang$core$Dict$get, subjectName, dict)))),
+						_1: A2(
+							_elm_lang$core$Maybe$withDefault,
+							0,
+							A2(
+								_elm_lang$core$Dict$get,
+								'correct',
+								A2(
+									_elm_lang$core$Maybe$withDefault,
+									_elm_lang$core$Dict$empty,
+									A2(_elm_lang$core$Dict$get, subjectName, dict))))
+					}
+				};
+			},
+			_elm_lang$core$Dict$keys(
+				A2(_elm_lang$core$Debug$log, 'subjectPerformance dict', dict))));
+};
+var _shohamh$learnmath_frontend$Page_TeacherDashboard$loadSubjectPerformanceEncoder = function (_p3) {
+	var _p4 = _p3;
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'sid',
+				_1: _elm_lang$core$Json_Encode$string(
+					_shohamh$learnmath_frontend$Data_Session$getSid(_p4._0))
+			},
+			_1: {ctor: '[]'}
+		});
+};
+var _shohamh$learnmath_frontend$Page_TeacherDashboard$studentPerformanceTransformer = function (dict) {
+	return A2(
+		_elm_lang$core$List$map,
+		function (studentName) {
+			return {
+				ctor: '_Tuple2',
+				_0: studentName,
+				_1: {
+					ctor: '_Tuple2',
+					_0: A2(
+						_elm_lang$core$Maybe$withDefault,
+						0.5,
+						A2(
+							_elm_lang$core$Dict$get,
+							'success_percentage',
+							A2(
+								_elm_lang$core$Maybe$withDefault,
+								_elm_lang$core$Dict$empty,
+								A2(_elm_lang$core$Dict$get, studentName, dict)))),
+					_1: A2(
+						_elm_lang$core$Maybe$withDefault,
+						100,
+						A2(
+							_elm_lang$core$Dict$get,
+							'average_solving_time',
+							A2(
+								_elm_lang$core$Maybe$withDefault,
+								_elm_lang$core$Dict$empty,
+								A2(_elm_lang$core$Dict$get, studentName, dict))))
+				}
+			};
+		},
+		_elm_lang$core$Dict$keys(dict));
+};
+var _shohamh$learnmath_frontend$Page_TeacherDashboard$loadStudentPerformanceEncoder = function (_p5) {
+	var _p6 = _p5;
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'sid',
+				_1: _elm_lang$core$Json_Encode$string(
+					_shohamh$learnmath_frontend$Data_Session$getSid(_p6._0))
+			},
+			_1: {ctor: '[]'}
+		});
+};
+var _shohamh$learnmath_frontend$Page_TeacherDashboard$model = {
+	barChartModel: _shohamh$learnmath_frontend$Visualizations_BarChart$model,
+	lineChartModel: _shohamh$learnmath_frontend$Visualizations_LineChart$model,
+	pieChartModel: _shohamh$learnmath_frontend$Visualizations_PieChart$model,
+	errorMessages: {ctor: '[]'}
+};
+var _shohamh$learnmath_frontend$Page_TeacherDashboard$Model = F4(
+	function (a, b, c, d) {
+		return {barChartModel: a, lineChartModel: b, pieChartModel: c, errorMessages: d};
+	});
+var _shohamh$learnmath_frontend$Page_TeacherDashboard$LoadSubjectPerformanceResponseData = F3(
+	function (a, b, c) {
+		return {success: a, error_messages: b, result: c};
+	});
+var _shohamh$learnmath_frontend$Page_TeacherDashboard$loadSubjectPerformanceResponseDecoder = A3(
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+	'result',
+	A2(
+		_elm_lang$core$Json_Decode$map,
+		_shohamh$learnmath_frontend$Page_TeacherDashboard$subjectPerformanceTransformer,
+		_elm_lang$core$Json_Decode$dict(
+			_elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$float))),
+	A3(
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+		'error_messages',
+		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string),
+		A3(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+			'success',
+			_elm_lang$core$Json_Decode$bool,
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_shohamh$learnmath_frontend$Page_TeacherDashboard$LoadSubjectPerformanceResponseData))));
+var _shohamh$learnmath_frontend$Page_TeacherDashboard$LoadStudentPerformanceResponseData = F3(
+	function (a, b, c) {
+		return {success: a, error_messages: b, result: c};
+	});
+var _shohamh$learnmath_frontend$Page_TeacherDashboard$loadStudentPerformanceResponseDecoder = A3(
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+	'result',
+	A2(
+		_elm_lang$core$Json_Decode$map,
+		_shohamh$learnmath_frontend$Page_TeacherDashboard$studentPerformanceTransformer,
+		_elm_lang$core$Json_Decode$dict(
+			_elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$float))),
+	A3(
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+		'error_messages',
+		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string),
+		A3(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+			'success',
+			_elm_lang$core$Json_Decode$bool,
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_shohamh$learnmath_frontend$Page_TeacherDashboard$LoadStudentPerformanceResponseData))));
+var _shohamh$learnmath_frontend$Page_TeacherDashboard$LoadMistakeTypesResponseData = F3(
+	function (a, b, c) {
+		return {success: a, error_messages: b, result: c};
+	});
+var _shohamh$learnmath_frontend$Page_TeacherDashboard$loadMistakeTypesResponseDecoder = A3(
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+	'result',
+	A2(
+		_elm_lang$core$Json_Decode$map,
+		_shohamh$learnmath_frontend$Page_TeacherDashboard$mistakeTypesTransformer,
+		_elm_lang$core$Json_Decode$dict(
+			_elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$float))),
+	A3(
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+		'error_messages',
+		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string),
+		A3(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+			'success',
+			_elm_lang$core$Json_Decode$bool,
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_shohamh$learnmath_frontend$Page_TeacherDashboard$LoadMistakeTypesResponseData))));
+var _shohamh$learnmath_frontend$Page_TeacherDashboard$LoadMistakeTypes = function (a) {
+	return {ctor: 'LoadMistakeTypes', _0: a};
+};
+var _shohamh$learnmath_frontend$Page_TeacherDashboard$loadMistakeTypes = F2(
+	function (session, model) {
+		return A5(
+			_shohamh$learnmath_frontend$Util$httpPost,
+			'get_mistake_type_stats',
+			{ctor: '_Tuple2', _0: session, _1: model},
+			_shohamh$learnmath_frontend$Page_TeacherDashboard$loadMistakeTypesEncoder,
+			_shohamh$learnmath_frontend$Page_TeacherDashboard$loadMistakeTypesResponseDecoder,
+			_shohamh$learnmath_frontend$Page_TeacherDashboard$LoadMistakeTypes);
+	});
+var _shohamh$learnmath_frontend$Page_TeacherDashboard$LoadSubjectPerformance = function (a) {
+	return {ctor: 'LoadSubjectPerformance', _0: a};
+};
+var _shohamh$learnmath_frontend$Page_TeacherDashboard$loadSubjectPerformance = F2(
+	function (session, model) {
+		return A5(
+			_shohamh$learnmath_frontend$Util$httpPost,
+			'get_wrong_right_stats',
+			{ctor: '_Tuple2', _0: session, _1: model},
+			_shohamh$learnmath_frontend$Page_TeacherDashboard$loadSubjectPerformanceEncoder,
+			_shohamh$learnmath_frontend$Page_TeacherDashboard$loadSubjectPerformanceResponseDecoder,
+			_shohamh$learnmath_frontend$Page_TeacherDashboard$LoadSubjectPerformance);
+	});
+var _shohamh$learnmath_frontend$Page_TeacherDashboard$LoadStudentPerformance = function (a) {
+	return {ctor: 'LoadStudentPerformance', _0: a};
+};
+var _shohamh$learnmath_frontend$Page_TeacherDashboard$loadStudentPerformance = F2(
+	function (session, model) {
+		return A5(
+			_shohamh$learnmath_frontend$Util$httpPost,
+			'get_success_percentage_avg_time_stats',
+			{ctor: '_Tuple2', _0: session, _1: model},
+			_shohamh$learnmath_frontend$Page_TeacherDashboard$loadStudentPerformanceEncoder,
+			_shohamh$learnmath_frontend$Page_TeacherDashboard$loadStudentPerformanceResponseDecoder,
+			_shohamh$learnmath_frontend$Page_TeacherDashboard$LoadStudentPerformance);
+	});
 
 var _shohamh$learnmath_frontend$Main$sessionChange = _shohamh$learnmath_frontend$Ports$onSessionChange(
 	function (_p0) {
@@ -38961,6 +40762,9 @@ var _shohamh$learnmath_frontend$Main$TeacherDashboard = function (a) {
 var _shohamh$learnmath_frontend$Main$Dashboard = function (a) {
 	return {ctor: 'Dashboard', _0: a};
 };
+var _shohamh$learnmath_frontend$Main$AddPractice = function (a) {
+	return {ctor: 'AddPractice', _0: a};
+};
 var _shohamh$learnmath_frontend$Main$AddQuestion = function (a) {
 	return {ctor: 'AddQuestion', _0: a};
 };
@@ -38997,6 +40801,9 @@ var _shohamh$learnmath_frontend$Main$TeacherDashboardMsg = function (a) {
 var _shohamh$learnmath_frontend$Main$DashboardMsg = function (a) {
 	return {ctor: 'DashboardMsg', _0: a};
 };
+var _shohamh$learnmath_frontend$Main$AddPracticeMsg = function (a) {
+	return {ctor: 'AddPracticeMsg', _0: a};
+};
 var _shohamh$learnmath_frontend$Main$AddQuestionMsg = function (a) {
 	return {ctor: 'AddQuestionMsg', _0: a};
 };
@@ -39024,6 +40831,8 @@ var _shohamh$learnmath_frontend$Main$pageSubscriptions = function (page) {
 				_shohamh$learnmath_frontend$Main$QuestionMsg,
 				_shohamh$learnmath_frontend$Page_Question$subs(_p3._0));
 		case 'AddQuestion':
+			return _elm_lang$core$Platform_Sub$none;
+		case 'AddPractice':
 			return _elm_lang$core$Platform_Sub$none;
 		case 'Dashboard':
 			return _elm_lang$core$Platform_Sub$none;
@@ -39113,6 +40922,14 @@ var _shohamh$learnmath_frontend$Main$viewPage = F3(
 						frame,
 						_shohamh$learnmath_frontend$Views_Page$Other,
 						A2(_shohamh$learnmath_frontend$Page_AddQuestion$view, session, _p4._0)));
+			case 'AddPractice':
+				return A2(
+					_elm_lang$html$Html$map,
+					_shohamh$learnmath_frontend$Main$AddPracticeMsg,
+					A2(
+						frame,
+						_shohamh$learnmath_frontend$Views_Page$Other,
+						A2(_shohamh$learnmath_frontend$Page_AddPractice$view, session, _p4._0)));
 			case 'Dashboard':
 				return A2(
 					_elm_lang$html$Html$map,
@@ -39202,7 +41019,7 @@ var _shohamh$learnmath_frontend$Main$setRoute = F2(
 						A2(
 							_elm_lang$core$Platform_Cmd$map,
 							_shohamh$learnmath_frontend$Main$QuestionMsg,
-							A2(_shohamh$learnmath_frontend$Page_Question$loadQuestion, model.session, _shohamh$learnmath_frontend$Page_Question$model)));
+							A2(_shohamh$learnmath_frontend$Page_Question$loadQuestions, model.session, _shohamh$learnmath_frontend$Page_Question$model)));
 				case 'AddQuestion':
 					return A2(
 						_shohamh$learnmath_frontend$Util_ops['=>'],
@@ -39216,6 +41033,19 @@ var _shohamh$learnmath_frontend$Main$setRoute = F2(
 							_elm_lang$core$Platform_Cmd$map,
 							_shohamh$learnmath_frontend$Main$AddQuestionMsg,
 							A2(_shohamh$learnmath_frontend$Page_AddQuestion$loadCurriculumsAndSubjects, model.session, _shohamh$learnmath_frontend$Page_AddQuestion$model)));
+				case 'AddPractice':
+					return A2(
+						_shohamh$learnmath_frontend$Util_ops['=>'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								pageState: _shohamh$learnmath_frontend$Main$Loaded(
+									_shohamh$learnmath_frontend$Main$AddPractice(_shohamh$learnmath_frontend$Page_AddPractice$model))
+							}),
+						A2(
+							_elm_lang$core$Platform_Cmd$map,
+							_shohamh$learnmath_frontend$Main$AddPracticeMsg,
+							A2(_shohamh$learnmath_frontend$Page_AddPractice$loadCurriculumsAndSubjects, model.session, _shohamh$learnmath_frontend$Page_AddPractice$model)));
 				case 'Login':
 					return A2(
 						_shohamh$learnmath_frontend$Util_ops['=>'],
@@ -39266,7 +41096,23 @@ var _shohamh$learnmath_frontend$Main$setRoute = F2(
 								pageState: _shohamh$learnmath_frontend$Main$Loaded(
 									_shohamh$learnmath_frontend$Main$Dashboard(_shohamh$learnmath_frontend$Page_Dashboard$model))
 							}),
-						_elm_lang$core$Platform_Cmd$none);
+						_elm_lang$core$Platform_Cmd$batch(
+							A2(
+								_elm_lang$core$List$map,
+								_elm_lang$core$Platform_Cmd$map(_shohamh$learnmath_frontend$Main$DashboardMsg),
+								{
+									ctor: '::',
+									_0: A2(_shohamh$learnmath_frontend$Page_Dashboard$loadStudentPerformance, model.session, _shohamh$learnmath_frontend$Page_Dashboard$model),
+									_1: {
+										ctor: '::',
+										_0: A2(_shohamh$learnmath_frontend$Page_Dashboard$loadSubjectPerformance, model.session, _shohamh$learnmath_frontend$Page_Dashboard$model),
+										_1: {
+											ctor: '::',
+											_0: A2(_shohamh$learnmath_frontend$Page_Dashboard$loadMistakeTypes, model.session, _shohamh$learnmath_frontend$Page_Dashboard$model),
+											_1: {ctor: '[]'}
+										}
+									}
+								})));
 				default:
 					return A2(
 						_shohamh$learnmath_frontend$Util_ops['=>'],
@@ -39276,7 +41122,23 @@ var _shohamh$learnmath_frontend$Main$setRoute = F2(
 								pageState: _shohamh$learnmath_frontend$Main$Loaded(
 									_shohamh$learnmath_frontend$Main$TeacherDashboard(_shohamh$learnmath_frontend$Page_TeacherDashboard$model))
 							}),
-						_elm_lang$core$Platform_Cmd$none);
+						_elm_lang$core$Platform_Cmd$batch(
+							A2(
+								_elm_lang$core$List$map,
+								_elm_lang$core$Platform_Cmd$map(_shohamh$learnmath_frontend$Main$TeacherDashboardMsg),
+								{
+									ctor: '::',
+									_0: A2(_shohamh$learnmath_frontend$Page_TeacherDashboard$loadStudentPerformance, model.session, _shohamh$learnmath_frontend$Page_TeacherDashboard$model),
+									_1: {
+										ctor: '::',
+										_0: A2(_shohamh$learnmath_frontend$Page_TeacherDashboard$loadSubjectPerformance, model.session, _shohamh$learnmath_frontend$Page_TeacherDashboard$model),
+										_1: {
+											ctor: '::',
+											_0: A2(_shohamh$learnmath_frontend$Page_TeacherDashboard$loadMistakeTypes, model.session, _shohamh$learnmath_frontend$Page_TeacherDashboard$model),
+											_1: {ctor: '[]'}
+										}
+									}
+								})));
 			}
 		}
 	});
@@ -39316,9 +41178,9 @@ var _shohamh$learnmath_frontend$Main$updatePage = F3(
 			});
 		var session = model.session;
 		var _p9 = {ctor: '_Tuple2', _0: msg, _1: page};
-		_v5_10:
+		_v5_13:
 		do {
-			_v5_9:
+			_v5_12:
 			do {
 				switch (_p9._0.ctor) {
 					case 'SetRoute':
@@ -39392,9 +41254,9 @@ var _shohamh$learnmath_frontend$Main$updatePage = F3(
 										}),
 									A2(_elm_lang$core$Platform_Cmd$map, _shohamh$learnmath_frontend$Main$LoginMsg, cmd));
 							case 'NotFound':
-								break _v5_9;
+								break _v5_12;
 							default:
-								break _v5_10;
+								break _v5_13;
 						}
 					case 'RegisterMsg':
 						switch (_p9._1.ctor) {
@@ -39429,9 +41291,9 @@ var _shohamh$learnmath_frontend$Main$updatePage = F3(
 										}),
 									A2(_elm_lang$core$Platform_Cmd$map, _shohamh$learnmath_frontend$Main$RegisterMsg, cmd));
 							case 'NotFound':
-								break _v5_9;
+								break _v5_12;
 							default:
-								break _v5_10;
+								break _v5_13;
 						}
 					case 'HomeMsg':
 						switch (_p9._1.ctor) {
@@ -39444,9 +41306,9 @@ var _shohamh$learnmath_frontend$Main$updatePage = F3(
 									_p9._0._0,
 									_p9._1._0);
 							case 'NotFound':
-								break _v5_9;
+								break _v5_12;
 							default:
-								break _v5_10;
+								break _v5_13;
 						}
 					case 'QuestionMsg':
 						switch (_p9._1.ctor) {
@@ -39459,9 +41321,9 @@ var _shohamh$learnmath_frontend$Main$updatePage = F3(
 									_p9._0._0,
 									_p9._1._0);
 							case 'NotFound':
-								break _v5_9;
+								break _v5_12;
 							default:
-								break _v5_10;
+								break _v5_13;
 						}
 					case 'AddQuestionMsg':
 						switch (_p9._1.ctor) {
@@ -39474,15 +41336,54 @@ var _shohamh$learnmath_frontend$Main$updatePage = F3(
 									_p9._0._0,
 									_p9._1._0);
 							case 'NotFound':
-								break _v5_9;
+								break _v5_12;
 							default:
-								break _v5_10;
+								break _v5_13;
+						}
+					case 'AddPracticeMsg':
+						switch (_p9._1.ctor) {
+							case 'AddPractice':
+								return A5(
+									toPage,
+									_shohamh$learnmath_frontend$Main$AddPractice,
+									_shohamh$learnmath_frontend$Main$AddPracticeMsg,
+									_shohamh$learnmath_frontend$Page_AddPractice$update(session),
+									_p9._0._0,
+									_p9._1._0);
+							case 'NotFound':
+								break _v5_12;
+							default:
+								break _v5_13;
+						}
+					case 'DashboardMsg':
+						switch (_p9._1.ctor) {
+							case 'Dashboard':
+								return A5(
+									toPage,
+									_shohamh$learnmath_frontend$Main$Dashboard,
+									_shohamh$learnmath_frontend$Main$DashboardMsg,
+									_shohamh$learnmath_frontend$Page_Dashboard$update(session),
+									_p9._0._0,
+									_p9._1._0);
+							case 'NotFound':
+								break _v5_12;
+							default:
+								break _v5_13;
 						}
 					default:
-						if (_p9._1.ctor === 'NotFound') {
-							break _v5_9;
-						} else {
-							break _v5_10;
+						switch (_p9._1.ctor) {
+							case 'TeacherDashboard':
+								return A5(
+									toPage,
+									_shohamh$learnmath_frontend$Main$TeacherDashboard,
+									_shohamh$learnmath_frontend$Main$TeacherDashboardMsg,
+									_shohamh$learnmath_frontend$Page_TeacherDashboard$update(session),
+									_p9._0._0,
+									_p9._1._0);
+							case 'NotFound':
+								break _v5_12;
+							default:
+								break _v5_13;
 						}
 				}
 			} while(false);
@@ -39509,7 +41410,7 @@ var _shohamh$learnmath_frontend$Main$main = A2(
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};
 if (typeof _shohamh$learnmath_frontend$Main$main !== 'undefined') {
-    _shohamh$learnmath_frontend$Main$main(Elm['Main'], 'Main', {"types":{"unions":{"Dict.LeafColor":{"args":[],"tags":{"LBBlack":[],"LBlack":[]}},"Data.User.Username":{"args":[],"tags":{"Username":["String"]}},"Page.AddQuestion.Msg":{"args":[],"tags":{"AddQuestion":[],"MyScriptExport":["String"],"SelectSubjects":["List String"],"SelectCurriculum":["String"],"LoadSubjectsInCurriculums":["Result.Result Http.Error Page.AddQuestion.SubjectsInCurriculums"],"AddQuestionResult":["Result.Result Http.Error Page.AddQuestion.ResponseData"]}},"Data.User.Role":{"args":[],"tags":{"Teacher":[],"Student":[]}},"Data.AuthToken.AuthToken":{"args":[],"tags":{"AuthToken":["String"]}},"Dict.Dict":{"args":["k","v"],"tags":{"RBNode_elm_builtin":["Dict.NColor","k","v","Dict.Dict k v","Dict.Dict k v"],"RBEmpty_elm_builtin":["Dict.LeafColor"]}},"Route.Route":{"args":[],"tags":{"AddQuestion":[],"Home":[],"Logout":[],"TeacherDashboard":[],"Register":[],"Dashboard":["Data.User.Username"],"Login":[],"Question":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Page.Dashboard.Msg":{"args":[],"tags":{"NoOp":[]}},"Main.Msg":{"args":[],"tags":{"QuestionMsg":["Page.Question.Msg"],"LoginMsg":["Page.Login.Msg"],"HomeLoaded":["Result.Result Page.Errored.PageLoadError Page.Home.Model"],"SetUser":["Maybe.Maybe Data.User.User"],"SetRoute":["Maybe.Maybe Route.Route"],"HomeMsg":["Page.Home.Msg"],"AddQuestionMsg":["Page.AddQuestion.Msg"],"TeacherDashboardMsg":["Page.TeacherDashboard.Msg"],"DashboardMsg":["Page.Dashboard.Msg"],"RegisterMsg":["Page.Register.Msg"]}},"Page.Question.Msg":{"args":[],"tags":{"MyScriptConvert":["String"],"CheckSolution":[],"MyScriptExport":["String"],"CheckSolutionResult":["Result.Result Http.Error Page.Question.CheckSolutionResponseData"],"LoadQuestionResult":["Result.Result Http.Error Page.Question.LoadQuestionResponseData"]}},"Page.Errored.PageLoadError":{"args":[],"tags":{"PageLoadError":["Page.Errored.Model"]}},"Dict.NColor":{"args":[],"tags":{"BBlack":[],"Red":[],"NBlack":[],"Black":[]}},"Page.TeacherDashboard.Msg":{"args":[],"tags":{"NoOp":[]}},"Views.Page.ActivePage":{"args":[],"tags":{"Other":[],"AddQuestion":[],"Home":[],"TeacherDashboard":[],"Register":[],"Dashboard":["Data.User.Username"],"Login":[],"Question":[]}},"Page.Home.Msg":{"args":[],"tags":{"NoOp":[]}},"Page.Register.Msg":{"args":[],"tags":{"SetPasswordAgain":["String"],"RegisterResult":["Result.Result Http.Error Page.Register.ResponseData"],"Register":[],"SetUsername":["String"],"SetUserRole":["Data.User.Role"],"SetPassword":["String"],"SetEmail":["String"]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String"],"NetworkError":[],"Timeout":[],"BadStatus":["Http.Response String"],"BadPayload":["String","Http.Response String"]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}},"Page.Login.Msg":{"args":[],"tags":{"SetUsername":["String"],"Submit":[],"SubmitResult":["Result.Result Http.Error Page.Login.ResponseData"],"SetPassword":["String"]}}},"aliases":{"Page.AddQuestion.ResponseData":{"args":[],"type":"{ success : Bool, error_messages : List String }"},"Page.AddQuestion.SubjectsInCurriculums":{"args":[],"type":"{ subjectsInCurriculums : Dict.Dict String (List String) , success : Bool , error_messages : List String }"},"Http.Response":{"args":["body"],"type":"{ url : String , status : { code : Int, message : String } , headers : Dict.Dict String String , body : body }"},"Page.Errored.Model":{"args":[],"type":"{ activePage : Views.Page.ActivePage, errorMessage : String }"},"Page.Home.Model":{"args":[],"type":"{}"},"Page.Question.LoadQuestionResponseData":{"args":[],"type":"{ success : Bool , error_messages : List String , problem : String , subjects : List String }"},"Data.User.User":{"args":[],"type":"{ email : String , token : Data.AuthToken.AuthToken , username : Data.User.Username , role : Data.User.Role }"},"Page.Login.ResponseData":{"args":[],"type":"{ success : Bool , user : Data.User.User , error_messages : List String }"},"Page.Register.ResponseData":{"args":[],"type":"{ success : Bool, errorMessages : List String }"},"Page.Question.CheckSolutionResponseData":{"args":[],"type":"{ success : Bool, error_messages : List String, correct : Bool }"}},"message":"Main.Msg"},"versions":{"elm":"0.18.0"}});
+    _shohamh$learnmath_frontend$Main$main(Elm['Main'], 'Main', {"types":{"unions":{"Dict.LeafColor":{"args":[],"tags":{"LBBlack":[],"LBlack":[]}},"Data.User.Username":{"args":[],"tags":{"Username":["String"]}},"Page.AddQuestion.Msg":{"args":[],"tags":{"AddQuestion":[],"MyScriptExport":["String"],"SelectSubjects":["List String"],"SelectCurriculum":["String"],"LoadSubjectsInCurriculums":["Result.Result Http.Error Page.AddQuestion.SubjectsInCurriculums"],"AddQuestionResult":["Result.Result Http.Error Page.AddQuestion.ResponseData"]}},"Data.User.Role":{"args":[],"tags":{"Teacher":[],"Student":[]}},"Data.Subject.Subject":{"args":[],"tags":{"Subject":["String"]}},"Data.AuthToken.AuthToken":{"args":[],"tags":{"AuthToken":["String"]}},"Page.AddPractice.Msg":{"args":[],"tags":{"SelectSubjects":["List String"],"AddPractice":[],"AddPracticeResult":["Result.Result Http.Error Page.AddPractice.ResponseData"],"SelectCurriculum":["String"],"LoadSubjectsInCurriculums":["Result.Result Http.Error Page.AddPractice.SubjectsInCurriculums"],"UpdateNumberOfQuestions":["String"]}},"Dict.Dict":{"args":["k","v"],"tags":{"RBNode_elm_builtin":["Dict.NColor","k","v","Dict.Dict k v","Dict.Dict k v"],"RBEmpty_elm_builtin":["Dict.LeafColor"]}},"Array.Array":{"args":["a"],"tags":{"Array":[]}},"Route.Route":{"args":[],"tags":{"AddQuestion":[],"Home":[],"Logout":[],"AddPractice":[],"TeacherDashboard":[],"Register":[],"Dashboard":["Data.User.Username"],"Login":[],"Question":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Page.Dashboard.Msg":{"args":[],"tags":{"LoadStudentPerformance":["Result.Result Http.Error Page.Dashboard.LoadStudentPerformanceResponseData"],"LoadSubjectPerformance":["Result.Result Http.Error Page.Dashboard.LoadSubjectPerformanceResponseData"],"LoadMistakeTypes":["Result.Result Http.Error Page.Dashboard.LoadMistakeTypesResponseData"]}},"Main.Msg":{"args":[],"tags":{"QuestionMsg":["Page.Question.Msg"],"LoginMsg":["Page.Login.Msg"],"HomeLoaded":["Result.Result Page.Errored.PageLoadError Page.Home.Model"],"SetUser":["Maybe.Maybe Data.User.User"],"SetRoute":["Maybe.Maybe Route.Route"],"AddPracticeMsg":["Page.AddPractice.Msg"],"HomeMsg":["Page.Home.Msg"],"AddQuestionMsg":["Page.AddQuestion.Msg"],"TeacherDashboardMsg":["Page.TeacherDashboard.Msg"],"DashboardMsg":["Page.Dashboard.Msg"],"RegisterMsg":["Page.Register.Msg"]}},"Page.Question.Msg":{"args":[],"tags":{"MyScriptConvert":["( String, String )"],"ValidateResult":["Result.Result Http.Error Page.Question.ValidateSolutionResponseData"],"CheckSolution":[],"MyScriptExport":["String"],"TimerTick":["Time.Time"],"NextQuestion":[],"PrevQuestion":[],"Validate":[],"CheckSolutionResult":["Result.Result Http.Error Page.Question.CheckSolutionResponseData"],"LoadQuestionResult":["Result.Result Http.Error Page.Question.LoadQuestionResponseData"]}},"Page.Errored.PageLoadError":{"args":[],"tags":{"PageLoadError":["Page.Errored.Model"]}},"Dict.NColor":{"args":[],"tags":{"BBlack":[],"Red":[],"NBlack":[],"Black":[]}},"Page.TeacherDashboard.Msg":{"args":[],"tags":{"LoadStudentPerformance":["Result.Result Http.Error Page.TeacherDashboard.LoadStudentPerformanceResponseData"],"LoadSubjectPerformance":["Result.Result Http.Error Page.TeacherDashboard.LoadSubjectPerformanceResponseData"],"LoadMistakeTypes":["Result.Result Http.Error Page.TeacherDashboard.LoadMistakeTypesResponseData"]}},"Views.Page.ActivePage":{"args":[],"tags":{"Other":[],"AddQuestion":[],"Home":[],"AddPractice":[],"TeacherDashboard":[],"Register":[],"Dashboard":["Data.User.Username"],"Login":[],"Question":[]}},"Page.Home.Msg":{"args":[],"tags":{"NoOp":[]}},"Page.Register.Msg":{"args":[],"tags":{"SetPasswordAgain":["String"],"RegisterResult":["Result.Result Http.Error Page.Register.ResponseData"],"Register":[],"SetUsername":["String"],"SetUserRole":["Data.User.Role"],"SetPassword":["String"],"SetEmail":["String"]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String"],"NetworkError":[],"Timeout":[],"BadStatus":["Http.Response String"],"BadPayload":["String","Http.Response String"]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}},"Page.Login.Msg":{"args":[],"tags":{"SetUsername":["String"],"Submit":[],"SubmitResult":["Result.Result Http.Error Page.Login.ResponseData"],"SetPassword":["String"]}}},"aliases":{"Page.AddPractice.SubjectsInCurriculums":{"args":[],"type":"{ subjectsInCurriculums : Dict.Dict String (List String) , success : Bool , error_messages : List String }"},"Page.AddQuestion.ResponseData":{"args":[],"type":"{ success : Bool, error_messages : List String }"},"Page.AddQuestion.SubjectsInCurriculums":{"args":[],"type":"{ subjectsInCurriculums : Dict.Dict String (List String) , success : Bool , error_messages : List String }"},"Http.Response":{"args":["body"],"type":"{ url : String , status : { code : Int, message : String } , headers : Dict.Dict String String , body : body }"},"Page.Errored.Model":{"args":[],"type":"{ activePage : Views.Page.ActivePage, errorMessage : String }"},"Page.Home.Model":{"args":[],"type":"{}"},"Page.Question.LoadQuestionResponseData":{"args":[],"type":"{ success : Bool , error_messages : List String , questions : Array.Array String , subjects : List String , curriculum : String }"},"Page.Dashboard.LoadSubjectPerformanceResponseData":{"args":[],"type":"{ success : Bool , error_messages : List String , result : List ( Data.Subject.Subject, ( Float, Float ) ) }"},"Page.TeacherDashboard.LoadStudentPerformanceResponseData":{"args":[],"type":"{ success : Bool , error_messages : List String , result : List ( String, ( Float, Float ) ) }"},"Page.TeacherDashboard.LoadSubjectPerformanceResponseData":{"args":[],"type":"{ success : Bool , error_messages : List String , result : List ( Data.Subject.Subject, ( Float, Float ) ) }"},"Page.AddPractice.ResponseData":{"args":[],"type":"{ success : Bool, error_messages : List String }"},"Page.Dashboard.LoadMistakeTypesResponseData":{"args":[],"type":"{ success : Bool , error_messages : List String , result : List ( String, Float ) }"},"Data.User.User":{"args":[],"type":"{ email : String , token : Data.AuthToken.AuthToken , username : Data.User.Username , role : Data.User.Role }"},"Page.Login.ResponseData":{"args":[],"type":"{ success : Bool , user : Data.User.User , error_messages : List String }"},"Page.Dashboard.LoadStudentPerformanceResponseData":{"args":[],"type":"{ success : Bool , error_messages : List String , result : List ( String, ( Float, Float ) ) }"},"Time.Time":{"args":[],"type":"Float"},"Page.Question.ValidateSolutionResponseData":{"args":[],"type":"{ success : Bool , error_messages : List String , correct : Bool , step : Maybe.Maybe Int , mistake_type : Maybe.Maybe String }"},"Page.Register.ResponseData":{"args":[],"type":"{ success : Bool, errorMessages : List String }"},"Page.TeacherDashboard.LoadMistakeTypesResponseData":{"args":[],"type":"{ success : Bool , error_messages : List String , result : List ( String, Float ) }"},"Page.Question.CheckSolutionResponseData":{"args":[],"type":"{ success : Bool, error_messages : List String, correct : Bool }"}},"message":"Main.Msg"},"versions":{"elm":"0.18.0"}});
 }
 
 if (typeof define === "function" && define['amd'])

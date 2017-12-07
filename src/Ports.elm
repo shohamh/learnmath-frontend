@@ -6,7 +6,7 @@ import Json.Encode exposing (Value)
 port storeSession : Maybe String -> Cmd msg
 
 
-port importQuestion : Maybe String -> Cmd msg
+port importQuestion : ( String, Int ) -> Cmd msg
 
 
 port myscriptConvert : () -> Cmd msg
