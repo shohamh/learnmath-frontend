@@ -188,8 +188,9 @@ update session msg model =
         ValidateResult (Ok resp) ->
             { model
                 | isCorrect = Array.set model.currentQuestionIndex (Just resp.correct) model.isCorrect
-                , mistakeStep = resp.step
-                , mistakeType = resp.mistake_type
+
+                -- , mistakeStep = resp.step
+                -- , mistakeType = resp.mistake_type
                 , errorMessages = resp.error_messages
             }
                 => Cmd.none
@@ -269,8 +270,9 @@ type alias ValidateSolutionResponseData =
     { success : Bool
     , error_messages : List String
     , correct : Bool
-    , step : Maybe Int
-    , mistake_type : Maybe String
+
+    -- , step : Maybe Int
+    -- , mistake_type : Maybe String
     }
 
 
@@ -337,7 +339,7 @@ checkSolution session model =
 
 validateSolution : Session -> Model -> Cmd Msg
 validateSolution session model =
-    httpPost "validate_solution" ( session, model ) validateSolutionEncoder validateSolutionResponseDecoder ValidateResult
+    httpPost "validate_solution" ( session, model ) checkSolutionEncoder validateSolutionResponseDecoder ValidateResult
 
 
 loadQuestionResponseDecoder : Decoder LoadQuestionResponseData
@@ -364,28 +366,37 @@ validateSolutionResponseDecoder =
         |> JDP.required "success" JD.bool
         |> JDP.required "error_messages" (JD.list JD.string)
         |> JDP.required "correct" JD.bool
-        |> JDP.optional "step"
-            (JD.map
-                (\x ->
-                    if x == -1 then
-                        Nothing
-                    else
-                        Just x
-                )
-                JD.int
-            )
-            (Just -1)
-        |> JDP.optional "mistake_type"
-            (JD.map
-                (\x ->
-                    if x == "" then
-                        Nothing
-                    else
-                        Just x
-                )
-                JD.string
-            )
-            (Just "")
+
+
+
+-- validateSolutionResponseDecoder : Decoder ValidateSolutionResponseData
+-- validateSolutionResponseDecoder =
+--     JDP.decode ValidateSolutionResponseData
+--         |> JDP.required "success" JD.bool
+--         |> JDP.required "error_messages" (JD.list JD.string)
+--         |> JDP.required "correct" JD.bool
+--         |> JDP.optional "step"
+--             (JD.map
+--                 (\x ->
+--                     if x == -1 then
+--                         Nothing
+--                     else
+--                         Just x
+--                 )
+--                 JD.int
+--             )
+--             (Just -1)
+--         |> JDP.optional "mistake_type"
+--             (JD.map
+--                 (\x ->
+--                     if x == "" then
+--                         Nothing
+--                     else
+--                         Just x
+--                 )
+--                 JD.string
+--             )
+--             (Just "")
 
 
 viewErrorMessages : List String -> Html Msg
