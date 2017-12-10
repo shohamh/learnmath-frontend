@@ -29,8 +29,10 @@ type alias Model =
     , questionEditors : Array (Html Msg)
     , isCorrect : Array (Maybe Bool)
     , timers : Array Int
+    , timersWorking : Array Bool
     , mistakeStep : Maybe Int
     , mistakeType : Maybe String
+    , questionsIsDone : Array Bool
     }
 
 
@@ -50,13 +52,15 @@ model =
     , questionEditors = Array.empty
     , isCorrect = Array.empty
     , timers = Array.empty
+    , timersWorking = Array.empty
     , mistakeStep = Nothing
     , mistakeType = Nothing
+    , questionsIsDone = Array.empty
     }
 
 
 type Msg
-    = MyScriptExport String
+    = MyScriptExport ( String, String )
     | MyScriptConvert ( String, String )
     | CheckSolution
     | Validate
@@ -85,7 +89,7 @@ editor index show =
         , onConvert MyScriptConvert
         , attribute "applicationkey" "22bd37fa-2ee4-4bfd-98d9-137a39b81720"
         , attribute "hmackey" "b79d64ad-89ba-4eed-a302-dee159005446"
-        , id (Debug.log "id" ("myscript-editor-" ++ toString index))
+        , id ("myscript-editor-" ++ toString index)
         , style
             [ ( "display"
               , if show then
@@ -107,6 +111,7 @@ update session msg model =
                     | currentQuestionIndex =
                         model.currentQuestionIndex - 1
                     , questionEditors = Array.set (model.currentQuestionIndex - 1) (editor (model.currentQuestionIndex - 1) True) <| Array.set model.currentQuestionIndex (editor model.currentQuestionIndex False) model.questionEditors
+                    , timersWorking = Array.set (model.currentQuestionIndex - 1) True model.timersWorking
                 }
                     ! []
             else
@@ -117,16 +122,21 @@ update session msg model =
                 { model
                     | currentQuestionIndex =
                         model.currentQuestionIndex + 1
-                    , questionEditors = Array.set (model.currentQuestionIndex + 1) (editor (model.currentQuestionIndex - 1) True) <| Array.set model.currentQuestionIndex (editor model.currentQuestionIndex False) model.questionEditors
+                    , questionEditors = Array.set (model.currentQuestionIndex + 1) (editor (model.currentQuestionIndex + 1) True) <| Array.set model.currentQuestionIndex (editor model.currentQuestionIndex False) model.questionEditors
+                    , timersWorking = Array.set (model.currentQuestionIndex + 1) True model.timersWorking
                 }
                     ! []
             else
                 model ! []
 
-        MyScriptExport str ->
+        MyScriptExport ( mathml, stringIndex ) ->
+            let
+                ind =
+                    Result.withDefault 0 (String.toInt (Maybe.withDefault "0" (Array.get 2 <| Array.fromList (String.split "-" (Debug.log "convertStringIndex" stringIndex)))))
+            in
             { model
-                | currentAnswers = Array.set model.currentQuestionIndex (Debug.log "latestExport" str) model.currentAnswers
-                , exportCount = model.exportCount + 1
+                | exportCount = model.convertCount + 1
+                , currentAnswers = Array.set ind mathml model.currentAnswers
             }
                 ! [ if model.exportCount <= 2 then
                         Ports.myscriptConvert ()
@@ -137,20 +147,27 @@ update session msg model =
         MyScriptConvert ( mathml, stringIndex ) ->
             let
                 ind =
-                    Result.withDefault 0 (String.toInt (Maybe.withDefault "0" (Array.get 2 <| Array.fromList (String.split "-" stringIndex))))
+                    Result.withDefault 0 (String.toInt (Maybe.withDefault "0" (Array.get 2 <| Array.fromList (String.split "-" (Debug.log "convertStringIndex" stringIndex)))))
             in
             { model
                 | lastConvert = Debug.log "latestConvert" mathml
                 , convertCount = model.convertCount + 1
-                , solutionHistory = Array.set (Debug.log "ind" ind) (List.append (Maybe.withDefault [] <| Array.get model.currentQuestionIndex model.solutionHistory) [ mathml ]) model.solutionHistory
+                , solutionHistory = Array.set (Debug.log "ind" ind) (List.append (Maybe.withDefault [] <| Array.get ind model.solutionHistory) [ mathml ]) model.solutionHistory
             }
                 ! []
 
         Validate ->
-            model ! [ validateSolution session model ]
+            { model
+                | timersWorking = Array.set model.currentQuestionIndex False model.timersWorking
+            }
+                ! [ validateSolution session model ]
 
         CheckSolution ->
-            model ! [ checkSolution session model ]
+            { model
+                | timersWorking =
+                    Array.set model.currentQuestionIndex False model.timersWorking
+            }
+                ! [ checkSolution session model ]
 
         CheckSolutionResult (Err httpError) ->
             let
@@ -162,6 +179,7 @@ update session msg model =
                     List.append model.errorMessages
                         [ errorMessage
                         ]
+                , timersWorking = Array.set model.currentQuestionIndex True model.timersWorking
             }
                 => Cmd.none
 
@@ -169,6 +187,8 @@ update session msg model =
             { model
                 | isCorrect = Array.set model.currentQuestionIndex (Just resp.correct) model.isCorrect
                 , errorMessages = resp.error_messages
+                , timersWorking = Array.set model.currentQuestionIndex (not resp.correct) model.timersWorking
+                , questionsIsDone = Array.set model.currentQuestionIndex resp.correct model.questionsIsDone
             }
                 => Cmd.none
 
@@ -182,12 +202,14 @@ update session msg model =
                     List.append model.errorMessages
                         [ errorMessage
                         ]
+                , timersWorking = Array.set model.currentQuestionIndex True model.timersWorking
             }
                 => Cmd.none
 
         ValidateResult (Ok resp) ->
             { model
                 | isCorrect = Array.set model.currentQuestionIndex (Just resp.correct) model.isCorrect
+                , timersWorking = Array.set model.currentQuestionIndex True model.timersWorking
 
                 -- , mistakeStep = resp.step
                 -- , mistakeType = resp.mistake_type
@@ -221,6 +243,8 @@ update session msg model =
                         , subjects = resp.subjects
                         , curriculum = resp.curriculum
                         , solutionHistory = Array.repeat (Array.length resp.questions) []
+                        , timersWorking = Array.set model.currentQuestionIndex True (Array.repeat (Array.length resp.questions) False)
+                        , questionsIsDone = Array.repeat (Array.length resp.questions) False
                         , questionEditors =
                             Array.indexedMap
                                 (\index item ->
@@ -243,11 +267,21 @@ update session msg model =
                 { model | errorMessages = resp.error_messages } ! []
 
         TimerTick time ->
-            { model
-                | timers =
-                    Array.set model.currentQuestionIndex ((Maybe.withDefault 42 <| Array.get model.currentQuestionIndex model.timers) + 1) model.timers
-            }
-                ! []
+            case Array.get model.currentQuestionIndex model.timersWorking of
+                Just True ->
+                    case Array.get model.currentQuestionIndex model.questionsIsDone of
+                        Just True ->
+                            model ! []
+
+                        _ ->
+                            { model
+                                | timers =
+                                    Array.set model.currentQuestionIndex ((Maybe.withDefault 42 <| Array.get model.currentQuestionIndex model.timers) + 1) model.timers
+                            }
+                                ! []
+
+                _ ->
+                    model ! []
 
 
 type alias LoadQuestionResponseData =
@@ -458,10 +492,28 @@ view session model =
                                   else
                                     text "Incorrect, check your work for mistakes and try again!"
                                 ]
-                    , button [ class "btn btn-lg btn-primary pull-xs-right", onClick Validate ]
+                    , button
+                        [ class "btn btn-lg btn-primary pull-xs-right"
+                        , case Array.get model.currentQuestionIndex model.questionsIsDone of
+                            Just True ->
+                                disabled True
+
+                            _ ->
+                                disabled False
+                        , onClick Validate
+                        ]
                         [ text "Validate"
                         ]
-                    , button [ class "btn btn-lg btn-primary pull-xs-right", onClick CheckSolution ]
+                    , button
+                        [ class "btn btn-lg btn-primary pull-xs-right"
+                        , case Array.get model.currentQuestionIndex model.questionsIsDone of
+                            Just True ->
+                                disabled True
+
+                            _ ->
+                                disabled False
+                        , onClick CheckSolution
+                        ]
                         [ text
                             ("Done "
                                 ++ (case Array.get model.currentQuestionIndex model.timers of
@@ -482,12 +534,16 @@ view session model =
 onConvert : (( String, String ) -> msg) -> Attribute msg
 onConvert message =
     let
-        map2d string int =
-            message ( string, int )
+        map2d convert index =
+            message ( convert, index )
     in
-    on "convert" (JD.map2 map2d (JD.at [ "target", "__data", "exports", "application/mathml+xml" ] JD.string) (JD.at [ "" ] JD.string))
+    on "convert" (JD.map2 map2d (JD.at [ "target", "__data", "exports", "application/mathml+xml" ] JD.string) (JD.at [ "target", "id" ] JD.string))
 
 
-onExport : (String -> msg) -> Attribute msg
+onExport : (( String, String ) -> msg) -> Attribute msg
 onExport message =
-    on "exports-changed" (JD.map message (JD.at [ "detail", "value", "application/mathml+xml" ] JD.string))
+    let
+        map2d convert index =
+            message ( convert, index )
+    in
+    on "exports-changed" (JD.map2 map2d (JD.at [ "detail", "value", "application/mathml+xml" ] JD.string) (JD.at [ "target", "id" ] JD.string))

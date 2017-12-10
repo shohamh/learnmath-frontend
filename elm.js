@@ -36426,17 +36426,20 @@ var _shohamh$learnmath_frontend$Visualizations_BarChart$scaleHeight = function (
 	return A2(
 		_elm_lang$core$Maybe$withDefault,
 		20,
-		_elm_lang$core$List$maximum(
-			A2(
-				_elm_lang$core$List$map,
-				function (_p0) {
-					return function (_p1) {
-						var _p2 = _p1;
-						return _p2._0 + _p2._1;
-					}(
-						_elm_lang$core$Tuple$second(_p0));
-				},
-				model)));
+		A2(
+			_elm_lang$core$Debug$log,
+			'scaleHeight listMax',
+			_elm_lang$core$List$maximum(
+				A2(
+					_elm_lang$core$List$map,
+					function (_p0) {
+						return function (_p1) {
+							var _p2 = _p1;
+							return _p2._0 + _p2._1;
+						}(
+							_elm_lang$core$Tuple$second(_p0));
+					},
+					A2(_elm_lang$core$Debug$log, 'scaleHeight model', model)))));
 };
 var _shohamh$learnmath_frontend$Visualizations_BarChart$padding = 30;
 var _shohamh$learnmath_frontend$Visualizations_BarChart$h = 450;
@@ -36459,41 +36462,18 @@ var _shohamh$learnmath_frontend$Visualizations_BarChart$yAxis = function (model)
 			{orientation: _gampleman$elm_visualization$Visualization_Axis$Left}),
 		_shohamh$learnmath_frontend$Visualizations_BarChart$yScale(model));
 };
-var _shohamh$learnmath_frontend$Visualizations_BarChart$w = 900;
-var _shohamh$learnmath_frontend$Visualizations_BarChart$xScale = function (model) {
-	return A3(
-		_gampleman$elm_visualization$Visualization_Scale$band,
-		_elm_lang$core$Native_Utils.update(
-			_gampleman$elm_visualization$Visualization_Scale$defaultBandConfig,
-			{paddingInner: 0.1, paddingOuter: 0.2}),
-		A2(_elm_lang$core$List$map, _elm_lang$core$Tuple$first, model),
-		{ctor: '_Tuple2', _0: 0, _1: _shohamh$learnmath_frontend$Visualizations_BarChart$w - (2 * _shohamh$learnmath_frontend$Visualizations_BarChart$padding)});
-};
-var _shohamh$learnmath_frontend$Visualizations_BarChart$xAxis = function (model) {
-	return A2(
-		_gampleman$elm_visualization$Visualization_Axis$axis,
-		_elm_lang$core$Native_Utils.update(
-			_gampleman$elm_visualization$Visualization_Axis$defaultOptions,
-			{
-				orientation: _gampleman$elm_visualization$Visualization_Axis$Bottom,
-				tickFormat: _elm_lang$core$Maybe$Just(_shohamh$learnmath_frontend$Data_Subject$toString)
-			}),
-		_gampleman$elm_visualization$Visualization_Scale$toRenderable(
-			_shohamh$learnmath_frontend$Visualizations_BarChart$xScale(model)));
-};
-var _shohamh$learnmath_frontend$Visualizations_BarChart$model = {ctor: '[]'};
-var _shohamh$learnmath_frontend$Visualizations_BarChart$column = F2(
-	function (xScale, _p3) {
+var _shohamh$learnmath_frontend$Visualizations_BarChart$column = F3(
+	function (model, xScale, _p3) {
 		var _p4 = _p3;
 		var _p7 = _p4._1._1;
 		var _p6 = _p4._0;
 		var _p5 = _p4._1._0;
-		var yScaled = _shohamh$learnmath_frontend$Visualizations_BarChart$yScale(_shohamh$learnmath_frontend$Visualizations_BarChart$model);
-		var fixedWrong = _shohamh$learnmath_frontend$Visualizations_BarChart$scaleHeight(_shohamh$learnmath_frontend$Visualizations_BarChart$model) - _p7;
-		var fixedCorrect = _shohamh$learnmath_frontend$Visualizations_BarChart$scaleHeight(_shohamh$learnmath_frontend$Visualizations_BarChart$model) - _p5;
+		var yScaled = _shohamh$learnmath_frontend$Visualizations_BarChart$yScale(model);
+		var fixedWrong = _shohamh$learnmath_frontend$Visualizations_BarChart$scaleHeight(model) - _p7;
+		var fixedCorrect = _shohamh$learnmath_frontend$Visualizations_BarChart$scaleHeight(model) - _p5;
 		var bottomRectHeight = A2(
 			_gampleman$elm_visualization$Visualization_Scale$convert,
-			_shohamh$learnmath_frontend$Visualizations_BarChart$yScale(_shohamh$learnmath_frontend$Visualizations_BarChart$model),
+			_shohamh$learnmath_frontend$Visualizations_BarChart$yScale(model),
 			fixedCorrect);
 		return A2(
 			_elm_lang$svg$Svg$g,
@@ -36589,7 +36569,7 @@ var _shohamh$learnmath_frontend$Visualizations_BarChart$column = F2(
 											(_shohamh$learnmath_frontend$Visualizations_BarChart$realH - A2(
 												_gampleman$elm_visualization$Visualization_Scale$convert,
 												yScaled,
-												_shohamh$learnmath_frontend$Visualizations_BarChart$scaleHeight(_shohamh$learnmath_frontend$Visualizations_BarChart$model) - (_p5 + _p7))) - (_shohamh$learnmath_frontend$Visualizations_BarChart$padding / 2))),
+												_shohamh$learnmath_frontend$Visualizations_BarChart$scaleHeight(model) - (_p5 + _p7))) - (_shohamh$learnmath_frontend$Visualizations_BarChart$padding / 2))),
 									_1: {
 										ctor: '::',
 										_0: _elm_lang$svg$Svg_Attributes$textAnchor('middle'),
@@ -36608,6 +36588,28 @@ var _shohamh$learnmath_frontend$Visualizations_BarChart$column = F2(
 				}
 			});
 	});
+var _shohamh$learnmath_frontend$Visualizations_BarChart$w = 900;
+var _shohamh$learnmath_frontend$Visualizations_BarChart$xScale = function (model) {
+	return A3(
+		_gampleman$elm_visualization$Visualization_Scale$band,
+		_elm_lang$core$Native_Utils.update(
+			_gampleman$elm_visualization$Visualization_Scale$defaultBandConfig,
+			{paddingInner: 0.1, paddingOuter: 0.2}),
+		A2(_elm_lang$core$List$map, _elm_lang$core$Tuple$first, model),
+		{ctor: '_Tuple2', _0: 0, _1: _shohamh$learnmath_frontend$Visualizations_BarChart$w - (2 * _shohamh$learnmath_frontend$Visualizations_BarChart$padding)});
+};
+var _shohamh$learnmath_frontend$Visualizations_BarChart$xAxis = function (model) {
+	return A2(
+		_gampleman$elm_visualization$Visualization_Axis$axis,
+		_elm_lang$core$Native_Utils.update(
+			_gampleman$elm_visualization$Visualization_Axis$defaultOptions,
+			{
+				orientation: _gampleman$elm_visualization$Visualization_Axis$Bottom,
+				tickFormat: _elm_lang$core$Maybe$Just(_shohamh$learnmath_frontend$Data_Subject$toString)
+			}),
+		_gampleman$elm_visualization$Visualization_Scale$toRenderable(
+			_shohamh$learnmath_frontend$Visualizations_BarChart$xScale(model)));
+};
 var _shohamh$learnmath_frontend$Visualizations_BarChart$viewBarChart = F2(
 	function (session, model) {
 		return A2(
@@ -36721,7 +36723,9 @@ var _shohamh$learnmath_frontend$Visualizations_BarChart$viewBarChart = F2(
 								},
 								A2(
 									_elm_lang$core$List$map,
-									_shohamh$learnmath_frontend$Visualizations_BarChart$column(
+									A2(
+										_shohamh$learnmath_frontend$Visualizations_BarChart$column,
+										model,
 										_shohamh$learnmath_frontend$Visualizations_BarChart$xScale(model)),
 									model)),
 							_1: {ctor: '[]'}
@@ -36730,6 +36734,7 @@ var _shohamh$learnmath_frontend$Visualizations_BarChart$viewBarChart = F2(
 				}
 			});
 	});
+var _shohamh$learnmath_frontend$Visualizations_BarChart$model = {ctor: '[]'};
 
 var _shohamh$learnmath_frontend$Visualizations_LineChart$scaleHeight = 1;
 var _shohamh$learnmath_frontend$Visualizations_LineChart$padding = 30;
@@ -38728,12 +38733,17 @@ var _shohamh$learnmath_frontend$Page_NotFound$view = function (session) {
 };
 
 var _shohamh$learnmath_frontend$Page_Question$onExport = function (message) {
+	var map2d = F2(
+		function (convert, index) {
+			return message(
+				{ctor: '_Tuple2', _0: convert, _1: index});
+		});
 	return A2(
 		_elm_lang$html$Html_Events$on,
 		'exports-changed',
-		A2(
-			_elm_lang$core$Json_Decode$map,
-			message,
+		A3(
+			_elm_lang$core$Json_Decode$map2,
+			map2d,
 			A2(
 				_elm_lang$core$Json_Decode$at,
 				{
@@ -38749,13 +38759,25 @@ var _shohamh$learnmath_frontend$Page_Question$onExport = function (message) {
 						}
 					}
 				},
+				_elm_lang$core$Json_Decode$string),
+			A2(
+				_elm_lang$core$Json_Decode$at,
+				{
+					ctor: '::',
+					_0: 'target',
+					_1: {
+						ctor: '::',
+						_0: 'id',
+						_1: {ctor: '[]'}
+					}
+				},
 				_elm_lang$core$Json_Decode$string)));
 };
 var _shohamh$learnmath_frontend$Page_Question$onConvert = function (message) {
 	var map2d = F2(
-		function (string, $int) {
+		function (convert, index) {
 			return message(
-				{ctor: '_Tuple2', _0: string, _1: $int});
+				{ctor: '_Tuple2', _0: convert, _1: index});
 		});
 	return A2(
 		_elm_lang$html$Html_Events$on,
@@ -38787,8 +38809,12 @@ var _shohamh$learnmath_frontend$Page_Question$onConvert = function (message) {
 				_elm_lang$core$Json_Decode$at,
 				{
 					ctor: '::',
-					_0: '',
-					_1: {ctor: '[]'}
+					_0: 'target',
+					_1: {
+						ctor: '::',
+						_0: 'id',
+						_1: {ctor: '[]'}
+					}
 				},
 				_elm_lang$core$Json_Decode$string)));
 };
@@ -38937,8 +38963,10 @@ var _shohamh$learnmath_frontend$Page_Question$model = {
 	questionEditors: _elm_lang$core$Array$empty,
 	isCorrect: _elm_lang$core$Array$empty,
 	timers: _elm_lang$core$Array$empty,
+	timersWorking: _elm_lang$core$Array$empty,
 	mistakeStep: _elm_lang$core$Maybe$Nothing,
-	mistakeType: _elm_lang$core$Maybe$Nothing
+	mistakeType: _elm_lang$core$Maybe$Nothing,
+	questionsIsDone: _elm_lang$core$Array$empty
 };
 var _shohamh$learnmath_frontend$Page_Question$Model = function (a) {
 	return function (b) {
@@ -38956,7 +38984,11 @@ var _shohamh$learnmath_frontend$Page_Question$Model = function (a) {
 													return function (n) {
 														return function (o) {
 															return function (p) {
-																return {successMessage: a, errorMessages: b, currentQuestionIndex: c, currentAnswers: d, solutionHistory: e, exportCount: f, lastConvert: g, convertCount: h, questions: i, subjects: j, curriculum: k, questionEditors: l, isCorrect: m, timers: n, mistakeStep: o, mistakeType: p};
+																return function (q) {
+																	return function (r) {
+																		return {successMessage: a, errorMessages: b, currentQuestionIndex: c, currentAnswers: d, solutionHistory: e, exportCount: f, lastConvert: g, convertCount: h, questions: i, subjects: j, curriculum: k, questionEditors: l, isCorrect: m, timers: n, timersWorking: o, mistakeStep: p, mistakeType: q, questionsIsDone: r};
+																	};
+																};
 															};
 														};
 													};
@@ -39297,8 +39329,19 @@ var _shohamh$learnmath_frontend$Page_Question$view = F2(
 																_0: _elm_lang$html$Html_Attributes$class('btn btn-lg btn-primary pull-xs-right'),
 																_1: {
 																	ctor: '::',
-																	_0: _elm_lang$html$Html_Events$onClick(_shohamh$learnmath_frontend$Page_Question$Validate),
-																	_1: {ctor: '[]'}
+																	_0: function () {
+																		var _p11 = A2(_elm_lang$core$Array$get, model.currentQuestionIndex, model.questionsIsDone);
+																		if ((_p11.ctor === 'Just') && (_p11._0 === true)) {
+																			return _elm_lang$html$Html_Attributes$disabled(true);
+																		} else {
+																			return _elm_lang$html$Html_Attributes$disabled(false);
+																		}
+																	}(),
+																	_1: {
+																		ctor: '::',
+																		_0: _elm_lang$html$Html_Events$onClick(_shohamh$learnmath_frontend$Page_Question$Validate),
+																		_1: {ctor: '[]'}
+																	}
 																}
 															},
 															{
@@ -39315,8 +39358,19 @@ var _shohamh$learnmath_frontend$Page_Question$view = F2(
 																	_0: _elm_lang$html$Html_Attributes$class('btn btn-lg btn-primary pull-xs-right'),
 																	_1: {
 																		ctor: '::',
-																		_0: _elm_lang$html$Html_Events$onClick(_shohamh$learnmath_frontend$Page_Question$CheckSolution),
-																		_1: {ctor: '[]'}
+																		_0: function () {
+																			var _p12 = A2(_elm_lang$core$Array$get, model.currentQuestionIndex, model.questionsIsDone);
+																			if ((_p12.ctor === 'Just') && (_p12._0 === true)) {
+																				return _elm_lang$html$Html_Attributes$disabled(true);
+																			} else {
+																				return _elm_lang$html$Html_Attributes$disabled(false);
+																			}
+																		}(),
+																		_1: {
+																			ctor: '::',
+																			_0: _elm_lang$html$Html_Events$onClick(_shohamh$learnmath_frontend$Page_Question$CheckSolution),
+																			_1: {ctor: '[]'}
+																		}
 																	}
 																},
 																{
@@ -39326,17 +39380,17 @@ var _shohamh$learnmath_frontend$Page_Question$view = F2(
 																			_elm_lang$core$Basics_ops['++'],
 																			'Done ',
 																			function () {
-																				var _p11 = A2(_elm_lang$core$Array$get, model.currentQuestionIndex, model.timers);
-																				if (_p11.ctor === 'Just') {
-																					var _p12 = _p11._0;
+																				var _p13 = A2(_elm_lang$core$Array$get, model.currentQuestionIndex, model.timers);
+																				if (_p13.ctor === 'Just') {
+																					var _p14 = _p13._0;
 																					return A2(
 																						_elm_lang$core$Basics_ops['++'],
-																						_elm_lang$core$Basics$toString((_p12 / 60) | 0),
+																						_elm_lang$core$Basics$toString((_p14 / 60) | 0),
 																						A2(
 																							_elm_lang$core$Basics_ops['++'],
 																							':',
 																							_elm_lang$core$Basics$toString(
-																								A2(_elm_lang$core$Basics_ops['%'], _p12, 60))));
+																								A2(_elm_lang$core$Basics_ops['%'], _p14, 60))));
 																				} else {
 																					return '';
 																				}
@@ -39407,12 +39461,9 @@ var _shohamh$learnmath_frontend$Page_Question$editor = F2(
 											ctor: '::',
 											_0: _elm_lang$html$Html_Attributes$id(
 												A2(
-													_elm_lang$core$Debug$log,
-													'id',
-													A2(
-														_elm_lang$core$Basics_ops['++'],
-														'myscript-editor-',
-														_elm_lang$core$Basics$toString(index)))),
+													_elm_lang$core$Basics_ops['++'],
+													'myscript-editor-',
+													_elm_lang$core$Basics$toString(index))),
 											_1: {
 												ctor: '::',
 												_0: _elm_lang$html$Html_Attributes$style(
@@ -39439,8 +39490,8 @@ var _shohamh$learnmath_frontend$Page_Question$editor = F2(
 	});
 var _shohamh$learnmath_frontend$Page_Question$update = F3(
 	function (session, msg, model) {
-		var _p13 = msg;
-		switch (_p13.ctor) {
+		var _p15 = msg;
+		switch (_p15.ctor) {
 			case 'PrevQuestion':
 				return (_elm_lang$core$Native_Utils.cmp(model.currentQuestionIndex, 0) > 0) ? A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
@@ -39456,7 +39507,8 @@ var _shohamh$learnmath_frontend$Page_Question$update = F3(
 									_elm_lang$core$Array$set,
 									model.currentQuestionIndex,
 									A2(_shohamh$learnmath_frontend$Page_Question$editor, model.currentQuestionIndex, false),
-									model.questionEditors))
+									model.questionEditors)),
+							timersWorking: A3(_elm_lang$core$Array$set, model.currentQuestionIndex - 1, true, model.timersWorking)
 						}),
 					{ctor: '[]'}) : A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
@@ -39474,38 +39526,19 @@ var _shohamh$learnmath_frontend$Page_Question$update = F3(
 							questionEditors: A3(
 								_elm_lang$core$Array$set,
 								model.currentQuestionIndex + 1,
-								A2(_shohamh$learnmath_frontend$Page_Question$editor, model.currentQuestionIndex - 1, true),
+								A2(_shohamh$learnmath_frontend$Page_Question$editor, model.currentQuestionIndex + 1, true),
 								A3(
 									_elm_lang$core$Array$set,
 									model.currentQuestionIndex,
 									A2(_shohamh$learnmath_frontend$Page_Question$editor, model.currentQuestionIndex, false),
-									model.questionEditors))
+									model.questionEditors)),
+							timersWorking: A3(_elm_lang$core$Array$set, model.currentQuestionIndex + 1, true, model.timersWorking)
 						}),
 					{ctor: '[]'}) : A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					model,
 					{ctor: '[]'});
 			case 'MyScriptExport':
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{
-							currentAnswers: A3(
-								_elm_lang$core$Array$set,
-								model.currentQuestionIndex,
-								A2(_elm_lang$core$Debug$log, 'latestExport', _p13._0),
-								model.currentAnswers),
-							exportCount: model.exportCount + 1
-						}),
-					{
-						ctor: '::',
-						_0: (_elm_lang$core$Native_Utils.cmp(model.exportCount, 2) < 1) ? _shohamh$learnmath_frontend$Ports$myscriptConvert(
-							{ctor: '_Tuple0'}) : _elm_lang$core$Platform_Cmd$none,
-						_1: {ctor: '[]'}
-					});
-			case 'MyScriptConvert':
-				var _p14 = _p13._0._0;
 				var ind = A2(
 					_elm_lang$core$Result$withDefault,
 					0,
@@ -39517,13 +39550,47 @@ var _shohamh$learnmath_frontend$Page_Question$update = F3(
 								_elm_lang$core$Array$get,
 								2,
 								_elm_lang$core$Array$fromList(
-									A2(_elm_lang$core$String$split, '-', _p13._0._1))))));
+									A2(
+										_elm_lang$core$String$split,
+										'-',
+										A2(_elm_lang$core$Debug$log, 'convertStringIndex', _p15._0._1)))))));
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
-							lastConvert: A2(_elm_lang$core$Debug$log, 'latestConvert', _p14),
+							exportCount: model.convertCount + 1,
+							currentAnswers: A3(_elm_lang$core$Array$set, ind, _p15._0._0, model.currentAnswers)
+						}),
+					{
+						ctor: '::',
+						_0: (_elm_lang$core$Native_Utils.cmp(model.exportCount, 2) < 1) ? _shohamh$learnmath_frontend$Ports$myscriptConvert(
+							{ctor: '_Tuple0'}) : _elm_lang$core$Platform_Cmd$none,
+						_1: {ctor: '[]'}
+					});
+			case 'MyScriptConvert':
+				var _p16 = _p15._0._0;
+				var ind = A2(
+					_elm_lang$core$Result$withDefault,
+					0,
+					_elm_lang$core$String$toInt(
+						A2(
+							_elm_lang$core$Maybe$withDefault,
+							'0',
+							A2(
+								_elm_lang$core$Array$get,
+								2,
+								_elm_lang$core$Array$fromList(
+									A2(
+										_elm_lang$core$String$split,
+										'-',
+										A2(_elm_lang$core$Debug$log, 'convertStringIndex', _p15._0._1)))))));
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{
+							lastConvert: A2(_elm_lang$core$Debug$log, 'latestConvert', _p16),
 							convertCount: model.convertCount + 1,
 							solutionHistory: A3(
 								_elm_lang$core$Array$set,
@@ -39533,10 +39600,10 @@ var _shohamh$learnmath_frontend$Page_Question$update = F3(
 									A2(
 										_elm_lang$core$Maybe$withDefault,
 										{ctor: '[]'},
-										A2(_elm_lang$core$Array$get, model.currentQuestionIndex, model.solutionHistory)),
+										A2(_elm_lang$core$Array$get, ind, model.solutionHistory)),
 									{
 										ctor: '::',
-										_0: _p14,
+										_0: _p16,
 										_1: {ctor: '[]'}
 									}),
 								model.solutionHistory)
@@ -39545,7 +39612,11 @@ var _shohamh$learnmath_frontend$Page_Question$update = F3(
 			case 'Validate':
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
-					model,
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{
+							timersWorking: A3(_elm_lang$core$Array$set, model.currentQuestionIndex, false, model.timersWorking)
+						}),
 					{
 						ctor: '::',
 						_0: A2(_shohamh$learnmath_frontend$Page_Question$validateSolution, session, model),
@@ -39554,15 +39625,19 @@ var _shohamh$learnmath_frontend$Page_Question$update = F3(
 			case 'CheckSolution':
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
-					model,
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{
+							timersWorking: A3(_elm_lang$core$Array$set, model.currentQuestionIndex, false, model.timersWorking)
+						}),
 					{
 						ctor: '::',
 						_0: A2(_shohamh$learnmath_frontend$Page_Question$checkSolution, session, model),
 						_1: {ctor: '[]'}
 					});
 			case 'CheckSolutionResult':
-				if (_p13._0.ctor === 'Err') {
-					var errorMessage = _shohamh$learnmath_frontend$Util$httpErrorToString(_p13._0._0);
+				if (_p15._0.ctor === 'Err') {
+					var errorMessage = _shohamh$learnmath_frontend$Util$httpErrorToString(_p15._0._0);
 					return A2(
 						_shohamh$learnmath_frontend$Util_ops['=>'],
 						_elm_lang$core$Native_Utils.update(
@@ -39575,11 +39650,12 @@ var _shohamh$learnmath_frontend$Page_Question$update = F3(
 										ctor: '::',
 										_0: errorMessage,
 										_1: {ctor: '[]'}
-									})
+									}),
+								timersWorking: A3(_elm_lang$core$Array$set, model.currentQuestionIndex, true, model.timersWorking)
 							}),
 						_elm_lang$core$Platform_Cmd$none);
 				} else {
-					var _p15 = _p13._0._0;
+					var _p17 = _p15._0._0;
 					return A2(
 						_shohamh$learnmath_frontend$Util_ops['=>'],
 						_elm_lang$core$Native_Utils.update(
@@ -39588,15 +39664,17 @@ var _shohamh$learnmath_frontend$Page_Question$update = F3(
 								isCorrect: A3(
 									_elm_lang$core$Array$set,
 									model.currentQuestionIndex,
-									_elm_lang$core$Maybe$Just(_p15.correct),
+									_elm_lang$core$Maybe$Just(_p17.correct),
 									model.isCorrect),
-								errorMessages: _p15.error_messages
+								errorMessages: _p17.error_messages,
+								timersWorking: A3(_elm_lang$core$Array$set, model.currentQuestionIndex, !_p17.correct, model.timersWorking),
+								questionsIsDone: A3(_elm_lang$core$Array$set, model.currentQuestionIndex, _p17.correct, model.questionsIsDone)
 							}),
 						_elm_lang$core$Platform_Cmd$none);
 				}
 			case 'ValidateResult':
-				if (_p13._0.ctor === 'Err') {
-					var errorMessage = _shohamh$learnmath_frontend$Util$httpErrorToString(_p13._0._0);
+				if (_p15._0.ctor === 'Err') {
+					var errorMessage = _shohamh$learnmath_frontend$Util$httpErrorToString(_p15._0._0);
 					return A2(
 						_shohamh$learnmath_frontend$Util_ops['=>'],
 						_elm_lang$core$Native_Utils.update(
@@ -39609,11 +39687,12 @@ var _shohamh$learnmath_frontend$Page_Question$update = F3(
 										ctor: '::',
 										_0: errorMessage,
 										_1: {ctor: '[]'}
-									})
+									}),
+								timersWorking: A3(_elm_lang$core$Array$set, model.currentQuestionIndex, true, model.timersWorking)
 							}),
 						_elm_lang$core$Platform_Cmd$none);
 				} else {
-					var _p16 = _p13._0._0;
+					var _p18 = _p15._0._0;
 					return A2(
 						_shohamh$learnmath_frontend$Util_ops['=>'],
 						_elm_lang$core$Native_Utils.update(
@@ -39622,15 +39701,16 @@ var _shohamh$learnmath_frontend$Page_Question$update = F3(
 								isCorrect: A3(
 									_elm_lang$core$Array$set,
 									model.currentQuestionIndex,
-									_elm_lang$core$Maybe$Just(_p16.correct),
+									_elm_lang$core$Maybe$Just(_p18.correct),
 									model.isCorrect),
-								errorMessages: _p16.error_messages
+								timersWorking: A3(_elm_lang$core$Array$set, model.currentQuestionIndex, true, model.timersWorking),
+								errorMessages: _p18.error_messages
 							}),
 						_elm_lang$core$Platform_Cmd$none);
 				}
 			case 'LoadQuestionResult':
-				if (_p13._0.ctor === 'Err') {
-					var errorMessage = _shohamh$learnmath_frontend$Util$httpErrorToString(_p13._0._0);
+				if (_p15._0.ctor === 'Err') {
+					var errorMessage = _shohamh$learnmath_frontend$Util$httpErrorToString(_p15._0._0);
 					return A2(
 						_shohamh$learnmath_frontend$Util_ops['=>'],
 						_elm_lang$core$Native_Utils.update(
@@ -39647,29 +39727,41 @@ var _shohamh$learnmath_frontend$Page_Question$update = F3(
 							}),
 						_elm_lang$core$Platform_Cmd$none);
 				} else {
-					var _p17 = _p13._0._0;
+					var _p19 = _p15._0._0;
 					var newModel = _elm_lang$core$Native_Utils.update(
 						model,
 						{
-							questions: A2(_elm_lang$core$Debug$log, 'questions haha', _p17.questions),
+							questions: A2(_elm_lang$core$Debug$log, 'questions haha', _p19.questions),
 							currentAnswers: A2(
 								_elm_lang$core$Array$repeat,
-								_elm_lang$core$Array$length(_p17.questions),
+								_elm_lang$core$Array$length(_p19.questions),
 								''),
 							isCorrect: A2(
 								_elm_lang$core$Array$repeat,
-								_elm_lang$core$Array$length(_p17.questions),
+								_elm_lang$core$Array$length(_p19.questions),
 								_elm_lang$core$Maybe$Nothing),
 							timers: A2(
 								_elm_lang$core$Array$repeat,
-								_elm_lang$core$Array$length(_p17.questions),
+								_elm_lang$core$Array$length(_p19.questions),
 								0),
-							subjects: _p17.subjects,
-							curriculum: _p17.curriculum,
+							subjects: _p19.subjects,
+							curriculum: _p19.curriculum,
 							solutionHistory: A2(
 								_elm_lang$core$Array$repeat,
-								_elm_lang$core$Array$length(_p17.questions),
+								_elm_lang$core$Array$length(_p19.questions),
 								{ctor: '[]'}),
+							timersWorking: A3(
+								_elm_lang$core$Array$set,
+								model.currentQuestionIndex,
+								true,
+								A2(
+									_elm_lang$core$Array$repeat,
+									_elm_lang$core$Array$length(_p19.questions),
+									false)),
+							questionsIsDone: A2(
+								_elm_lang$core$Array$repeat,
+								_elm_lang$core$Array$length(_p19.questions),
+								false),
 							questionEditors: A2(
 								_elm_lang$core$Array$indexedMap,
 								F2(
@@ -39679,10 +39771,10 @@ var _shohamh$learnmath_frontend$Page_Question$update = F3(
 											index,
 											_elm_lang$core$Native_Utils.eq(model.currentQuestionIndex, index));
 									}),
-								A2(_elm_lang$core$Debug$log, 'resp.questions', _p17.questions))
+								A2(_elm_lang$core$Debug$log, 'resp.questions', _p19.questions))
 						});
 					var stringList = {ctor: '[]'};
-					return _p17.success ? A2(
+					return _p19.success ? A2(
 						_elm_lang$core$Platform_Cmd_ops['!'],
 						newModel,
 						_elm_lang$core$Array$toList(
@@ -39701,25 +39793,41 @@ var _shohamh$learnmath_frontend$Page_Question$update = F3(
 						_elm_lang$core$Platform_Cmd_ops['!'],
 						_elm_lang$core$Native_Utils.update(
 							model,
-							{errorMessages: _p17.error_messages}),
+							{errorMessages: _p19.error_messages}),
 						{ctor: '[]'});
 				}
 			default:
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
+				var _p20 = A2(_elm_lang$core$Array$get, model.currentQuestionIndex, model.timersWorking);
+				if ((_p20.ctor === 'Just') && (_p20._0 === true)) {
+					var _p21 = A2(_elm_lang$core$Array$get, model.currentQuestionIndex, model.questionsIsDone);
+					if ((_p21.ctor === 'Just') && (_p21._0 === true)) {
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							model,
+							{ctor: '[]'});
+					} else {
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							_elm_lang$core$Native_Utils.update(
+								model,
+								{
+									timers: A3(
+										_elm_lang$core$Array$set,
+										model.currentQuestionIndex,
+										A2(
+											_elm_lang$core$Maybe$withDefault,
+											42,
+											A2(_elm_lang$core$Array$get, model.currentQuestionIndex, model.timers)) + 1,
+										model.timers)
+								}),
+							{ctor: '[]'});
+					}
+				} else {
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
 						model,
-						{
-							timers: A3(
-								_elm_lang$core$Array$set,
-								model.currentQuestionIndex,
-								A2(
-									_elm_lang$core$Maybe$withDefault,
-									42,
-									A2(_elm_lang$core$Array$get, model.currentQuestionIndex, model.timers)) + 1,
-								model.timers)
-						}),
-					{ctor: '[]'});
+						{ctor: '[]'});
+				}
 		}
 	});
 
@@ -41388,7 +41496,7 @@ var _shohamh$learnmath_frontend$Main$main = A2(
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};
 if (typeof _shohamh$learnmath_frontend$Main$main !== 'undefined') {
-    _shohamh$learnmath_frontend$Main$main(Elm['Main'], 'Main', {"types":{"unions":{"Dict.LeafColor":{"args":[],"tags":{"LBBlack":[],"LBlack":[]}},"Data.User.Username":{"args":[],"tags":{"Username":["String"]}},"Page.AddQuestion.Msg":{"args":[],"tags":{"AddQuestion":[],"MyScriptExport":["String"],"SelectSubjects":["List String"],"SelectCurriculum":["String"],"LoadSubjectsInCurriculums":["Result.Result Http.Error Page.AddQuestion.SubjectsInCurriculums"],"AddQuestionResult":["Result.Result Http.Error Page.AddQuestion.ResponseData"]}},"Data.User.Role":{"args":[],"tags":{"Teacher":[],"Student":[]}},"Data.Subject.Subject":{"args":[],"tags":{"Subject":["String"]}},"Data.AuthToken.AuthToken":{"args":[],"tags":{"AuthToken":["String"]}},"Page.AddPractice.Msg":{"args":[],"tags":{"SelectSubjects":["List String"],"AddPractice":[],"AddPracticeResult":["Result.Result Http.Error Page.AddPractice.ResponseData"],"SelectCurriculum":["String"],"LoadSubjectsInCurriculums":["Result.Result Http.Error Page.AddPractice.SubjectsInCurriculums"],"UpdateNumberOfQuestions":["String"]}},"Dict.Dict":{"args":["k","v"],"tags":{"RBNode_elm_builtin":["Dict.NColor","k","v","Dict.Dict k v","Dict.Dict k v"],"RBEmpty_elm_builtin":["Dict.LeafColor"]}},"Array.Array":{"args":["a"],"tags":{"Array":[]}},"Route.Route":{"args":[],"tags":{"AddQuestion":[],"Home":[],"Logout":[],"AddPractice":[],"TeacherDashboard":[],"Register":[],"Dashboard":["Data.User.Username"],"Login":[],"Question":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Page.Dashboard.Msg":{"args":[],"tags":{"LoadStudentPerformance":["Result.Result Http.Error Page.Dashboard.LoadStudentPerformanceResponseData"],"LoadSubjectPerformance":["Result.Result Http.Error Page.Dashboard.LoadSubjectPerformanceResponseData"],"LoadMistakeTypes":["Result.Result Http.Error Page.Dashboard.LoadMistakeTypesResponseData"]}},"Main.Msg":{"args":[],"tags":{"QuestionMsg":["Page.Question.Msg"],"LoginMsg":["Page.Login.Msg"],"HomeLoaded":["Result.Result Page.Errored.PageLoadError Page.Home.Model"],"SetUser":["Maybe.Maybe Data.User.User"],"SetRoute":["Maybe.Maybe Route.Route"],"AddPracticeMsg":["Page.AddPractice.Msg"],"HomeMsg":["Page.Home.Msg"],"AddQuestionMsg":["Page.AddQuestion.Msg"],"TeacherDashboardMsg":["Page.TeacherDashboard.Msg"],"DashboardMsg":["Page.Dashboard.Msg"],"RegisterMsg":["Page.Register.Msg"]}},"Page.Question.Msg":{"args":[],"tags":{"MyScriptConvert":["( String, String )"],"ValidateResult":["Result.Result Http.Error Page.Question.ValidateSolutionResponseData"],"CheckSolution":[],"MyScriptExport":["String"],"TimerTick":["Time.Time"],"NextQuestion":[],"PrevQuestion":[],"Validate":[],"CheckSolutionResult":["Result.Result Http.Error Page.Question.CheckSolutionResponseData"],"LoadQuestionResult":["Result.Result Http.Error Page.Question.LoadQuestionResponseData"]}},"Page.Errored.PageLoadError":{"args":[],"tags":{"PageLoadError":["Page.Errored.Model"]}},"Dict.NColor":{"args":[],"tags":{"BBlack":[],"Red":[],"NBlack":[],"Black":[]}},"Page.TeacherDashboard.Msg":{"args":[],"tags":{"LoadStudentPerformance":["Result.Result Http.Error Page.TeacherDashboard.LoadStudentPerformanceResponseData"],"LoadSubjectPerformance":["Result.Result Http.Error Page.TeacherDashboard.LoadSubjectPerformanceResponseData"],"LoadMistakeTypes":["Result.Result Http.Error Page.TeacherDashboard.LoadMistakeTypesResponseData"]}},"Views.Page.ActivePage":{"args":[],"tags":{"Other":[],"AddQuestion":[],"Home":[],"AddPractice":[],"TeacherDashboard":[],"Register":[],"Dashboard":["Data.User.Username"],"Login":[],"Question":[]}},"Page.Home.Msg":{"args":[],"tags":{"NoOp":[]}},"Page.Register.Msg":{"args":[],"tags":{"SetPasswordAgain":["String"],"RegisterResult":["Result.Result Http.Error Page.Register.ResponseData"],"Register":[],"SetUsername":["String"],"SetUserRole":["Data.User.Role"],"SetPassword":["String"],"SetEmail":["String"]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String"],"NetworkError":[],"Timeout":[],"BadStatus":["Http.Response String"],"BadPayload":["String","Http.Response String"]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}},"Page.Login.Msg":{"args":[],"tags":{"SetUsername":["String"],"Submit":[],"SubmitResult":["Result.Result Http.Error Page.Login.ResponseData"],"SetPassword":["String"]}}},"aliases":{"Page.AddPractice.SubjectsInCurriculums":{"args":[],"type":"{ subjectsInCurriculums : Dict.Dict String (List String) , success : Bool , error_messages : List String }"},"Page.AddQuestion.ResponseData":{"args":[],"type":"{ success : Bool, error_messages : List String }"},"Page.AddQuestion.SubjectsInCurriculums":{"args":[],"type":"{ subjectsInCurriculums : Dict.Dict String (List String) , success : Bool , error_messages : List String }"},"Http.Response":{"args":["body"],"type":"{ url : String , status : { code : Int, message : String } , headers : Dict.Dict String String , body : body }"},"Page.Errored.Model":{"args":[],"type":"{ activePage : Views.Page.ActivePage, errorMessage : String }"},"Page.Home.Model":{"args":[],"type":"{}"},"Page.Question.LoadQuestionResponseData":{"args":[],"type":"{ success : Bool , error_messages : List String , questions : Array.Array String , subjects : List String , curriculum : String }"},"Page.Dashboard.LoadSubjectPerformanceResponseData":{"args":[],"type":"{ success : Bool , error_messages : List String , result : List ( Data.Subject.Subject, ( Float, Float ) ) }"},"Page.TeacherDashboard.LoadStudentPerformanceResponseData":{"args":[],"type":"{ success : Bool , error_messages : List String , result : List ( String, ( Float, Float ) ) }"},"Page.TeacherDashboard.LoadSubjectPerformanceResponseData":{"args":[],"type":"{ success : Bool , error_messages : List String , result : List ( Data.Subject.Subject, ( Float, Float ) ) }"},"Page.AddPractice.ResponseData":{"args":[],"type":"{ success : Bool, error_messages : List String }"},"Page.Dashboard.LoadMistakeTypesResponseData":{"args":[],"type":"{ success : Bool , error_messages : List String , result : List ( String, Float ) }"},"Data.User.User":{"args":[],"type":"{ email : String , token : Data.AuthToken.AuthToken , username : Data.User.Username , role : Data.User.Role }"},"Page.Login.ResponseData":{"args":[],"type":"{ success : Bool , user : Data.User.User , error_messages : List String }"},"Page.Dashboard.LoadStudentPerformanceResponseData":{"args":[],"type":"{ success : Bool , error_messages : List String , result : List ( String, ( Float, Float ) ) }"},"Time.Time":{"args":[],"type":"Float"},"Page.Question.ValidateSolutionResponseData":{"args":[],"type":"{ success : Bool, error_messages : List String, correct : Bool }"},"Page.Register.ResponseData":{"args":[],"type":"{ success : Bool, errorMessages : List String }"},"Page.TeacherDashboard.LoadMistakeTypesResponseData":{"args":[],"type":"{ success : Bool , error_messages : List String , result : List ( String, Float ) }"},"Page.Question.CheckSolutionResponseData":{"args":[],"type":"{ success : Bool, error_messages : List String, correct : Bool }"}},"message":"Main.Msg"},"versions":{"elm":"0.18.0"}});
+    _shohamh$learnmath_frontend$Main$main(Elm['Main'], 'Main', {"types":{"unions":{"Dict.LeafColor":{"args":[],"tags":{"LBBlack":[],"LBlack":[]}},"Data.User.Username":{"args":[],"tags":{"Username":["String"]}},"Page.AddQuestion.Msg":{"args":[],"tags":{"AddQuestion":[],"MyScriptExport":["String"],"SelectSubjects":["List String"],"SelectCurriculum":["String"],"LoadSubjectsInCurriculums":["Result.Result Http.Error Page.AddQuestion.SubjectsInCurriculums"],"AddQuestionResult":["Result.Result Http.Error Page.AddQuestion.ResponseData"]}},"Data.User.Role":{"args":[],"tags":{"Teacher":[],"Student":[]}},"Data.Subject.Subject":{"args":[],"tags":{"Subject":["String"]}},"Data.AuthToken.AuthToken":{"args":[],"tags":{"AuthToken":["String"]}},"Page.AddPractice.Msg":{"args":[],"tags":{"SelectSubjects":["List String"],"AddPractice":[],"AddPracticeResult":["Result.Result Http.Error Page.AddPractice.ResponseData"],"SelectCurriculum":["String"],"LoadSubjectsInCurriculums":["Result.Result Http.Error Page.AddPractice.SubjectsInCurriculums"],"UpdateNumberOfQuestions":["String"]}},"Dict.Dict":{"args":["k","v"],"tags":{"RBNode_elm_builtin":["Dict.NColor","k","v","Dict.Dict k v","Dict.Dict k v"],"RBEmpty_elm_builtin":["Dict.LeafColor"]}},"Array.Array":{"args":["a"],"tags":{"Array":[]}},"Route.Route":{"args":[],"tags":{"AddQuestion":[],"Home":[],"Logout":[],"AddPractice":[],"TeacherDashboard":[],"Register":[],"Dashboard":["Data.User.Username"],"Login":[],"Question":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"Page.Dashboard.Msg":{"args":[],"tags":{"LoadStudentPerformance":["Result.Result Http.Error Page.Dashboard.LoadStudentPerformanceResponseData"],"LoadSubjectPerformance":["Result.Result Http.Error Page.Dashboard.LoadSubjectPerformanceResponseData"],"LoadMistakeTypes":["Result.Result Http.Error Page.Dashboard.LoadMistakeTypesResponseData"]}},"Main.Msg":{"args":[],"tags":{"QuestionMsg":["Page.Question.Msg"],"LoginMsg":["Page.Login.Msg"],"HomeLoaded":["Result.Result Page.Errored.PageLoadError Page.Home.Model"],"SetUser":["Maybe.Maybe Data.User.User"],"SetRoute":["Maybe.Maybe Route.Route"],"AddPracticeMsg":["Page.AddPractice.Msg"],"HomeMsg":["Page.Home.Msg"],"AddQuestionMsg":["Page.AddQuestion.Msg"],"TeacherDashboardMsg":["Page.TeacherDashboard.Msg"],"DashboardMsg":["Page.Dashboard.Msg"],"RegisterMsg":["Page.Register.Msg"]}},"Page.Question.Msg":{"args":[],"tags":{"MyScriptConvert":["( String, String )"],"ValidateResult":["Result.Result Http.Error Page.Question.ValidateSolutionResponseData"],"CheckSolution":[],"MyScriptExport":["( String, String )"],"TimerTick":["Time.Time"],"NextQuestion":[],"PrevQuestion":[],"Validate":[],"CheckSolutionResult":["Result.Result Http.Error Page.Question.CheckSolutionResponseData"],"LoadQuestionResult":["Result.Result Http.Error Page.Question.LoadQuestionResponseData"]}},"Page.Errored.PageLoadError":{"args":[],"tags":{"PageLoadError":["Page.Errored.Model"]}},"Dict.NColor":{"args":[],"tags":{"BBlack":[],"Red":[],"NBlack":[],"Black":[]}},"Page.TeacherDashboard.Msg":{"args":[],"tags":{"LoadStudentPerformance":["Result.Result Http.Error Page.TeacherDashboard.LoadStudentPerformanceResponseData"],"LoadSubjectPerformance":["Result.Result Http.Error Page.TeacherDashboard.LoadSubjectPerformanceResponseData"],"LoadMistakeTypes":["Result.Result Http.Error Page.TeacherDashboard.LoadMistakeTypesResponseData"]}},"Views.Page.ActivePage":{"args":[],"tags":{"Other":[],"AddQuestion":[],"Home":[],"AddPractice":[],"TeacherDashboard":[],"Register":[],"Dashboard":["Data.User.Username"],"Login":[],"Question":[]}},"Page.Home.Msg":{"args":[],"tags":{"NoOp":[]}},"Page.Register.Msg":{"args":[],"tags":{"SetPasswordAgain":["String"],"RegisterResult":["Result.Result Http.Error Page.Register.ResponseData"],"Register":[],"SetUsername":["String"],"SetUserRole":["Data.User.Role"],"SetPassword":["String"],"SetEmail":["String"]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String"],"NetworkError":[],"Timeout":[],"BadStatus":["Http.Response String"],"BadPayload":["String","Http.Response String"]}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}},"Page.Login.Msg":{"args":[],"tags":{"SetUsername":["String"],"Submit":[],"SubmitResult":["Result.Result Http.Error Page.Login.ResponseData"],"SetPassword":["String"]}}},"aliases":{"Page.AddPractice.SubjectsInCurriculums":{"args":[],"type":"{ subjectsInCurriculums : Dict.Dict String (List String) , success : Bool , error_messages : List String }"},"Page.AddQuestion.ResponseData":{"args":[],"type":"{ success : Bool, error_messages : List String }"},"Page.AddQuestion.SubjectsInCurriculums":{"args":[],"type":"{ subjectsInCurriculums : Dict.Dict String (List String) , success : Bool , error_messages : List String }"},"Http.Response":{"args":["body"],"type":"{ url : String , status : { code : Int, message : String } , headers : Dict.Dict String String , body : body }"},"Page.Errored.Model":{"args":[],"type":"{ activePage : Views.Page.ActivePage, errorMessage : String }"},"Page.Home.Model":{"args":[],"type":"{}"},"Page.Question.LoadQuestionResponseData":{"args":[],"type":"{ success : Bool , error_messages : List String , questions : Array.Array String , subjects : List String , curriculum : String }"},"Page.Dashboard.LoadSubjectPerformanceResponseData":{"args":[],"type":"{ success : Bool , error_messages : List String , result : List ( Data.Subject.Subject, ( Float, Float ) ) }"},"Page.TeacherDashboard.LoadStudentPerformanceResponseData":{"args":[],"type":"{ success : Bool , error_messages : List String , result : List ( String, ( Float, Float ) ) }"},"Page.TeacherDashboard.LoadSubjectPerformanceResponseData":{"args":[],"type":"{ success : Bool , error_messages : List String , result : List ( Data.Subject.Subject, ( Float, Float ) ) }"},"Page.AddPractice.ResponseData":{"args":[],"type":"{ success : Bool, error_messages : List String }"},"Page.Dashboard.LoadMistakeTypesResponseData":{"args":[],"type":"{ success : Bool , error_messages : List String , result : List ( String, Float ) }"},"Data.User.User":{"args":[],"type":"{ email : String , token : Data.AuthToken.AuthToken , username : Data.User.Username , role : Data.User.Role }"},"Page.Login.ResponseData":{"args":[],"type":"{ success : Bool , user : Data.User.User , error_messages : List String }"},"Page.Dashboard.LoadStudentPerformanceResponseData":{"args":[],"type":"{ success : Bool , error_messages : List String , result : List ( String, ( Float, Float ) ) }"},"Time.Time":{"args":[],"type":"Float"},"Page.Question.ValidateSolutionResponseData":{"args":[],"type":"{ success : Bool, error_messages : List String, correct : Bool }"},"Page.Register.ResponseData":{"args":[],"type":"{ success : Bool, errorMessages : List String }"},"Page.TeacherDashboard.LoadMistakeTypesResponseData":{"args":[],"type":"{ success : Bool , error_messages : List String , result : List ( String, Float ) }"},"Page.Question.CheckSolutionResponseData":{"args":[],"type":"{ success : Bool, error_messages : List String, correct : Bool }"}},"message":"Main.Msg"},"versions":{"elm":"0.18.0"}});
 }
 
 if (typeof define === "function" && define['amd'])

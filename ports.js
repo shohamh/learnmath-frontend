@@ -49,6 +49,7 @@ app.ports.myscriptConvert.subscribe(function () {
     if (!isChrome) {
         commonElements = Array.from(document.getElementsByTagName('myscript-common-element'));
     } else {
+        console.log("not chrome");
         var myscriptMathWebElements = Array.from(document.getElementsByTagName('myscript-math-web'));
         commonElements = [];
         myscriptMathWebElements.forEach(function (myscriptMathWeb) {

@@ -56,7 +56,7 @@ xScale model =
 
 scaleHeight : Model -> Float
 scaleHeight model =
-    Maybe.withDefault 20 <| List.maximum (List.map (Tuple.second >> (\( wrong, right ) -> wrong + right)) model)
+    Maybe.withDefault 20 <| Debug.log "scaleHeight listMax" (List.maximum (List.map (Tuple.second >> (\( wrong, right ) -> wrong + right)) (Debug.log "scaleHeight model" model)))
 
 
 yScale : Model -> ContinuousScale
@@ -74,8 +74,8 @@ yAxis model =
     Axis.axis { defaultOptions | orientation = Axis.Left } (yScale model)
 
 
-column : BandScale Subject -> ( Subject, ( Float, Float ) ) -> Svg msg
-column xScale ( subject, ( correct, wrong ) ) =
+column : Model -> BandScale Subject -> ( Subject, ( Float, Float ) ) -> Svg msg
+column model xScale ( subject, ( correct, wrong ) ) =
     let
         bottomRectHeight =
             Scale.convert (yScale model) fixedCorrect
@@ -131,5 +131,5 @@ viewBarChart session model =
         , Svg.g [ SvgAttr.transform ("translate(" ++ toString (padding - 1) ++ ", " ++ toString padding ++ ")") ]
             [ yAxis model ]
         , Svg.g [ SvgAttr.transform ("translate(" ++ toString padding ++ ", " ++ toString padding ++ ")"), SvgAttr.class "series" ] <|
-            List.map (column (xScale model)) model
+            List.map (column model (xScale model)) model
         ]
